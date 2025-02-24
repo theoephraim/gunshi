@@ -48,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync changelog from github releases
-        run: npx gh-changelogen --repo=kazupon/gunshi--tag=${{ steps.split.outputs._2 }}
+        run: npx gh-changelogen --repo=kazupon/gunshi --tag=${{ steps.split.outputs._2 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
