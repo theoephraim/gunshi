@@ -1,0 +1,118 @@
+{
+  "name": "gunshi",
+  "description": "Modern command-line interfaces composer",
+  "version": "0.0.0",
+  "author": {
+    "name": "kazuya kawaguchi",
+    "email": "kawakazu80@gmail.com"
+  },
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/kazupon",
+  "bugs": {
+    "url": "https://github.com/kazupon/gunshi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kazupon/gunshi.git"
+  },
+  "keywords": [
+    "command",
+    "option",
+    "cli",
+    "argument",
+    "args",
+    "argv"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.4.1",
+  "engines": {
+    "node": ">= 20"
+  },
+  "type": "module",
+  "files": [
+    "lib"
+  ],
+  "module": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json",
+    "./*": "./*"
+  },
+  "types": "lib/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/*",
+        "./*"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsc -p ./tsconfig.build.json",
+    "changelog": "gh-changelogen --repo=kazupon/gunshi",
+    "dev": "pnpx @eslint/config-inspector --config eslint.config.ts",
+    "dev:eslint": "pnpx @eslint/config-inspector --config eslint.config.ts",
+    "fix": "pnpm run --parallel --color \"/^fix:/\"",
+    "fix:eslint": "eslint . --fix",
+    "fix:knip": "knip --fix --no-exit-code",
+    "fix:prettier": "prettier . --write",
+    "lint": "pnpm run --parallel --color \"/^lint:/\"",
+    "lint:eslint": "eslint .",
+    "lint:knip": "knip",
+    "lint:prettier": "prettier . --check",
+    "prepack": "pnpm build",
+    "prepare": "git config --local core.hooksPath .githooks",
+    "release": "bumpp --commit \"release: v%s\" --all --push --tag",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/markdown": "^6.2.2",
+    "@kazupon/eslint-config": "^0.22.0",
+    "@kazupon/prettier-config": "^0.1.1",
+    "@types/node": "^22.13.5",
+    "@vitest/eslint-plugin": "^1.1.31",
+    "bumpp": "^10.0.3",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-jsonc": "^2.19.1",
+    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-regexp": "^2.7.0",
+    "eslint-plugin-unicorn": "^57.0.0",
+    "eslint-plugin-yml": "^1.17.0",
+    "gh-changelogen": "^0.2.8",
+    "knip": "^5.44.4",
+    "lint-staged": "^15.4.3",
+    "pkg-pr-new": "^0.0.39",
+    "prettier": "^3.5.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.1",
+    "vitest": "^3.0.6"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "prettier": "@kazupon/prettier-config",
+  "lint-staged": {
+    "*.ts?(x)": [
+      "prettier --parser=typescript --write",
+      "eslint --fix"
+    ],
+    "*.{js,mjs,cjs}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,jsonc,json5,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}
