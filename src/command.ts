@@ -32,8 +32,8 @@ export async function gunshi<Options extends ArgOptions>(
 ): Promise<void> {
   const tokens = parseArgs(args)
 
-  const raw = getCommandRaw(tokens)
-  const [name, command, env] = await resolveCommand(raw, envOrEntry)
+  const subCommand = getSubCommand(tokens)
+  const [name, command, env] = await resolveCommand(subCommand, envOrEntry)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
@@ -57,7 +57,7 @@ export async function gunshi<Options extends ArgOptions>(
   await showHeader(ctx)
 
   if (values.help) {
-    if (raw) {
+    if (subCommand) {
       await showUsage(ctx)
       return
     } else {
@@ -79,7 +79,7 @@ function resolveOptions<Options extends ArgOptions>(options?: Options): Options 
   return Object.assign(Object.create(null) as Options, options, COMMON_OPTIONS)
 }
 
-function getCommandRaw(tokens: ArgToken[]): string {
+function getSubCommand(tokens: ArgToken[]): string {
   const firstToken = tokens[0]
   return firstToken &&
     firstToken.kind === 'positional' &&
@@ -134,10 +134,10 @@ async function showValidationErrors<Options extends ArgOptions>(
 }
 
 async function resolveCommand<Options extends ArgOptions>(
-  raw: string,
+  sub: string,
   envOrEntry: CommandEnvironment<Options> | CommandRunner<Options>
 ): Promise<[string | undefined, Command<Options> | undefined, CommandEnvironment<Options>]> {
-  const omitted = !raw
+  const omitted = !sub
   if (typeof envOrEntry === 'function') {
     const cmd = { run: envOrEntry } satisfies Command<Options>
     return [undefined, cmd, { entry: cmd }]
@@ -159,7 +159,7 @@ async function resolveCommand<Options extends ArgOptions>(
 
       if (name) {
         // find sub command with entry command name
-        return [raw, await loadCommand(raw, envOrEntry), envOrEntry]
+        return [sub, await loadCommand(sub, envOrEntry), envOrEntry]
       } else {
         // find command from such commands that has default flag
         const loaded = await Promise.all(
@@ -173,9 +173,9 @@ async function resolveCommand<Options extends ArgOptions>(
     } else {
       // eslint-disable-next-line unicorn/no-null
       if (envOrEntry.subCommands == null) {
-        return [raw, undefined, envOrEntry]
+        return [sub, undefined, envOrEntry]
       }
-      return [raw, await loadCommand(raw, envOrEntry), envOrEntry]
+      return [sub, await loadCommand(sub, envOrEntry), envOrEntry]
     }
   }
 }
