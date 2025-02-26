@@ -79,10 +79,10 @@ export async function renderUsageDefault<Options extends ArgOptions>(
       '',
       'COMMANDS:'
     )
-    const commandMaxLength = Math.max(...loadedCommands.map(cmd => cmd.name.length))
+    const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
     const commandsStr = await Promise.all(
       loadedCommands.map(async cmd => {
-        const key = cmd.name
+        const key = cmd.name || ''
         const desc = await resolveCommandUsageRender(
           ctx as CommandContext<Options>,
           cmd.description || ''

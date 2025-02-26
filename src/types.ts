@@ -11,18 +11,23 @@ type Awaitable<T> = T | Promise<T>
 export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
   /**
    * The current working directory
+   * @description This is the current working directory path passed in the context of the run command. This is useful if you need your command about the current execution directory.
    */
-  cwd: string
+  cwd?: string
   /**
    * The command name
+   * @description Please specify the name of the command that was executed. If you would specify it, gunshi will be displayed in the usage.
    */
   name?: string
   /**
    * The command description
+   * @description Please specify the description (summary) of the command that was executed. If you would specify it, gunshi will be displayed in the usage.
+   *
    */
   description?: string
   /**
    * The command version
+   * @description Please specify the version of the command that was executed. If you would specify it, gunshi will be displayed in the usage.
    */
   version?: string
   /**
@@ -88,7 +93,7 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
    * The command name, that is the command that is executed
    * @description The command name is same {@link CommandEnvironment.name}
    */
-  name: string
+  name?: string
   /**
    * The command description, that is the description of the command that is executed
    * @description The command description is same {@link CommandEnvironment.description}
@@ -161,7 +166,7 @@ export interface Command<Options extends ArgOptions> {
   /**
    * The command name
    */
-  name: string
+  name?: string
   /**
    * The command description
    */
@@ -180,11 +185,18 @@ export interface Command<Options extends ArgOptions> {
    */
   usage?: CommandUsage<Options>
   /**
-   * The command implementation, that is the command to be executed
-   * @param ctx - The command context
+   * The command runner, that is the command to be executed
    */
-  run(ctx: CommandContext<Options>): Awaitable<void>
+  run: CommandRunner<Options>
 }
+
+/**
+ * The command runner interface
+ * @param ctx - The {@link CommandContext | command context}
+ */
+export type CommandRunner<Options extends ArgOptions> = (
+  ctx: CommandContext<Options>
+) => Awaitable<void>
 
 /**
  * The lazy command interface

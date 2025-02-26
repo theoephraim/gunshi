@@ -15,6 +15,7 @@ import type {
   CommandContext,
   CommandEnvironment,
   CommandOptions,
+  CommandRunner,
   LazyCommand
 } from './types'
 
@@ -26,13 +27,13 @@ import type {
  */
 export async function gunshi<Options extends ArgOptions>(
   args: string[],
-  env: CommandEnvironment<Options>,
+  envOrEntry: CommandEnvironment<Options> | CommandRunner<Options>,
   opts: CommandOptions<Options> = COMMAND_OPTIONS_DEFAULT
 ): Promise<void> {
   const tokens = parseArgs(args)
 
   const raw = getCommandRaw(tokens)
-  const [name, command] = await resolveCommand(raw, env)
+  const [name, command, env] = await resolveCommand(raw, envOrEntry)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
@@ -134,43 +135,48 @@ async function showValidationErrors<Options extends ArgOptions>(
 
 async function resolveCommand<Options extends ArgOptions>(
   raw: string,
-  env: CommandEnvironment<Options>
-): Promise<[string | undefined, Command<Options> | undefined]> {
+  envOrEntry: CommandEnvironment<Options> | CommandRunner<Options>
+): Promise<[string | undefined, Command<Options> | undefined, CommandEnvironment<Options>]> {
   const omitted = !raw
-  if (omitted) {
-    let name: string | undefined
-    if (env.entry) {
-      if (typeof env.entry === 'string') {
-        name = env.entry
-      } else if (typeof env.entry === 'object') {
-        return [env.entry.name, env.entry]
-      }
-    }
-
-    // eslint-disable-next-line unicorn/no-null
-    if (env.subCommands == null) {
-      return [undefined, undefined]
-    }
-
-    if (name) {
-      // find sub command with entry command name
-      return [raw, await loadCommand(raw, env)]
-    } else {
-      // find command from such commands that has default flag
-      const loaded = await Promise.all(
-        Object.entries(env.subCommands || nullObject()).map(
-          async ([_, cmd]) => await resolveLazyCommand(cmd)
-        )
-      )
-      const found = loaded.find(cmd => cmd.default)
-      return found ? [found.name, found] : [undefined, undefined]
-    }
+  if (typeof envOrEntry === 'function') {
+    const cmd = { run: envOrEntry } satisfies Command<Options>
+    return [undefined, cmd, { entry: cmd }]
   } else {
-    // eslint-disable-next-line unicorn/no-null
-    if (env.subCommands == null) {
-      return [raw, undefined]
+    if (omitted) {
+      let name: string | undefined
+      if (envOrEntry.entry) {
+        if (typeof envOrEntry.entry === 'string') {
+          name = envOrEntry.entry
+        } else if (typeof envOrEntry.entry === 'object') {
+          return [envOrEntry.entry.name, envOrEntry.entry, envOrEntry]
+        }
+      }
+
+      // eslint-disable-next-line unicorn/no-null
+      if (envOrEntry.subCommands == null) {
+        return [undefined, undefined, envOrEntry]
+      }
+
+      if (name) {
+        // find sub command with entry command name
+        return [raw, await loadCommand(raw, envOrEntry), envOrEntry]
+      } else {
+        // find command from such commands that has default flag
+        const loaded = await Promise.all(
+          Object.entries(envOrEntry.subCommands || nullObject()).map(
+            async ([_, cmd]) => await resolveLazyCommand(cmd)
+          )
+        )
+        const found = loaded.find(cmd => cmd.default)
+        return found ? [found.name, found, envOrEntry] : [undefined, undefined, envOrEntry]
+      }
+    } else {
+      // eslint-disable-next-line unicorn/no-null
+      if (envOrEntry.subCommands == null) {
+        return [raw, undefined, envOrEntry]
+      }
+      return [raw, await loadCommand(raw, envOrEntry), envOrEntry]
     }
-    return [raw, await loadCommand(raw, env)]
   }
 }
 
