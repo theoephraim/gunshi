@@ -73,9 +73,7 @@ function resolveArgOptions<Options extends ArgOptions>(options?: Options): Optio
 function resolveCommandOptions<Options extends ArgOptions>(
   options: CommandOptions<Options>
 ): CommandOptions<Options> {
-  const subCommands = options.subCommands
-    ? new Map<string, Command<Options> | LazyCommand<Options>>(options.subCommands) // shallow copy
-    : new Map<string, Command<Options> | LazyCommand<Options>>()
+  const subCommands = new Map<string, Command<Options> | LazyCommand<Options>>(options.subCommands) // shallow copy
   return Object.assign(
     create<CommandOptions<Options>>(),
     COMMAND_OPTIONS_DEFAULT,
