@@ -118,20 +118,20 @@ export interface CommandOptions<Options extends ArgOptions> {
   /**
    * Render function the command usage
    */
-  renderUsage?: ((ctx: CommandContext<Options>) => Promise<string>) | null
+  renderUsage?: ((ctx: Readonly<CommandContext<Options>>) => Promise<string>) | null
   /**
    * Render function the default command usage
    */
-  renderUsageDefault?: ((ctx: CommandContext<Options>) => Promise<string>) | null
+  renderUsageDefault?: ((ctx: Readonly<CommandContext<Options>>) => Promise<string>) | null
   /**
    * Render function the header section in the command usage
    */
-  renderHeader?: ((ctx: CommandContext<Options>) => Promise<string>) | null
+  renderHeader?: ((ctx: Readonly<CommandContext<Options>>) => Promise<string>) | null
   /**
    * Render function the validation errors
    */
   renderValidationErrors?:
-    | ((ctx: CommandContext<Options>, error: AggregateError) => Promise<string>)
+    | ((ctx: Readonly<CommandContext<Options>>, error: AggregateError) => Promise<string>)
     | null
 }
 
@@ -186,7 +186,7 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
  * @description if the render function is async, it should return a promise
  */
 export type CommandUsageRender<Options extends ArgOptions> =
-  | ((ctx: CommandContext<Options>) => Promise<string>)
+  | ((ctx: Readonly<CommandContext<Options>>) => Promise<string>)
   | string
 
 /**
@@ -247,7 +247,7 @@ export interface Command<Options extends ArgOptions> {
  * @param ctx - The {@link CommandContext | command context}
  */
 export type CommandRunner<Options extends ArgOptions> = (
-  ctx: CommandContext<Options>
+  ctx: Readonly<CommandContext<Options>>
 ) => Awaitable<void>
 
 /**
