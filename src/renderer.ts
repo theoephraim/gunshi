@@ -125,7 +125,7 @@ export function renderValidationErrors<Options extends ArgOptions>(
   for (const err of error.errors as Error[]) {
     messages.push(err.message)
   }
-  messages.push('', `For more info, run \`${resolveEntry(ctx)} ${ctx.name} --help\``)
+  messages.push('', `For more info, run \`${resolveEntry(ctx)} ${resolveSubCommand(ctx)} --help\``)
   return Promise.resolve(messages.join('\n'))
 }
 
