@@ -61,14 +61,13 @@ export async function resolveLazyCommand<Options extends ArgOptions>(
     typeof cmd == 'function' ? await cmd() : cmd,
     { default: entry }
   )
-  // eslint-disable-next-line unicorn/no-null
+
   if (resolved.name == null && name) {
     resolved.name = name
   }
   return deepFreeze(resolved)
 }
 
-// eslint-disable-next-line unicorn/no-null
 export function create<T>(obj: object | null = null): T {
   return Object.create(obj) as T
 }

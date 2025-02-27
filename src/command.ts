@@ -150,14 +150,12 @@ async function resolveCommand<Options extends ArgOptions>(
         ? [entry.name, await resolveLazyCommand(entry, undefined, true)]
         : [undefined, undefined]
     } else {
-      // eslint-disable-next-line unicorn/no-null
       if (options.subCommands == null) {
         return [sub, undefined]
       }
 
       const cmd = options.subCommands?.get(sub)
 
-      // eslint-disable-next-line unicorn/no-null
       if (cmd == null) {
         return [sub, undefined]
       }

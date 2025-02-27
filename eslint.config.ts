@@ -33,7 +33,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     rules: {
       '@typescript-eslint/ban-ts-comment': 'off',
       'unicorn/prevent-abbreviations': 'off',
-      'unicorn/filename-case': 'off'
+      'unicorn/filename-case': 'off',
+      'unicorn/no-null': 'off'
     }
   },
   {

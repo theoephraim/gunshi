@@ -53,7 +53,7 @@ test('basic', () => {
       leftMargin: 4,
       middleMargin: 2,
       usageOptionType: true,
-      // eslint-disable-next-line unicorn/no-null
+
       renderHeader: null,
       renderUsage: mockRenderUsage,
       renderUsageDefault: mockRenderUsageDefault,
@@ -81,7 +81,7 @@ test('basic', () => {
     leftMargin: 4,
     middleMargin: 2,
     usageOptionType: true,
-    // eslint-disable-next-line unicorn/no-null
+
     renderHeader: null,
     renderUsage: mockRenderUsage,
     renderUsageDefault: mockRenderUsageDefault,
