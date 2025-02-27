@@ -77,7 +77,7 @@ function resolveCommandOptions<Options extends ArgOptions>(
   return Object.assign(
     create<CommandOptions<Options>>(),
     COMMAND_OPTIONS_DEFAULT,
-    { renderHeader, renderUsage, renderUsageDefault, renderValidationErrors, subCommands },
+    { subCommands },
     options
   ) as CommandOptions<Options>
 }
