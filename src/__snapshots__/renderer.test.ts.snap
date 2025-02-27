@@ -127,3 +127,8 @@ EXAMPLES:
   $ test -f bar -b 42 -q quux
 "
 `;
+
+exports[`renderValidationErrors 1`] = `
+"Option '--dependency' or '-d' is required
+Option '--alias' or '-a' is required"
+`;

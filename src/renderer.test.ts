@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from './context'
-import { renderHeader, renderUsage, renderUsageDefault } from './renderer'
+import { renderHeader, renderUsage, renderUsageDefault, renderValidationErrors } from './renderer'
 
 import type { ArgOptions } from 'args-tokens'
 import type { Command, CommandOptions, LazyCommand } from './types'
@@ -338,4 +338,19 @@ describe('renderUsageDefault', () => {
 
     expect(await renderUsageDefault(ctx)).toMatchSnapshot()
   })
+})
+
+test('renderValidationErrors', async () => {
+  const ctx = createCommandContext(SHOW.options, {}, [], SHOW, {
+    cwd: '/path/to/cmd1',
+    version: '0.0.0',
+    name: 'cmd1'
+  })
+
+  // eslint-disable-next-line unicorn/error-message
+  const error = new AggregateError([
+    new Error(`Option '--dependency' or '-d' is required`),
+    new Error(`Option '--alias' or '-a' is required`)
+  ])
+  await expect(renderValidationErrors(ctx, error)).resolves.toMatchSnapshot()
 })

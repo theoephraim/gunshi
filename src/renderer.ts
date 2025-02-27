@@ -118,14 +118,14 @@ export async function renderUsageDefault<Options extends ArgOptions>(
 }
 
 export function renderValidationErrors<Options extends ArgOptions>(
-  ctx: CommandContext<Options>,
+  _ctx: CommandContext<Options>,
   error: AggregateError
 ): Promise<string> {
   const messages = [] as string[]
   for (const err of error.errors as Error[]) {
     messages.push(err.message)
   }
-  messages.push('', `For more info, run \`${resolveEntry(ctx)} ${resolveSubCommand(ctx)} --help\``)
+  // messages.push('', `For more info, run \`${resolveEntry(ctx)} ${resolveSubCommand(ctx)} --help\``)
   return Promise.resolve(messages.join('\n'))
 }
 
