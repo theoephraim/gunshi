@@ -7,48 +7,39 @@ import {
   renderUsageDefault,
   renderValidationErrors
 } from './renderer.js'
-import { log, nullObject } from './utils.js'
+import { create, log, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgToken } from 'args-tokens'
-import type {
-  Command,
-  CommandContext,
-  CommandEnvironment,
-  CommandOptions,
-  CommandRunner,
-  LazyCommand
-} from './types'
+import type { Command, CommandContext, CommandOptions, CommandRunner, LazyCommand } from './types'
 
 /**
- * Run a command with given arguments and environment
+ * Run the command
  * @param args - command line arguments
- * @param env - a {@link CommandEnvironment | command environment}
+ * @param entry - a {@link Command | entry command} or an {@linke CommandRunner | inline command runner}
  * @param opts - a {@link CommandOptions | command options}
  */
 export async function gunshi<Options extends ArgOptions>(
   args: string[],
-  envOrEntry: CommandEnvironment<Options> | CommandRunner<Options>,
-  opts: CommandOptions<Options> = COMMAND_OPTIONS_DEFAULT
+  entry: Command<Options> | CommandRunner<Options>,
+  opts: CommandOptions<Options> = {}
 ): Promise<void> {
   const tokens = parseArgs(args)
 
   const subCommand = getSubCommand(tokens)
-  const [name, command, env] = await resolveCommand(subCommand, envOrEntry)
+  const resolvedCommandOptions = resolveCommandOptions(opts)
+  const [name, command] = await resolveCommand(subCommand, entry, resolvedCommandOptions)
   if (!command) {
     throw new Error(`Command not found: ${name || ''}`)
   }
 
-  const options = resolveOptions(command.options)
+  if (command.name && !resolvedCommandOptions.subCommands!.has(command.name)) {
+    resolvedCommandOptions.subCommands!.set(command.name, command)
+  }
+
+  const options = resolveArgOptions(command.options)
 
   const { values, positionals, error } = resolveArgs(options, tokens)
-  const ctx = createCommandContext(
-    options,
-    values,
-    positionals,
-    env,
-    command,
-    opts as Required<CommandOptions<Options>>
-  )
+  const ctx = createCommandContext(options, values, positionals, command, opts)
   if (values.version) {
     showVersion(ctx)
     return
@@ -75,8 +66,22 @@ export async function gunshi<Options extends ArgOptions>(
   await command.run(ctx)
 }
 
-function resolveOptions<Options extends ArgOptions>(options?: Options): Options {
-  return Object.assign(Object.create(null) as Options, options, COMMON_OPTIONS)
+function resolveArgOptions<Options extends ArgOptions>(options?: Options): Options {
+  return Object.assign(create<Options>(), options, COMMON_OPTIONS)
+}
+
+function resolveCommandOptions<Options extends ArgOptions>(
+  options: CommandOptions<Options>
+): CommandOptions<Options> {
+  const subCommands = options.subCommands
+    ? new Map<string, Command<Options> | LazyCommand<Options>>(options.subCommands) // shallow copy
+    : new Map<string, Command<Options> | LazyCommand<Options>>()
+  return Object.assign(
+    create<CommandOptions<Options>>(),
+    COMMAND_OPTIONS_DEFAULT,
+    { renderHeader, renderUsage, renderUsageDefault, renderValidationErrors, subCommands },
+    options
+  ) as CommandOptions<Options>
 }
 
 function getSubCommand(tokens: ArgToken[]): string {
@@ -90,20 +95,20 @@ function getSubCommand(tokens: ArgToken[]): string {
 }
 
 async function showUsage<Options extends ArgOptions>(ctx: CommandContext<Options>): Promise<void> {
-  if (ctx.commandOptions.renderUsage === null) {
+  if (ctx.env.renderUsage === null) {
     return
   }
-  const render = ctx.commandOptions.renderUsage || renderUsage
+  const render = ctx.env.renderUsage || renderUsage
   log(await render(ctx))
 }
 
 async function showUsageDefault<Options extends ArgOptions>(
   ctx: CommandContext<Options>
 ): Promise<void> {
-  if (ctx.commandOptions.renderUsageDefault === null) {
+  if (ctx.env.renderUsageDefault === null) {
     return
   }
-  const render = ctx.commandOptions.renderUsageDefault || renderUsageDefault
+  const render = ctx.env.renderUsageDefault || renderUsageDefault
   log(await render(ctx))
 }
 
@@ -112,10 +117,10 @@ function showVersion<Options extends ArgOptions>(ctx: CommandContext<Options>): 
 }
 
 async function showHeader<Options extends ArgOptions>(ctx: CommandContext<Options>): Promise<void> {
-  if (ctx.commandOptions.renderHeader === null) {
+  if (ctx.env.renderHeader === null) {
     return
   }
-  const header = await (ctx.commandOptions.renderHeader || renderHeader)(ctx)
+  const header = await (ctx.env.renderHeader || renderHeader)(ctx)
   if (header) {
     log(header)
     log()
@@ -126,70 +131,40 @@ async function showValidationErrors<Options extends ArgOptions>(
   ctx: CommandContext<Options>,
   error: AggregateError
 ): Promise<void> {
-  if (ctx.commandOptions.renderValidationErrors === null) {
+  if (ctx.env.renderValidationErrors === null) {
     return
   }
-  const render = ctx.commandOptions.renderValidationErrors || renderValidationErrors
+  const render = ctx.env.renderValidationErrors || renderValidationErrors
   log(await render(ctx, error))
 }
 
 async function resolveCommand<Options extends ArgOptions>(
   sub: string,
-  envOrEntry: CommandEnvironment<Options> | CommandRunner<Options>
-): Promise<[string | undefined, Command<Options> | undefined, CommandEnvironment<Options>]> {
+  entry: Command<Options> | CommandRunner<Options>,
+  options: CommandOptions<Options>
+): Promise<[string | undefined, Command<Options> | undefined]> {
   const omitted = !sub
-  if (typeof envOrEntry === 'function') {
-    const cmd = { run: envOrEntry } satisfies Command<Options>
-    return [undefined, cmd, { entry: cmd }]
+  if (typeof entry === 'function') {
+    return [undefined, { run: entry, default: true }]
   } else {
     if (omitted) {
-      let name: string | undefined
-      if (envOrEntry.entry) {
-        if (typeof envOrEntry.entry === 'string') {
-          name = envOrEntry.entry
-        } else if (typeof envOrEntry.entry === 'object') {
-          return [envOrEntry.entry.name, envOrEntry.entry, envOrEntry]
-        }
-      }
-
-      // eslint-disable-next-line unicorn/no-null
-      if (envOrEntry.subCommands == null) {
-        return [undefined, undefined, envOrEntry]
-      }
-
-      if (name) {
-        // find sub command with entry command name
-        return [sub, await loadCommand(sub, envOrEntry), envOrEntry]
-      } else {
-        // find command from such commands that has default flag
-        const loaded = await Promise.all(
-          Object.entries(envOrEntry.subCommands || nullObject()).map(
-            async ([_, cmd]) => await resolveLazyCommand(cmd)
-          )
-        )
-        const found = loaded.find(cmd => cmd.default)
-        return found ? [found.name, found, envOrEntry] : [undefined, undefined, envOrEntry]
-      }
+      return typeof entry === 'object'
+        ? [entry.name, await resolveLazyCommand(entry, undefined, true)]
+        : [undefined, undefined]
     } else {
       // eslint-disable-next-line unicorn/no-null
-      if (envOrEntry.subCommands == null) {
-        return [sub, undefined, envOrEntry]
+      if (options.subCommands == null) {
+        return [sub, undefined]
       }
-      return [sub, await loadCommand(sub, envOrEntry), envOrEntry]
+
+      const cmd = options.subCommands?.get(sub)
+
+      // eslint-disable-next-line unicorn/no-null
+      if (cmd == null) {
+        return [sub, undefined]
+      }
+
+      return [sub, await resolveLazyCommand(cmd, sub)]
     }
   }
-}
-
-async function resolveLazyCommand<Options extends ArgOptions>(
-  cmd: Command<Options> | LazyCommand<Options>
-): Promise<Command<Options>> {
-  return typeof cmd == 'function' ? await cmd() : cmd
-}
-
-async function loadCommand<Options extends ArgOptions>(
-  name: string,
-  env: CommandEnvironment<Options>
-): Promise<Command<Options>> {
-  const cmd = env.subCommands![name]
-  return await resolveLazyCommand(cmd)
 }

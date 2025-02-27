@@ -1,5 +1,5 @@
 <p align="center">
-	<img width="110" src="./assets/logo.webp">
+	<img width="196" src="./assets/logo.webp">
 </p>
 <h1 align="center">🏯 gunshi</h1>
 

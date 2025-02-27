@@ -21,7 +21,16 @@ export const COMMON_OPTIONS_USAGE: Record<
 }
 
 export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
+  name: undefined,
+  description: undefined,
+  version: undefined,
+  cwd: undefined,
+  subCommands: undefined,
   leftMargin: 2,
   middleMargin: 10,
-  usageOptionType: false
+  usageOptionType: false,
+  renderHeader: undefined,
+  renderUsage: undefined,
+  renderUsageDefault: undefined,
+  renderValidationErrors: undefined
 }

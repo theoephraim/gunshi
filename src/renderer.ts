@@ -1,13 +1,12 @@
 import {
   generateOptionsUsage,
   getOptionsPairs,
-  nullObject,
   resolveCommandUsageRender,
   resolveLazyCommand
 } from './utils.js'
 
 import type { ArgOptions } from 'args-tokens'
-import type { Command, CommandContext, LazyCommand } from './types'
+import type { CommandContext } from './types'
 
 export function renderHeader<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
@@ -31,8 +30,8 @@ export async function renderUsage<Options extends ArgOptions>(
   }
 
   // render usage
-  const usageStr = `${resolveEntry(ctx)} ${ctx.name} ${generateOptionsSymbols(ctx)}`
-  messages.push(`USAGE:`, usageStr.padStart(ctx.commandOptions.leftMargin + usageStr.length), '')
+  const usageStr = `${resolveEntry(ctx)} ${resolveSubCommand(ctx)} ${generateOptionsSymbols(ctx)}`
+  messages.push(`USAGE:`, usageStr.padStart(ctx.env.leftMargin + usageStr.length), '')
 
   // render options
   if (hasOptions(ctx)) {
@@ -46,7 +45,7 @@ export async function renderUsage<Options extends ArgOptions>(
     const resolved = await resolveCommandUsageRender(ctx, ctx.usage.examples)
     const examples = resolved
       .split('\n')
-      .map(example => example.padStart(ctx.commandOptions.leftMargin + example.length))
+      .map(example => example.padStart(ctx.env.leftMargin + example.length))
     messages.push(`EXAMPLES: `, ...examples, '')
   }
 
@@ -56,26 +55,22 @@ export async function renderUsage<Options extends ArgOptions>(
 export async function renderUsageDefault<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string> {
-  const subCommands =
-    ctx.env.subCommands || nullObject<Record<string, Command<Options> | LazyCommand<Options>>>()
+  const subCommands = [...(ctx.env.subCommands || [])]
   const loadedCommands = await Promise.all(
-    Object.entries(subCommands).map(async ([_, cmd]) => await resolveLazyCommand(cmd))
+    subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
   )
 
   const hasManyCommands = loadedCommands.length > 1
-  const defaultCommand = `${resolveEntry(ctx)}${hasManyCommands ? ` [${ctx.name}]` : ''} ${hasOptions(ctx) ? '<OPTIONS>' : ''} `
+  const defaultCommand = `${resolveEntry(ctx)}${hasManyCommands ? ` [${resolveSubCommand(ctx)}]` : ''} ${hasOptions(ctx) ? '<OPTIONS>' : ''} `
 
   // render usage
-  const messages = [
-    'USAGE:',
-    defaultCommand.padStart(ctx.commandOptions.leftMargin + defaultCommand.length)
-  ]
+  const messages = ['USAGE:', defaultCommand.padStart(ctx.env.leftMargin + defaultCommand.length)]
 
   // render commands
   if (hasManyCommands) {
     const commandsUsage = `${resolveEntry(ctx)} <COMMANDS>`
     messages.push(
-      commandsUsage.padStart(ctx.commandOptions.leftMargin + commandsUsage.length),
+      commandsUsage.padStart(ctx.env.leftMargin + commandsUsage.length),
       '',
       'COMMANDS:'
     )
@@ -87,8 +82,8 @@ export async function renderUsageDefault<Options extends ArgOptions>(
           ctx as CommandContext<Options>,
           cmd.description || ''
         )
-        const command = `${key.padEnd(commandMaxLength + ctx.commandOptions.middleMargin)}${desc} `
-        return `${command.padStart(ctx.commandOptions.leftMargin + command.length)} `
+        const command = `${key.padEnd(commandMaxLength + ctx.env.middleMargin)}${desc} `
+        return `${command.padStart(ctx.env.leftMargin + command.length)} `
       })
     )
     messages.push(...commandsStr, '', `For more info, run any command with the \`--help\` flag:`)
@@ -96,7 +91,7 @@ export async function renderUsageDefault<Options extends ArgOptions>(
     messages.push(
       ...loadedCommands.map(cmd => {
         const commandHelp = `${ctx.env.name} ${cmd.name} --help`
-        return `${commandHelp.padStart(ctx.commandOptions.leftMargin + commandHelp.length)}`
+        return `${commandHelp.padStart(ctx.env.leftMargin + commandHelp.length)}`
       })
     )
   }
@@ -114,7 +109,7 @@ export async function renderUsageDefault<Options extends ArgOptions>(
     const resolved = await resolveCommandUsageRender(ctx, ctx.usage.examples)
     const examples = resolved
       .split('\n')
-      .map(example => example.padStart(ctx.commandOptions.leftMargin + example.length))
+      .map(example => example.padStart(ctx.env.leftMargin + example.length))
     messages.push(`EXAMPLES:`, ...examples)
   }
   messages.push('')
@@ -136,6 +131,12 @@ export function renderValidationErrors<Options extends ArgOptions>(
 
 function resolveEntry<Options extends ArgOptions>(ctx: Readonly<CommandContext<Options>>): string {
   return ctx.env.name || 'COMMAND'
+}
+
+function resolveSubCommand<Options extends ArgOptions>(
+  ctx: Readonly<CommandContext<Options>>
+): string {
+  return ctx.name || 'SUBCOMMAND'
 }
 
 function hasOptions<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {

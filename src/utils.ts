@@ -22,7 +22,7 @@ export function getOptionsPairs<Options extends ArgOptions>(
     }
     acc[name] = key
     return acc
-  }, nullObject<Record<string, string>>())
+  }, create<Record<string, string>>())
 }
 
 export async function generateOptionsUsage<Options extends ArgOptions>(
@@ -33,18 +33,18 @@ export async function generateOptionsUsage<Options extends ArgOptions>(
     ...Object.entries(optionsPairs).map(([_, value]) => value.length)
   )
 
-  const optionSchemaMaxLength = ctx.commandOptions.usageOptionType
+  const optionSchemaMaxLength = ctx.env.usageOptionType
     ? Math.max(...Object.entries(optionsPairs).map(([key, _]) => ctx.options![key].type.length))
     : 0
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(async ([key, value]) => {
       const rawDesc = (await resolveCommandUsageRender(ctx, ctx.usage.options![key])) || ''
-      const optionsSchema = ctx.commandOptions.usageOptionType ? `[${ctx.options![key].type}] ` : ''
+      const optionsSchema = ctx.env.usageOptionType ? `[${ctx.options![key].type}] ` : ''
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
-      const option = `${value.padEnd(optionsMaxLength + ctx.commandOptions.middleMargin)}${desc}`
-      return `${option.padStart(ctx.commandOptions.leftMargin + option.length)}`
+      const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}`
+      return `${option.padStart(ctx.env.leftMargin + option.length)}`
     })
   )
 
@@ -52,15 +52,44 @@ export async function generateOptionsUsage<Options extends ArgOptions>(
 }
 
 export async function resolveLazyCommand<Options extends ArgOptions>(
-  cmd: Command<Options> | LazyCommand<Options>
+  cmd: Command<Options> | LazyCommand<Options>,
+  name: string | undefined,
+  entry: boolean = false
 ): Promise<Command<Options>> {
-  return typeof cmd == 'function' ? await cmd() : cmd
+  const resolved = Object.assign(
+    create<Command<Options>>(),
+    typeof cmd == 'function' ? await cmd() : cmd,
+    { default: entry }
+  )
+  // eslint-disable-next-line unicorn/no-null
+  if (resolved.name == null && name) {
+    resolved.name = name
+  }
+  return deepFreeze(resolved)
 }
 
-export function nullObject<T>(): T {
-  return Object.create(null) as T
+// eslint-disable-next-line unicorn/no-null
+export function create<T>(obj: object | null = null): T {
+  return Object.create(obj) as T
 }
 
 export function log(...args: unknown[]): void {
   console.log(...args)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function deepFreeze<T extends Record<string, any>>(obj: T): Readonly<T> {
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+
+  for (const key of Object.keys(obj)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const value = obj[key]
+    if (typeof value === 'object' && value !== null) {
+      deepFreeze(value)
+    }
+  }
+
+  return Object.freeze(obj)
 }

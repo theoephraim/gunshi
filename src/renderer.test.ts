@@ -19,43 +19,38 @@ describe('renderHeader', () => {
   } as Command<ArgOptions>
 
   test('basic', async () => {
-    const ctx = createCommandContext(
-      command.options,
-      {},
-      [],
-      { cwd: '/path/to/cmd1', description: 'this is command line', version: '0.0.0', name: 'cmd1' },
-      command
-    )
+    const ctx = createCommandContext(command.options, {}, [], command, {
+      cwd: '/path/to/cmd1',
+      description: 'this is command line',
+      version: '0.0.0',
+      name: 'cmd1'
+    })
 
     expect(await renderHeader(ctx)).toEqual('this is command line (cmd1 v0.0.0)')
   })
 
   test('no description', async () => {
-    const ctx = createCommandContext(
-      command.options,
-      {},
-      [],
-      { cwd: '/path/to/cmd1', version: '0.0.0', name: 'cmd1' },
-      command
-    )
+    const ctx = createCommandContext(command.options, {}, [], command, {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    })
 
     expect(await renderHeader(ctx)).toEqual('cmd1 (cmd1 v0.0.0)')
   })
 
   test('no name & no description', async () => {
-    const ctx = createCommandContext(command.options, {}, [], { cwd: '/path/to/cmd1' }, command)
+    const ctx = createCommandContext(command.options, {}, [], command, { cwd: '/path/to/cmd1' })
 
     expect(await renderHeader(ctx)).toEqual('')
   })
 
   test('no version', async () => {
-    const ctx = createCommandContext(
-      command.options,
-      {},
-      [],
-      { cwd: '/path/to/cmd1', name: 'cmd1', description: 'this is command line' },
-      command
-    )
+    const ctx = createCommandContext(command.options, {}, [], command, {
+      cwd: '/path/to/cmd1',
+      name: 'cmd1',
+      description: 'this is command line'
+    })
 
     expect(await renderHeader(ctx)).toEqual('this is command line (cmd1)')
   })
@@ -96,13 +91,11 @@ describe('renderUsage', () => {
       },
       run: NOOP
     } as Command<ArgOptions>
-    const ctx = createCommandContext(
-      command.options,
-      {}, // argument values
-      [],
-      { cwd: '/path/to/cmd1', version: '0.0.0', name: 'cmd1' },
-      command
-    )
+    const ctx = createCommandContext(command.options, {}, [], command, {
+      cwd: '/path/to/cmd1',
+      name: 'cmd1',
+      description: 'this is command line'
+    })
 
     expect(await renderUsage(ctx)).toMatchSnapshot()
   })
@@ -118,13 +111,11 @@ describe('renderUsage', () => {
         // something here
       }
     } as Command<ArgOptions>
-    const ctx = createCommandContext(
-      command.options,
-      {}, // argument values
-      [],
-      { cwd: '/path/to/cmd1', version: '0.0.0', name: 'cmd1' },
-      command
-    )
+    const ctx = createCommandContext(command.options, {}, [], command, {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    })
 
     expect(await renderUsage(ctx)).toMatchSnapshot()
   })
@@ -156,13 +147,11 @@ describe('renderUsage', () => {
       },
       run: NOOP
     } as Command<ArgOptions>
-    const ctx = createCommandContext(
-      command.options,
-      {}, // argument values
-      [],
-      { cwd: '/path/to/cmd1', version: '0.0.0', name: 'cmd1' },
-      command
-    )
+    const ctx = createCommandContext(command.options, {}, [], command, {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    })
 
     expect(await renderUsage(ctx)).toMatchSnapshot()
   })
@@ -200,13 +189,11 @@ describe('renderUsage', () => {
       },
       run: NOOP
     } as Command<ArgOptions>
-    const ctx = createCommandContext(
-      command.options,
-      {}, // argument values
-      [],
-      { cwd: '/path/to/cmd1', version: '0.0.0', name: 'cmd1' },
-      command
-    )
+    const ctx = createCommandContext(command.options, {}, [], command, {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    })
 
     expect(await renderUsage(ctx)).toMatchSnapshot()
   })
@@ -245,16 +232,14 @@ describe('renderUsage', () => {
       },
       run: NOOP
     } as Command<ArgOptions>
-    const ctx = createCommandContext(
-      command.options,
-      {}, // argument values
-      [],
-      { cwd: '/path/to/cmd1', version: '0.0.0', name: 'cmd1' },
-      command,
-      { usageOptionType: true, leftMargin: 4, middleMargin: 12 } as Required<
-        CommandOptions<ArgOptions>
-      >
-    )
+    const ctx = createCommandContext(command.options, {}, [], command, {
+      usageOptionType: true,
+      leftMargin: 4,
+      middleMargin: 12,
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    } as Required<CommandOptions<ArgOptions>>)
 
     expect(await renderUsage(ctx)).toMatchSnapshot()
   })
@@ -294,65 +279,62 @@ const SHOW = {
   run: NOOP
 } as Command<ArgOptions>
 
-const COMMANDS = {
-  show: SHOW,
-  command1: {
+const COMMANDS = new Map<string, Command<ArgOptions> | LazyCommand<ArgOptions>>()
+COMMANDS.set('show', SHOW)
+COMMANDS.set('command1', {
+  name: 'command1',
+  options: {
+    foo: {
+      type: 'string',
+      short: 'f'
+    }
+  },
+  default: true,
+  description: 'this is command1',
+  usage: {
+    options: {
+      foo: 'The foo option'
+    }
+  },
+  run: NOOP
+})
+COMMANDS.set('command2', () =>
+  Promise.resolve({
     name: 'command1',
     options: {
-      foo: {
-        type: 'string',
-        short: 'f'
+      bar: {
+        type: 'boolean',
+        short: 'b'
       }
     },
-    default: true,
-    description: 'this is command1',
+    description: 'this is command2',
     usage: {
       options: {
-        foo: 'The foo option'
+        bar: 'The bar option'
       }
     },
     run: NOOP
-  },
-  command2: () =>
-    Promise.resolve({
-      name: 'command1',
-      options: {
-        bar: {
-          type: 'boolean',
-          short: 'b'
-        }
-      },
-      description: 'this is command2',
-      usage: {
-        options: {
-          bar: 'The bar option'
-        }
-      },
-      run: NOOP
-    })
-} as Record<string, Command<ArgOptions> | LazyCommand<ArgOptions>>
+  })
+)
 
 describe('renderUsageDefault', () => {
   test('basic', async () => {
-    const ctx = createCommandContext(
-      SHOW.options,
-      {},
-      [],
-      { cwd: '/path/to/cmd1', version: '0.0.0', name: 'cmd1', entry: SHOW, subCommands: COMMANDS },
-      SHOW
-    )
+    const ctx = createCommandContext(SHOW.options, {}, [], SHOW, {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1',
+      subCommands: COMMANDS
+    })
 
     expect(await renderUsageDefault(ctx)).toMatchSnapshot()
   })
 
   test('no subCommands', async () => {
-    const ctx = createCommandContext(
-      SHOW.options,
-      {},
-      [],
-      { cwd: '/path/to/cmd1', version: '0.0.0', name: 'cmd1', entry: SHOW },
-      SHOW
-    )
+    const ctx = createCommandContext(SHOW.options, {}, [], SHOW, {
+      cwd: '/path/to/cmd1',
+      version: '0.0.0',
+      name: 'cmd1'
+    })
 
     expect(await renderUsageDefault(ctx)).toMatchSnapshot()
   })

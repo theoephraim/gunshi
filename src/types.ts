@@ -11,6 +11,75 @@ type Awaitable<T> = T | Promise<T>
 export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
   /**
    * The current working directory
+   * @see {@link CommandOptions.cwd}
+   */
+  cwd: string | undefined
+  /**
+   * The command name
+   * @see {@link CommandOptions.name}
+   */
+  name: string | undefined
+  /**
+   * The command description
+   * @see {@link CommandOptions.description}
+   *
+   */
+  description: string | undefined
+  /**
+   * The command version
+   * @see {@link CommandOptions.version}
+   */
+  version: string | undefined
+  /**
+   * The left margin of the command output
+   * @default 2
+   * @see {@link CommandOptions.leftMargin}
+   */
+  leftMargin: number
+  /**
+   * The middle margin of the command output
+   * @default 10
+   * @see {@link CommandOptions.middleMargin}
+   */
+  middleMargin: number
+  /**
+   * Whether to display the usage option type
+   * @default false
+   * @see {@link CommandOptions.usageOptionType}
+   */
+  usageOptionType: boolean
+  /**
+   * The sub commands
+   * @see {@link CommandOptions.subCommands}
+   */
+  subCommands: Map<string, Command<Options> | LazyCommand<Options>> | undefined
+  /**
+   * Render function the command usage
+   */
+  renderUsage: ((ctx: CommandContext<Options>) => Promise<string>) | null | undefined
+  /**
+   * Render function the default command usage
+   */
+  renderUsageDefault: ((ctx: CommandContext<Options>) => Promise<string>) | null | undefined
+  /**
+   * Render function the header section in the command usage
+   */
+  renderHeader: ((ctx: CommandContext<Options>) => Promise<string>) | null | undefined
+  /**
+   * Render function the validation errors
+   */
+  renderValidationErrors:
+    | ((ctx: CommandContext<Options>, error: AggregateError) => Promise<string>)
+    | null
+    | undefined
+}
+
+/**
+ * The command options
+ */
+export interface CommandOptions<Options extends ArgOptions> {
+  /**
+   * The current working directory
    * @description This is the current working directory path passed in the context of the run command. This is useful if you need your command about the current execution directory.
    */
   cwd?: string
@@ -31,53 +100,35 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
    */
   version?: string
   /**
-   * The entry command
-   */
-  entry?: Command<Options> | string
-  /**
    * The sub commands
    */
-  subCommands?: Record<string, Command<Options> | LazyCommand<Options>>
-}
-
-/**
- * The command options
- */
-export interface CommandOptions<Options extends ArgOptions> {
+  subCommands?: Map<string, Command<Options> | LazyCommand<Options>>
   /**
    * The left margin of the command output
-   * @default 2
    */
   leftMargin?: number
   /**
    * The middle margin of the command output
-   * @default 10
    */
   middleMargin?: number
   /**
    * Whether to display the usage option type
-   * @default false
    */
   usageOptionType?: boolean
   /**
    * Render function the command usage
-   * @default if not specified, use the built-in render function
    */
   renderUsage?: ((ctx: CommandContext<Options>) => Promise<string>) | null
   /**
    * Render function the default command usage
-   * @description The default command is the command that is executed when no sub command is specified
-   * @default if not specified, use the built-in render function of the default command
    */
   renderUsageDefault?: ((ctx: CommandContext<Options>) => Promise<string>) | null
   /**
-   * Render function the header
-   * @default if not specified, use the built-in render function of the header
+   * Render function the header section in the command usage
    */
   renderHeader?: ((ctx: CommandContext<Options>) => Promise<string>) | null
   /**
    * Render function the validation errors
-   * @default if not specified, use the built-in render function of the validation errors
    */
   renderValidationErrors?:
     | ((ctx: CommandContext<Options>, error: AggregateError) => Promise<string>)
@@ -93,12 +144,12 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
    * The command name, that is the command that is executed
    * @description The command name is same {@link CommandEnvironment.name}
    */
-  name?: string
+  name: string | undefined
   /**
    * The command description, that is the description of the command that is executed
    * @description The command description is same {@link CommandEnvironment.description}
    */
-  description?: CommandUsageRender<Options>
+  description: CommandUsageRender<Options> | undefined
   /**
    * The command locale, that is the locale of the command that is executed
    */
@@ -112,7 +163,7 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
    * The command options, that is the options of the command that is executed
    * @description The command options is same {@link Command.options}
    */
-  options?: Options
+  options: Options | undefined
   /**
    * The command values, that is the values of the command that is executed
    * @description Resolve values with `resolveArgs` from command arguments and {@link Command.options}
@@ -128,11 +179,6 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
    * @description The usage of the command is same {@link Command.usage}, and more has `--help` and `--version` options
    */
   usage: CommandUsage<Options>
-  /**
-   * The command options
-   * @description The command options is same {@link CommandOptions}
-   */
-  commandOptions: Required<CommandOptions<Options>>
 }
 
 /**
@@ -165,10 +211,14 @@ interface CommandUsage<Options extends ArgOptions> {
 export interface Command<Options extends ArgOptions> {
   /**
    * The command name
+   * @description
+   * The command name is used to find command line arguments to execute from sub commands, so it's recommended to specify.
    */
   name?: string
   /**
    * The command description
+   * @description
+   * The command description is used to describe the command in usage, so it's recommended to specify.
    */
   description?: CommandUsageRender<Options>
   /**
@@ -182,10 +232,12 @@ export interface Command<Options extends ArgOptions> {
   options?: Options
   /**
    * The command usage
+   * @description
+   * The command usage is used to describe the command in usage, so it's recommended to specify.
    */
   usage?: CommandUsage<Options>
   /**
-   * The command runner, that is the command to be executed
+   * The command runner, that's the command to be executed
    */
   run: CommandRunner<Options>
 }

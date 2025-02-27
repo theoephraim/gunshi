@@ -1,30 +1,42 @@
 import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS_USAGE } from './constants.js'
-import { nullObject } from './utils.js'
+import { create, deepFreeze } from './utils.js'
 
-import type { ArgOptions, ArgValues } from 'args-tokens'
+import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 import type { Command, CommandContext, CommandEnvironment, CommandOptions } from './types'
 
 export function createCommandContext<Options extends ArgOptions, Values = ArgValues<Options>>(
   options: Options | undefined,
   values: Values,
   positionals: string[],
-  env: CommandEnvironment<Options>,
   command: Command<Options>,
-  commandOptions: Required<CommandOptions<Options>> = COMMAND_OPTIONS_DEFAULT as Required<
-    CommandOptions<Options>
-  >
+  commandOptions: CommandOptions<Options>
 ): Readonly<CommandContext<Options, Values>> {
-  const usage = command.usage || nullObject<Options>()
-  usage.options = Object.assign(nullObject<Options>(), usage.options, COMMON_OPTIONS_USAGE)
-  return Object.freeze({
-    name: command.name,
-    description: command.description,
-    locale: new Intl.Locale('en'), // TODO: resolve locale on runtime and abstraction
-    env,
-    options,
-    values,
-    positionals,
-    usage,
+  const _options =
+    options == undefined
+      ? undefined
+      : // eslint-disable-next-line unicorn/no-array-reduce
+        Object.entries(options as ArgOptions).reduce((acc, [key, value]) => {
+          acc[key] = Object.assign(create<ArgOptionSchema>(), value)
+          return acc
+        }, create<ArgOptions>())
+  const _values = Object.assign(create<ArgValues<Options>>(), values)
+  const usage = Object.assign(create<Options>(), command.usage)
+  usage.options = Object.assign(create<Options>(), usage.options, COMMON_OPTIONS_USAGE)
+  const env = Object.assign(
+    create<CommandEnvironment<Options>>(),
+    COMMAND_OPTIONS_DEFAULT,
     commandOptions
-  })
+  )
+  return deepFreeze(
+    Object.assign(create<CommandContext<Options, Values>>(), {
+      name: command.name,
+      description: command.description,
+      locale: new Intl.Locale('en'), // TODO: resolve locale on runtime and abstraction
+      env,
+      options: _options,
+      values: _values,
+      positionals,
+      usage
+    })
+  )
 }
