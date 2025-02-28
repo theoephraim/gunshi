@@ -1,2 +1,2 @@
-export * from './command.js'
+export * from './cli.js'
 export type * from './types'

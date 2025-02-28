@@ -102,3 +102,17 @@ EXAMPLES:
   $ gunshi command2 -b 42
 "
 `;
+
+exports[`custom generate usage > basic 1`] = `
+"Usage:
+  gunshi [options]
+
+Options:
+  --foo        [string]    this is foo option
+  --bar        [boolean]   this is bar option
+  --baz        [number]    this is baz option
+  --help       [boolean]   Display this help message
+  --version    [boolean]   Display this version
+
+Option '--bar'  is required"
+`;

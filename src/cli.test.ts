@@ -1,9 +1,11 @@
+import pc from 'picocolors'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { defineMockLog } from '../test/utils'
-import { gunshi } from './command'
+import { cli } from './cli'
+import { renderValidationErrors } from './renderer'
 
 import type { ArgOptions } from 'args-tokens'
-import type { Command, LazyCommand } from './types'
+import type { Command, CommandOptions, LazyCommand } from './types'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -12,13 +14,13 @@ afterEach(() => {
 describe('execute command', () => {
   test('entry iniline function', async () => {
     const mockFn = vi.fn()
-    await gunshi([], mockFn)
+    await cli([], mockFn)
     expect(mockFn).toBeCalled()
   })
 
   test('entry command', async () => {
     const mockFn = vi.fn()
-    await gunshi([], {
+    await cli([], {
       run: mockFn
     })
     expect(mockFn).toBeCalled()
@@ -45,10 +47,10 @@ describe('execute command', () => {
       subCommands
     }
 
-    await gunshi([''], show, options) // omit
-    await gunshi(['show'], show, options)
-    await gunshi(['command1'], show, options)
-    await gunshi(['command2'], show, options)
+    await cli([''], show, options) // omit
+    await cli(['show'], show, options)
+    await cli(['command1'], show, options)
+    await cli(['command2'], show, options)
 
     expect(mockShow).toBeCalledTimes(2)
     expect(mockCommand1).toBeCalledTimes(1)
@@ -80,10 +82,10 @@ describe('execute command', () => {
       subCommands
     }
 
-    await gunshi([''], anonymous, options) // omit
-    await gunshi(['show'], anonymous, options)
-    await gunshi(['command1'], anonymous, options)
-    await gunshi(['command2'], anonymous, options)
+    await cli([''], anonymous, options) // omit
+    await cli(['show'], anonymous, options)
+    await cli(['command1'], anonymous, options)
+    await cli(['command2'], anonymous, options)
 
     expect(mockAnonymous).toBeCalledTimes(1)
     expect(mockShow).toBeCalledTimes(1)
@@ -93,25 +95,25 @@ describe('execute command', () => {
 
   test('command not found', async () => {
     await expect(async () => {
-      await gunshi(['show'], { run: vi.fn() }, {})
+      await cli(['show'], { run: vi.fn() }, {})
     }).rejects.toThrowError('Command not found: show')
   })
 })
 
 describe('aute generate usage', () => {
   test('inline function', async () => {
-    const utils = await import('../src/utils')
+    const utils = await import('./utils')
     const log = defineMockLog(utils)
-    await gunshi(['-h'], vi.fn())
+    await cli(['-h'], vi.fn())
 
     const message = log()
     expect(message).toMatchSnapshot()
   })
 
   test('loosely entry command', async () => {
-    const utils = await import('../src/utils')
+    const utils = await import('./utils')
     const log = defineMockLog(utils)
-    await gunshi(['-h'], {
+    await cli(['-h'], {
       options: {
         foo: {
           type: 'string',
@@ -126,9 +128,9 @@ describe('aute generate usage', () => {
   })
 
   test('strictly entry command', async () => {
-    const utils = await import('../src/utils')
+    const utils = await import('./utils')
     const log = defineMockLog(utils)
-    await gunshi(
+    await cli(
       ['-h'],
       {
         options: {
@@ -159,7 +161,7 @@ describe('aute generate usage', () => {
   })
 
   test('loosely sub commands', async () => {
-    const utils = await import('../src/utils')
+    const utils = await import('./utils')
     const log = defineMockLog(utils)
 
     const entryOptions = {
@@ -189,15 +191,15 @@ describe('aute generate usage', () => {
     const subCommands = new Map<string, Command<CommandArgs> | LazyCommand<CommandArgs>>()
     subCommands.set('command2', command2)
 
-    await gunshi(['-h'], entry, { subCommands })
-    await gunshi(['command2', '-h'], entry, { subCommands })
+    await cli(['-h'], entry, { subCommands })
+    await cli(['command2', '-h'], entry, { subCommands })
 
     const message = log()
     expect(message).toMatchSnapshot()
   })
 
   test('strictly sub commands', async () => {
-    const utils = await import('../src/utils')
+    const utils = await import('./utils')
     const log = defineMockLog(utils)
 
     const entryOptions = {
@@ -241,7 +243,7 @@ describe('aute generate usage', () => {
     const subCommands = new Map<string, Command<CommandArgs> | LazyCommand<CommandArgs>>()
     subCommands.set('command2', command2)
 
-    await gunshi(['-h'], entry, {
+    await cli(['-h'], entry, {
       subCommands,
       name: 'gunshi',
       description: 'Modern CLI tool',
@@ -250,7 +252,7 @@ describe('aute generate usage', () => {
       middleMargin: 15
     })
 
-    await gunshi(['command2', '-h'], entry, {
+    await cli(['command2', '-h'], entry, {
       subCommands,
       name: 'gunshi',
       description: 'Modern CLI tool',
@@ -262,4 +264,81 @@ describe('aute generate usage', () => {
   })
 })
 
-describe.todo('custom generate usage', () => {})
+describe('custom generate usage', () => {
+  test('basic', async () => {
+    const utils = await import('./utils')
+    const log = defineMockLog(utils)
+
+    const entryOptions = {
+      foo: {
+        type: 'string',
+        short: 'f'
+      },
+      bar: {
+        type: 'boolean',
+        required: true
+      },
+      baz: {
+        type: 'number',
+        short: 'b',
+        default: 42
+      }
+    } satisfies ArgOptions
+
+    const entry = {
+      options: entryOptions,
+      name: 'command1',
+      usage: {
+        options: {
+          foo: 'this is foo option',
+          bar: 'this is bar option',
+          baz: 'this is baz option'
+        }
+      },
+      run: vi.fn()
+    } satisfies Command<typeof entryOptions>
+
+    const options = {
+      name: 'gunshi',
+      description: 'Modern CLI tool',
+      version: '0.0.0',
+      renderHeader: null, // no header
+      renderUsage: ctx => {
+        const messages: string[] = []
+
+        // render usage section
+        messages.push('Usage:')
+        messages.push(`  ${ctx.env.name} [options]`)
+        messages.push('')
+
+        // render options section
+        messages.push('Options:')
+        for (const [key, value] of Object.entries(ctx.options!)) {
+          const usageOptions = (ctx.usage.options ?? Object.create(null)) as Record<string, string>
+          const usage = usageOptions[key] || ''
+          messages.push(`  --${key.padEnd(10)} ${`[${value.type}]`.padEnd(12)}`.padEnd(20) + usage)
+        }
+        messages.push('')
+
+        return Promise.resolve(messages.join('\n'))
+      },
+      renderValidationErrors: async (ctx, error) => {
+        // call built-in renderer, and decorate with picocolors
+        return pc.red(await renderValidationErrors(ctx, error))
+      }
+    } satisfies CommandOptions<typeof entryOptions>
+
+    // usage
+    await cli(['-h'], entry, options)
+
+    // validation errors
+    try {
+      await cli([''], entry, options)
+      // eslint-disable-next-line no-empty
+    } catch {}
+
+    const message = log()
+    console.log(message)
+    expect(message).toMatchSnapshot()
+  })
+})

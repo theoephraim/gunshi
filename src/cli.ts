@@ -5,7 +5,13 @@ import { renderHeader, renderUsage, renderValidationErrors } from './renderer.js
 import { create, log, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgToken } from 'args-tokens'
-import type { Command, CommandContext, CommandOptions, CommandRunner, LazyCommand } from './types'
+import type {
+  Command,
+  CommandContext,
+  CommandOptions,
+  CommandRunner,
+  LazyCommand
+} from './types.js'
 
 /**
  * Run the command
@@ -13,7 +19,7 @@ import type { Command, CommandContext, CommandOptions, CommandRunner, LazyComman
  * @param entry - a {@link Command | entry command} or an {@linke CommandRunner | inline command runner}
  * @param opts - a {@link CommandOptions | command options}
  */
-export async function gunshi<Options extends ArgOptions>(
+export async function cli<Options extends ArgOptions>(
   args: string[],
   entry: Command<Options> | CommandRunner<Options>,
   opts: CommandOptions<Options> = {}
