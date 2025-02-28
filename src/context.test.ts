@@ -27,8 +27,8 @@ test('basic', () => {
   const mockRenderUsageDefault = vi.fn()
   const mockRenderValidationErrors = vi.fn()
 
-  const ctx = createCommandContext(
-    {
+  const ctx = createCommandContext({
+    options: {
       foo: {
         type: 'string',
         short: 'f'
@@ -42,10 +42,10 @@ test('basic', () => {
         default: 42
       }
     },
-    { foo: 'foo', bar: true, baz: 42 },
-    ['bar'],
+    values: { foo: 'foo', bar: true, baz: 42 },
+    positionals: ['bar'],
     command,
-    {
+    commandOptions: {
       cwd: '/path/to/cmd1',
       description: 'this is command line',
       version: '0.0.0',
@@ -60,7 +60,7 @@ test('basic', () => {
       renderValidationErrors: mockRenderValidationErrors,
       subCommands
     }
-  )
+  })
 
   /**
    * check values
@@ -130,13 +130,13 @@ test('default', () => {
   const command = {
     run: vi.fn()
   }
-  const ctx = createCommandContext(
-    undefined,
-    { foo: 'foo', bar: true, baz: 42 },
-    ['bar'],
+  const ctx = createCommandContext({
+    options: undefined,
+    values: { foo: 'foo', bar: true, baz: 42 },
+    positionals: ['bar'],
     command,
-    {}
-  )
+    commandOptions: {}
+  })
 
   /**
    * check values

@@ -39,7 +39,7 @@ export async function gunshi<Options extends ArgOptions>(
   const options = resolveArgOptions(command.options)
 
   const { values, positionals, error } = resolveArgs(options, tokens)
-  const ctx = createCommandContext(options, values, positionals, command, opts)
+  const ctx = createCommandContext({ options, values, positionals, command, commandOptions: opts })
   if (values.version) {
     showVersion(ctx)
     return

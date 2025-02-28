@@ -4,13 +4,19 @@ import { create, deepFreeze } from './utils.js'
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 import type { Command, CommandContext, CommandEnvironment, CommandOptions } from './types'
 
-export function createCommandContext<Options extends ArgOptions, Values = ArgValues<Options>>(
-  options: Options | undefined,
-  values: Values,
-  positionals: string[],
-  command: Command<Options>,
+export function createCommandContext<Options extends ArgOptions, Values = ArgValues<Options>>({
+  options,
+  values,
+  positionals,
+  command,
+  commandOptions
+}: {
+  options: Options | undefined
+  values: Values
+  positionals: string[]
+  command: Command<Options>
   commandOptions: CommandOptions<Options>
-): Readonly<CommandContext<Options, Values>> {
+}): Readonly<CommandContext<Options, Values>> {
   const _options =
     options == undefined
       ? undefined
