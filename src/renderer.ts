@@ -28,7 +28,7 @@ export async function renderUsage<Options extends ArgOptions>(
   messages.push(...(await renderUsageSection(ctx)), '')
 
   // render commands section
-  if (await hasCommands(ctx)) {
+  if (ctx.omitted && (await hasCommands(ctx))) {
     messages.push(...(await renderCommandsSection(ctx)), '')
   }
 

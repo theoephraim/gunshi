@@ -249,6 +249,7 @@ describe('aute generate usage', () => {
       leftMargin: 4,
       middleMargin: 15
     })
+
     await gunshi(['command2', '-h'], entry, {
       subCommands,
       name: 'gunshi',
