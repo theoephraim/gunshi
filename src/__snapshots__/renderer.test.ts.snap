@@ -12,7 +12,7 @@ OPTIONS:
   -b, --baz [baz]          The baz option
   -q, --qux <qux>          The qux option
 
-EXAMPLES: 
+EXAMPLES:
   # Example 1
   $ test --foo bar --bar --baz 42 --qux quux
   # Example 2
@@ -32,7 +32,7 @@ OPTIONS:
     -b, --baz [baz]            [number]  The baz option
     -q, --qux <qux>            [string]  The qux option
 
-EXAMPLES: 
+EXAMPLES:
     # Example 1
     $ test --foo bar --bar --baz 42 --qux quux
     # Example 2
@@ -60,9 +60,9 @@ exports[`renderUsage > no options 1`] = `
 USAGE:
   cmd1 test 
 
-EXAMPLES: 
+EXAMPLES:
   # Example 1
-   $test
+  $test
   # Example 2
   $ test
 "
@@ -81,7 +81,7 @@ OPTIONS:
 "
 `;
 
-exports[`renderUsageDefault > basic 1`] = `
+exports[`renderUsage > sub commands 1`] = `
 "USAGE:
   cmd1 [show] <OPTIONS> 
   cmd1 <COMMANDS>
@@ -95,24 +95,6 @@ For more info, run any command with the \`--help\` flag:
   cmd1 show --help
   cmd1 command1 --help
   cmd1 command1 --help
-
-OPTIONS:
-  -f, --foo <foo>          The foo option
-  --bar                    The bar option
-  -b, --baz [baz]          The baz option
-  -q, --qux <qux>          The qux option
-
-EXAMPLES:
-  # Example 1
-  $ test --foo bar --bar --baz 42 --qux quux
-  # Example 2
-  $ test -f bar -b 42 -q quux
-"
-`;
-
-exports[`renderUsageDefault > no subCommands 1`] = `
-"USAGE:
-  cmd1 <OPTIONS> 
 
 OPTIONS:
   -f, --foo <foo>          The foo option

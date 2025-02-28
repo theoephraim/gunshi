@@ -1,5 +1,5 @@
 import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS_USAGE } from './constants.js'
-import { create, deepFreeze } from './utils.js'
+import { create, deepFreeze, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 import type { Command, CommandContext, CommandEnvironment, CommandOptions } from './types'
@@ -9,11 +9,13 @@ export function createCommandContext<Options extends ArgOptions, Values = ArgVal
   values,
   positionals,
   command,
-  commandOptions
+  commandOptions,
+  omitted = false
 }: {
   options: Options | undefined
   values: Values
   positionals: string[]
+  omitted: boolean
   command: Command<Options>
   commandOptions: CommandOptions<Options>
 }): Readonly<CommandContext<Options, Values>> {
@@ -33,16 +35,31 @@ export function createCommandContext<Options extends ArgOptions, Values = ArgVal
     COMMAND_OPTIONS_DEFAULT,
     commandOptions
   )
+
+  let cachedCommands: Command<Options>[] | undefined
+  async function loadCommands(): Promise<Command<Options>[]> {
+    if (cachedCommands) {
+      return cachedCommands
+    }
+
+    const subCommands = [...(env.subCommands || [])] as [string, Command<Options>][]
+    return (cachedCommands = await Promise.all(
+      subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
+    ))
+  }
+
   return deepFreeze(
     Object.assign(create<CommandContext<Options, Values>>(), {
       name: command.name,
       description: command.description,
+      omitted,
       locale: new Intl.Locale('en'), // TODO: resolve locale on runtime and abstraction
       env,
       options: _options,
       values: _values,
       positionals,
-      usage
+      usage,
+      loadCommands
     })
   )
 }

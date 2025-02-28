@@ -15,11 +15,22 @@ import {
 
 const config: ReturnType<typeof defineConfig> = defineConfig(
   javascript(),
-  typescript(),
+  typescript({
+    rules: {
+      '@typescript-eslint/ban-ts-comment': 'off'
+    }
+  }),
   comments(),
   promise(),
   regexp(),
-  unicorn(),
+  unicorn({
+    rules: {
+      'unicorn/no-array-push-push': 'off',
+      'unicorn/prevent-abbreviations': 'off',
+      'unicorn/filename-case': 'off',
+      'unicorn/no-null': 'off'
+    }
+  }),
   jsonc({
     json: true,
     json5: true,
@@ -29,14 +40,6 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   markdown(),
   vitest(),
   prettier(),
-  {
-    rules: {
-      '@typescript-eslint/ban-ts-comment': 'off',
-      'unicorn/prevent-abbreviations': 'off',
-      'unicorn/filename-case': 'off',
-      'unicorn/no-null': 'off'
-    }
-  },
   {
     ignores: ['.vscode', '.github', 'lib', 'tsconfig.json', 'pnpm-lock.yaml', 'eslint.config.ts']
   }

@@ -31,6 +31,5 @@ export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
   usageOptionType: false,
   renderHeader: undefined,
   renderUsage: undefined,
-  renderUsageDefault: undefined,
   renderValidationErrors: undefined
 }

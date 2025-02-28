@@ -22,9 +22,7 @@ test('basic', () => {
   const subCommands = new Map<string, Command<ArgOptions> | LazyCommand<ArgOptions>>()
   subCommands.set('cmd2', { name: 'cmd2', run: vi.fn() })
 
-  // const mockRenderHeader = vi.fn()
   const mockRenderUsage = vi.fn()
-  const mockRenderUsageDefault = vi.fn()
   const mockRenderValidationErrors = vi.fn()
 
   const ctx = createCommandContext({
@@ -44,6 +42,7 @@ test('basic', () => {
     },
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
+    omitted: true,
     command,
     commandOptions: {
       cwd: '/path/to/cmd1',
@@ -56,7 +55,6 @@ test('basic', () => {
 
       renderHeader: null,
       renderUsage: mockRenderUsage,
-      renderUsageDefault: mockRenderUsageDefault,
       renderValidationErrors: mockRenderValidationErrors,
       subCommands
     }
@@ -71,7 +69,8 @@ test('basic', () => {
     description: 'this is cmd1',
     options: { foo: { type: 'string' } },
     values: { foo: 'foo' },
-    positionals: ['bar']
+    positionals: ['bar'],
+    omitted: true
   })
   expect(ctx.env).toMatchObject({
     name: 'gunshi',
@@ -84,7 +83,6 @@ test('basic', () => {
 
     renderHeader: null,
     renderUsage: mockRenderUsage,
-    renderUsageDefault: mockRenderUsageDefault,
     renderValidationErrors: mockRenderValidationErrors
   })
   expect(ctx.usage).toMatchObject({
@@ -135,6 +133,7 @@ test('default', () => {
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
     command,
+    omitted: false,
     commandOptions: {}
   })
 
@@ -147,7 +146,8 @@ test('default', () => {
     description: undefined,
     options: undefined,
     values: { foo: 'foo', bar: true, baz: 42 },
-    positionals: ['bar']
+    positionals: ['bar'],
+    omitted: false
   })
   expect(ctx.env).toMatchObject({
     name: undefined,
@@ -159,7 +159,6 @@ test('default', () => {
     usageOptionType: false,
     renderHeader: undefined,
     renderUsage: undefined,
-    renderUsageDefault: undefined,
     renderValidationErrors: undefined
   })
   expect(ctx.usage).toMatchObject({

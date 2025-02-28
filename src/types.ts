@@ -58,10 +58,6 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
    */
   renderUsage: ((ctx: CommandContext<Options>) => Promise<string>) | null | undefined
   /**
-   * Render function the default command usage
-   */
-  renderUsageDefault: ((ctx: CommandContext<Options>) => Promise<string>) | null | undefined
-  /**
    * Render function the header section in the command usage
    */
   renderHeader: ((ctx: CommandContext<Options>) => Promise<string>) | null | undefined
@@ -120,10 +116,6 @@ export interface CommandOptions<Options extends ArgOptions> {
    */
   renderUsage?: ((ctx: Readonly<CommandContext<Options>>) => Promise<string>) | null
   /**
-   * Render function the default command usage
-   */
-  renderUsageDefault?: ((ctx: Readonly<CommandContext<Options>>) => Promise<string>) | null
-  /**
    * Render function the header section in the command usage
    */
   renderHeader?: ((ctx: Readonly<CommandContext<Options>>) => Promise<string>) | null
@@ -175,10 +167,20 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
    */
   positionals: string[]
   /**
+   * Whether the currently executing command has been executed with the sub-command name omitted
+   */
+  omitted: boolean
+  /**
    * The usage of the command
    * @description The usage of the command is same {@link Command.usage}, and more has `--help` and `--version` options
    */
   usage: CommandUsage<Options>
+  /**
+   * Load the sub-commands
+   * @description The loaded commands are cached and returned when called again
+   * @returns loaded commands
+   */
+  loadCommands: () => Promise<Command<Options>[]>
 }
 
 /**

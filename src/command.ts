@@ -1,12 +1,7 @@
 import { parseArgs, resolveArgs } from 'args-tokens'
 import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS } from './constants.js'
 import { createCommandContext } from './context.js'
-import {
-  renderHeader,
-  renderUsage,
-  renderUsageDefault,
-  renderValidationErrors
-} from './renderer.js'
+import { renderHeader, renderUsage, renderValidationErrors } from './renderer.js'
 import { create, log, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgToken } from 'args-tokens'
@@ -39,7 +34,15 @@ export async function gunshi<Options extends ArgOptions>(
   const options = resolveArgOptions(command.options)
 
   const { values, positionals, error } = resolveArgs(options, tokens)
-  const ctx = createCommandContext({ options, values, positionals, command, commandOptions: opts })
+  const omitted = !subCommand
+  const ctx = createCommandContext({
+    options,
+    values,
+    positionals,
+    omitted,
+    command,
+    commandOptions: opts
+  })
   if (values.version) {
     showVersion(ctx)
     return
@@ -48,14 +51,8 @@ export async function gunshi<Options extends ArgOptions>(
   await showHeader(ctx)
 
   if (values.help) {
-    if (subCommand) {
-      await showUsage(ctx)
-      return
-    } else {
-      // omitted command
-      await showUsageDefault(ctx)
-      return
-    }
+    await showUsage(ctx)
+    return
   }
 
   if (error) {
@@ -97,16 +94,6 @@ async function showUsage<Options extends ArgOptions>(ctx: CommandContext<Options
     return
   }
   const render = ctx.env.renderUsage || renderUsage
-  log(await render(ctx))
-}
-
-async function showUsageDefault<Options extends ArgOptions>(
-  ctx: CommandContext<Options>
-): Promise<void> {
-  if (ctx.env.renderUsageDefault === null) {
-    return
-  }
-  const render = ctx.env.renderUsageDefault || renderUsageDefault
   log(await render(ctx))
 }
 
