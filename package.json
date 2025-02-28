@@ -57,6 +57,7 @@
   "scripts": {
     "build": "tsc -p ./tsconfig.build.json",
     "changelog": "gh-changelogen --repo=kazupon/gunshi",
+    "clean": "git clean -df",
     "dev": "pnpx @eslint/config-inspector --config eslint.config.ts",
     "dev:eslint": "pnpx @eslint/config-inspector --config eslint.config.ts",
     "fix": "pnpm run --parallel --color \"/^fix:/\"",
