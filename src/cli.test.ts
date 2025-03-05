@@ -266,7 +266,7 @@ describe('aute generate usage', () => {
   test('locale resource not found', async () => {
     const utils = await import('./utils')
     const log = defineMockLog(utils)
-    const mockResouce = vi.fn().mockRejectedValue(new Error('Resource not found'))
+    const mockResource = vi.fn().mockRejectedValue(new Error('Resource not found'))
     await cli(
       ['-h'],
       {
@@ -283,7 +283,7 @@ describe('aute generate usage', () => {
           },
           examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar'
         },
-        resource: mockResouce,
+        resource: mockResource,
         run: vi.fn()
       },
       {
