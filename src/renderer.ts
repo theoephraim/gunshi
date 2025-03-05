@@ -196,7 +196,6 @@ async function generateOptionsUsage<Options extends ArgOptions>(
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(([key, value]) => {
-      // const rawDesc = (await resolveCommandUsageRender(ctx, ctx.usage.options![key])) || ''
       const rawDesc = ctx.translation(key)
       const optionsSchema = ctx.env.usageOptionType ? `[${ctx.options![key].type}] ` : ''
       // padEnd is used to align the `[]` symbols
