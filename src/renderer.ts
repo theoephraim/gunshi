@@ -1,4 +1,4 @@
-import { create, resolveCommandUsageRender } from './utils.js'
+import { create } from './utils.js'
 
 import type { ArgOptions } from 'args-tokens'
 import type { CommandContext } from './types'
@@ -21,7 +21,7 @@ export async function renderUsage<Options extends ArgOptions>(
 
   // render description section (sub command executed only)
   if (!ctx.omitted && hasDescription(ctx)) {
-    messages.push(await resolveCommandUsageRender(ctx, ctx.description!), '')
+    messages.push(ctx.description!, '')
   }
 
   // render usage section
@@ -39,7 +39,7 @@ export async function renderUsage<Options extends ArgOptions>(
 
   // render examples section
   if (hasExamples(ctx)) {
-    messages.push(...(await renderExamplesSection(ctx)), '')
+    messages.push(...renderExamplesSection(ctx), '')
   }
 
   return messages.join('\n')
@@ -67,13 +67,12 @@ async function renderOptionsSection<Options extends ArgOptions>(
   return messages
 }
 
-async function renderExamplesSection<Options extends ArgOptions>(
+function renderExamplesSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
-): Promise<string[]> {
+): string[] {
   const messages: string[] = []
-  const resolved = await resolveCommandUsageRender(ctx, ctx.usage.examples!)
-  const examples = resolved
-    .split('\n')
+  const examples = ctx.usage
+    .examples!.split('\n')
     .map(example => example.padStart(ctx.env.leftMargin + example.length))
   messages.push(`${ctx.translation('EXAMPLES')}:`, ...examples)
   return messages
@@ -104,12 +103,9 @@ async function renderCommandsSection<Options extends ArgOptions>(
   const loadedCommands = await ctx.loadCommands()
   const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
   const commandsStr = await Promise.all(
-    loadedCommands.map(async cmd => {
+    loadedCommands.map(cmd => {
       const key = cmd.name || ''
-      const desc = await resolveCommandUsageRender(
-        ctx as CommandContext<Options>,
-        cmd.description || ''
-      )
+      const desc = cmd.description || ''
       const command = `${key.padEnd(commandMaxLength + ctx.env.middleMargin)}${desc} `
       return `${command.padStart(ctx.env.leftMargin + command.length)} `
     })

@@ -170,7 +170,7 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
    * The command description, that is the description of the command that is executed
    * @description The command description is same {@link CommandEnvironment.description}
    */
-  description: CommandUsageRender<Options> | undefined
+  description: string | undefined
   /**
    * The command locale, that is the locale of the command that is executed
    */
@@ -235,12 +235,12 @@ interface CommandUsage<Options extends ArgOptions> {
    * The options usage
    */
   options?: {
-    [Option in keyof Options]: CommandUsageRender<Options>
+    [Option in keyof Options]: string
   }
   /**
    * The examples usage
    */
-  examples?: CommandUsageRender<Options>
+  examples?: string
 }
 
 /**
@@ -258,7 +258,7 @@ export interface Command<Options extends ArgOptions> {
    * @description
    * The command description is used to describe the command in usage, so it's recommended to specify.
    */
-  description?: CommandUsageRender<Options>
+  description?: string
   /**
    * whether the command is default or not
    * @description if the command is default, it is executed when no sub-command is specified

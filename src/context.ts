@@ -1,6 +1,6 @@
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
 import { COMMAND_I18N_RESOURCE_KEYS, COMMAND_OPTIONS_DEFAULT } from './constants.js'
-import { create, deepFreeze, resolveCommandUsageRender, resolveLazyCommand } from './utils.js'
+import { create, deepFreeze, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 import type {
@@ -32,6 +32,10 @@ export async function createCommandContext<
   command: Command<Options>
   commandOptions: CommandOptions<Options>
 }): Promise<Readonly<CommandContext<Options, Values>>> {
+  /**
+   * tweak the options and values
+   */
+
   const _options =
     options == null
       ? undefined
@@ -42,9 +46,18 @@ export async function createCommandContext<
         }, create<ArgOptions>())
   const _values = Object.assign(create<ArgValues<Options>>(), values)
 
+  /**
+   * normalize the usage
+   */
+
   const usage = Object.assign(create<Options>(), command.usage)
   const { help, version } = DefaultResource as unknown as ArgOptions
   usage.options = Object.assign(create<Options>(), usage.options, { help, version })
+
+  /**
+   * setup the environment
+   */
+
   const env = Object.assign(
     create<CommandEnvironment<Options>>(),
     COMMAND_OPTIONS_DEFAULT,
@@ -57,7 +70,7 @@ export async function createCommandContext<
   let builtInLoadedResources: Record<string, string> | undefined
 
   /**
-   * Load the built-in locale resources
+   * load the built-in locale resources
    */
 
   localeResources.set(DEFAULT_LOCALE, DefaultResource as Record<string, string>)
@@ -69,6 +82,10 @@ export async function createCommandContext<
       localeResources.set(locale.toString(), builtInLoadedResources)
     } catch {} // eslint-disable-line no-empty
   }
+
+  /**
+   * define the translation function
+   */
 
   function translation<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
     if (COMMAND_I18N_RESOURCE_KEYS.includes(key as CommandBuiltinResourceKeys)) {
@@ -83,7 +100,7 @@ export async function createCommandContext<
   }
 
   /**
-   * Load the sub-commands
+   * load the sub commands
    */
 
   let cachedCommands: Command<Options>[] | undefined
@@ -97,6 +114,10 @@ export async function createCommandContext<
       subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
     ))
   }
+
+  /**
+   * create the context
+   */
 
   const ctx = deepFreeze(
     Object.assign(create<CommandContext<Options, Values>>(), {
@@ -114,22 +135,23 @@ export async function createCommandContext<
     })
   )
 
-  const loadedOptionsResources = await Promise.all(
-    Object.entries(usage.options || create<Options>()).map(async ([key, _]) => {
-      const option = await resolveCommandUsageRender(ctx, usage.options![key])
+  /**
+   * load the command resources
+   */
+
+  const loadedOptionsResources = Object.entries(usage.options || create<Options>()).map(
+    ([key, _]) => {
+      const option = usage.options![key]
       return [key, option] as [string, string]
-    })
+    }
   )
   // eslint-disable-next-line unicorn/no-array-reduce
   const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
     res[key] = value
     return res
   }, create<Record<string, string>>())
-  defaultCommandResource.description = await resolveCommandUsageRender(
-    ctx,
-    command.description || ''
-  )
-  defaultCommandResource.examples = await resolveCommandUsageRender(ctx, usage.examples || '')
+  defaultCommandResource.description = command.description || ''
+  defaultCommandResource.examples = usage.examples || ''
   commandResources.set(DEFAULT_LOCALE, defaultCommandResource)
 
   const originalResource = await loadCommandResource(ctx, command)

@@ -1,12 +1,5 @@
 import type { ArgOptions } from 'args-tokens'
-import type { Command, CommandContext, CommandUsageRender, LazyCommand } from './types'
-
-export async function resolveCommandUsageRender<Options extends ArgOptions>(
-  ctx: CommandContext<Options>,
-  redner: CommandUsageRender<Options>
-): Promise<string> {
-  return typeof redner === 'function' ? await redner(ctx) : redner
-}
+import type { Command, LazyCommand } from './types'
 
 export async function resolveLazyCommand<Options extends ArgOptions>(
   cmd: Command<Options> | LazyCommand<Options>,
