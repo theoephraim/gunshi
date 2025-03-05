@@ -10,6 +10,25 @@ OPTIONS:
 "
 `;
 
+exports[`aute generate usage > locale resource not found 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+
+USAGE:
+  gunshi <OPTIONS> 
+
+OPTIONS:
+  -f, --foo <foo>          [string]  The foo option
+  -h, --help               [boolean] Display this help message
+  -v, --version            [boolean] Display this version
+
+EXAMPLES:
+  # Example 1
+  $ gunshi --foo bar
+  # Example 2
+  $ gunshi -f bar
+"
+`;
+
 exports[`aute generate usage > loosely entry command 1`] = `
 "USAGE:
   COMMAND <OPTIONS> 

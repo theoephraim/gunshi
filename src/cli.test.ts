@@ -262,6 +262,42 @@ describe('aute generate usage', () => {
     const message = log()
     expect(message).toMatchSnapshot()
   })
+
+  test('locale resource not found', async () => {
+    const utils = await import('./utils')
+    const log = defineMockLog(utils)
+    const mockResouce = vi.fn().mockRejectedValue(new Error('Resource not found'))
+    await cli(
+      ['-h'],
+      {
+        options: {
+          foo: {
+            type: 'string',
+            short: 'f'
+          }
+        },
+        name: 'command1',
+        usage: {
+          options: {
+            foo: 'The foo option'
+          },
+          examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar'
+        },
+        resource: mockResouce,
+        run: vi.fn()
+      },
+      {
+        name: 'gunshi',
+        description: 'Modern CLI tool',
+        version: '0.0.0',
+        locale: 'fr-FR',
+        usageOptionType: true
+      }
+    )
+
+    const message = log()
+    expect(message).toMatchSnapshot()
+  })
 })
 
 describe('custom generate usage', () => {

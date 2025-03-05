@@ -8,7 +8,8 @@ import type {
   CommandBuiltinResourceKeys,
   CommandContext,
   CommandEnvironment,
-  CommandOptions
+  CommandOptions,
+  CommandResource
 } from './types'
 
 export const DEFAULT_LOCALE = 'en-US'
@@ -40,6 +41,7 @@ export async function createCommandContext<
           return acc
         }, create<ArgOptions>())
   const _values = Object.assign(create<ArgValues<Options>>(), values)
+
   const usage = Object.assign(create<Options>(), command.usage)
   const { help, version } = DefaultResource as unknown as ArgOptions
   usage.options = Object.assign(create<Options>(), usage.options, { help, version })
@@ -60,10 +62,12 @@ export async function createCommandContext<
 
   localeResources.set(DEFAULT_LOCALE, DefaultResource as Record<string, string>)
   if (DEFAULT_LOCALE !== locale.toString()) {
-    builtInLoadedResources = (await import(`../locales/${locale.toString()}.json`, {
-      with: { type: 'json' }
-    })) as Record<string, string>
-    localeResources.set(locale.toString(), builtInLoadedResources)
+    try {
+      builtInLoadedResources = (await import(`../locales/${locale.toString()}.json`, {
+        with: { type: 'json' }
+      })) as Record<string, string>
+      localeResources.set(locale.toString(), builtInLoadedResources)
+    } catch {} // eslint-disable-line no-empty
   }
 
   function translation<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
@@ -128,8 +132,8 @@ export async function createCommandContext<
   defaultCommandResource.examples = await resolveCommandUsageRender(ctx, usage.examples || '')
   commandResources.set(DEFAULT_LOCALE, defaultCommandResource)
 
-  if (command.resource) {
-    const originalResource = await command.resource(ctx)
+  const originalResource = await loadCommandResource(ctx, command)
+  if (originalResource) {
     // eslint-disable-next-line unicorn/no-array-reduce
     const resource = Object.entries(originalResource.options).reduce(
       (res, [key, value]) => {
@@ -157,4 +161,15 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
     : typeof locale === 'string'
       ? new Intl.Locale(locale)
       : new Intl.Locale(DEFAULT_LOCALE)
+}
+
+async function loadCommandResource<Options extends ArgOptions>(
+  ctx: CommandContext<Options>,
+  command: Command<Options>
+): Promise<CommandResource<Options> | undefined> {
+  let resource: CommandResource<Options> | undefined
+  try {
+    resource = await command.resource?.(ctx)
+  } catch {} // eslint-disable-line no-empty
+  return resource
 }
