@@ -16,7 +16,7 @@ import type {
 /**
  * Run the command
  * @param args - command line arguments
- * @param entry - a {@link Command | entry command} or an {@linke CommandRunner | inline command runner}
+ * @param entry - a {@link Command | entry command} or an {@link CommandRunner | inline command runner}
  * @param opts - a {@link CommandOptions | command options}
  */
 export async function cli<Options extends ArgOptions>(

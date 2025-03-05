@@ -53,24 +53,25 @@ export async function createCommandContext<
   )
 
   const locale = resolveLocale(commandOptions.locale)
-  const localeResouces: Map<string, Record<string, string>> = new Map()
+  const localeResources: Map<string, Record<string, string>> = new Map()
   const commandResources = new Map<string, Record<string, string>>()
 
   /**
    * Load the built-in locale resources
    */
 
-  localeResouces.set(DEFAULT_LOCALE, DefaultResource as Record<string, string>)
+  localeResources.set(DEFAULT_LOCALE, DefaultResource as Record<string, string>)
   if (DEFAULT_LOCALE !== locale.toString()) {
     const resource = (await import(`../locales/${locale.toString()}.json`, {
       with: { type: 'json' }
     })) as Record<string, string>
-    localeResouces.set(locale.toString(), resource)
+    localeResources.set(locale.toString(), resource)
   }
 
   function translation<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
     if (COMMAND_I18N_RESOURCE_KEYS.includes(key as CommandBuiltinResourceKeys)) {
-      const resource = localeResouces.get(locale.toString()) || localeResouces.get(DEFAULT_LOCALE)!
+      const resource =
+        localeResources.get(locale.toString()) || localeResources.get(DEFAULT_LOCALE)!
       return resource[key as CommandBuiltinResourceKeys] || (key as string)
     } else {
       const resource =

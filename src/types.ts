@@ -282,7 +282,7 @@ export interface Command<Options extends ArgOptions> {
    * The command resource fetcher
    * @experimental
    */
-  resource?: CommadResourceFetcher<Options>
+  resource?: CommandResourceFetcher<Options>
 }
 
 /**
@@ -310,7 +310,7 @@ export interface CommandResource<Options extends ArgOptions> {
  * The command resource fetcher
  * @experimental
  */
-export type CommadResourceFetcher<Options extends ArgOptions> = (
+export type CommandResourceFetcher<Options extends ArgOptions> = (
   ctx: Readonly<CommandContext<Options>>
 ) => Promise<CommandResource<Options>>
 

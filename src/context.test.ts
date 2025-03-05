@@ -4,7 +4,7 @@ import { COMMON_OPTIONS_USAGE } from './constants'
 import { createCommandContext, DEFAULT_LOCALE } from './context'
 
 import type { ArgOptions } from 'args-tokens'
-import type { CommadResourceFetcher, Command, CommandResource, LazyCommand } from './types'
+import type { CommandResourceFetcher, Command, CommandResource, LazyCommand } from './types'
 
 test('basic', async () => {
   const command = {
@@ -256,7 +256,7 @@ describe('translation', () => {
       }
     } satisfies ArgOptions
 
-    const jaJPResouce = {
+    const jaJPResource = {
       description: 'これはコマンド1です',
       options: {
         foo: 'これは foo オプションです',
@@ -268,9 +268,9 @@ describe('translation', () => {
 
     const loadLocale = 'ja-JP'
 
-    const mockResource = vi.fn<CommadResourceFetcher<typeof options>>().mockImplementation(ctx => {
+    const mockResource = vi.fn<CommandResourceFetcher<typeof options>>().mockImplementation(ctx => {
       if (ctx.locale.toString() === loadLocale) {
-        return Promise.resolve(jaJPResouce)
+        return Promise.resolve(jaJPResource)
       } else {
         throw new Error('not found')
       }
@@ -307,10 +307,10 @@ describe('translation', () => {
     type OptionsKeys = keyof typeof command.usage.options
 
     // description, options, and examples
-    expect(ctx.translation('description')).toEqual(jaJPResouce.description)
-    expect(ctx.translation<OptionsKeys>('foo')).toEqual(jaJPResouce.options.foo)
-    expect(ctx.translation<OptionsKeys>('bar')).toEqual(jaJPResouce.options.bar)
-    expect(ctx.translation<OptionsKeys>('baz')).toEqual(jaJPResouce.options.baz)
-    expect(ctx.translation('examples')).toEqual(jaJPResouce.examples)
+    expect(ctx.translation('description')).toEqual(jaJPResource.description)
+    expect(ctx.translation<OptionsKeys>('foo')).toEqual(jaJPResource.options.foo)
+    expect(ctx.translation<OptionsKeys>('bar')).toEqual(jaJPResource.options.bar)
+    expect(ctx.translation<OptionsKeys>('baz')).toEqual(jaJPResource.options.baz)
+    expect(ctx.translation('examples')).toEqual(jaJPResource.examples)
   })
 })
