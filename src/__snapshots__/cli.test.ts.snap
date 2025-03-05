@@ -114,5 +114,7 @@ Options:
   --help       [boolean]   Display this help message
   --version    [boolean]   Display this version
 
-Option '--bar'  is required"
+*******************************
+* Option '--bar'  is required *
+*******************************"
 `;

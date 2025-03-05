@@ -1,4 +1,3 @@
-import pc from 'picocolors'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { defineMockLog } from '../test/utils'
 import { cli } from './cli'
@@ -323,8 +322,10 @@ describe('custom generate usage', () => {
         return Promise.resolve(messages.join('\n'))
       },
       renderValidationErrors: async (ctx, error) => {
-        // call built-in renderer, and decorate with picocolors
-        return pc.red(await renderValidationErrors(ctx, error))
+        // call built-in renderer, and decorate like picocolors
+        // return pc.red(await renderValidationErrors(ctx, error))
+        const msg = `* ${await renderValidationErrors(ctx, error)} *`
+        return ['*'.repeat(msg.length), msg, '*'.repeat(msg.length)].join('\n')
       }
     } satisfies CommandOptions<typeof entryOptions>
 
