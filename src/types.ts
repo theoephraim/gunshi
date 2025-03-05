@@ -9,7 +9,7 @@ type Awaitable<T> = T | Promise<T>
  * The command i18n built-in options keys
  * @experimental
  */
-export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants'))['COMMON_OPTIONS_USAGE']
+export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants'))['COMMON_OPTIONS']
 
 /**
  * The command i18n built-in resource keys

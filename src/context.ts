@@ -1,9 +1,5 @@
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
-import {
-  COMMAND_I18N_RESOURCE_KEYS,
-  COMMAND_OPTIONS_DEFAULT,
-  COMMON_OPTIONS_USAGE
-} from './constants.js'
+import { COMMAND_I18N_RESOURCE_KEYS, COMMAND_OPTIONS_DEFAULT } from './constants.js'
 import { create, deepFreeze, resolveCommandUsageRender, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
@@ -45,7 +41,8 @@ export async function createCommandContext<
         }, create<ArgOptions>())
   const _values = Object.assign(create<ArgValues<Options>>(), values)
   const usage = Object.assign(create<Options>(), command.usage)
-  usage.options = Object.assign(create<Options>(), usage.options, COMMON_OPTIONS_USAGE)
+  const { help, version } = DefaultResource as unknown as ArgOptions
+  usage.options = Object.assign(create<Options>(), usage.options, { help, version })
   const env = Object.assign(
     create<CommandEnvironment<Options>>(),
     COMMAND_OPTIONS_DEFAULT,
@@ -55,6 +52,7 @@ export async function createCommandContext<
   const locale = resolveLocale(commandOptions.locale)
   const localeResources: Map<string, Record<string, string>> = new Map()
   const commandResources = new Map<string, Record<string, string>>()
+  let builtInLoadedResources: Record<string, string> | undefined
 
   /**
    * Load the built-in locale resources
@@ -62,10 +60,10 @@ export async function createCommandContext<
 
   localeResources.set(DEFAULT_LOCALE, DefaultResource as Record<string, string>)
   if (DEFAULT_LOCALE !== locale.toString()) {
-    const resource = (await import(`../locales/${locale.toString()}.json`, {
+    builtInLoadedResources = (await import(`../locales/${locale.toString()}.json`, {
       with: { type: 'json' }
     })) as Record<string, string>
-    localeResources.set(locale.toString(), resource)
+    localeResources.set(locale.toString(), builtInLoadedResources)
   }
 
   function translation<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
@@ -143,6 +141,10 @@ export async function createCommandContext<
         examples: originalResource.examples
       } as Record<string, string>)
     )
+    if (builtInLoadedResources) {
+      resource.help = builtInLoadedResources.help
+      resource.version = builtInLoadedResources.version
+    }
     commandResources.set(locale.toString(), resource)
   }
 

@@ -1,10 +1,11 @@
 import { describe, expect, test, vi } from 'vitest'
+import DefaultLocale from '../locales/en-US.json'
+import jaLocale from '../locales/ja-JP.json'
 import { hasPrototype } from '../test/utils'
-import { COMMON_OPTIONS_USAGE } from './constants'
 import { createCommandContext, DEFAULT_LOCALE } from './context'
 
 import type { ArgOptions } from 'args-tokens'
-import type { CommandResourceFetcher, Command, CommandResource, LazyCommand } from './types'
+import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types'
 
 test('basic', async () => {
   const command = {
@@ -200,8 +201,8 @@ describe('translation', () => {
 
     // description, options, and examples
     expect(ctx.translation('description')).toEqual('description') // not defined in the command
-    expect(ctx.translation('help')).toEqual(COMMON_OPTIONS_USAGE.help)
-    expect(ctx.translation('version')).toEqual(COMMON_OPTIONS_USAGE.version)
+    expect(ctx.translation('help')).toEqual(DefaultLocale.help)
+    expect(ctx.translation('version')).toEqual(DefaultLocale.version)
     expect(ctx.translation('examples')).toEqual('examples') // not defined in the command
   })
 
@@ -232,8 +233,8 @@ describe('translation', () => {
 
     // description, options, and examples
     expect(ctx.translation('description')).toEqual('this is cmd1')
-    expect(ctx.translation('help')).toEqual(COMMON_OPTIONS_USAGE.help)
-    expect(ctx.translation('version')).toEqual(COMMON_OPTIONS_USAGE.version)
+    expect(ctx.translation('help')).toEqual(DefaultLocale.help)
+    expect(ctx.translation('version')).toEqual(DefaultLocale.version)
     expect(ctx.translation<OptionsKeys>('foo')).toEqual('this is foo option')
     expect(ctx.translation<OptionsKeys>('bar')).toEqual('this is bar option')
     expect(ctx.translation<OptionsKeys>('baz')).toEqual('this is baz option')
@@ -305,6 +306,11 @@ describe('translation', () => {
     expect(ctx.locale.toString()).toEqual(loadLocale)
 
     type OptionsKeys = keyof typeof command.usage.options
+
+    // built-in command resources
+    expect(ctx.translation('help')).toEqual(jaLocale.help)
+    expect(ctx.translation('version')).toEqual(jaLocale.version)
+    expect(ctx.translation('FORMORE')).toEqual(jaLocale.FORMORE)
 
     // description, options, and examples
     expect(ctx.translation('description')).toEqual(jaJPResource.description)
