@@ -1,0 +1,11 @@
+{
+  "COMMAND": "COMMAND",
+  "COMMANDS": "COMMANDS",
+  "SUBCOMMAND": "SUBCOMMAND",
+  "USAGE": "USAGE",
+  "OPTIONS": "OPTIONS",
+  "EXAMPLES": "EXAMPLES",
+  "FORMORE": "For more info, run any command with the `--help` flag:",
+  "help": "Display this help message",
+  "version": "Display this version"
+}

@@ -16,7 +16,7 @@ import type {
 /**
  * Run the command
  * @param args - command line arguments
- * @param entry - a {@link Command | entry command} or an {@linke CommandRunner | inline command runner}
+ * @param entry - a {@link Command | entry command} or an {@link CommandRunner | inline command runner}
  * @param opts - a {@link CommandOptions | command options}
  */
 export async function cli<Options extends ArgOptions>(
@@ -41,7 +41,7 @@ export async function cli<Options extends ArgOptions>(
 
   const { values, positionals, error } = resolveArgs(options, tokens)
   const omitted = !subCommand
-  const ctx = createCommandContext({
+  const ctx = await createCommandContext({
     options,
     values,
     positionals,

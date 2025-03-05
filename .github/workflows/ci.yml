@@ -103,7 +103,7 @@ jobs:
         node-version: [20]
         os: [ubuntu-latest]
 
-    name: Test on Node.js ${{ matrix.node-version }}
+    name: Type Checking on Node.js ${{ matrix.node-version }}
     steps:
       - name: Checkout codes
         uses: actions/checkout@v4

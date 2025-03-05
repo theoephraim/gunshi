@@ -1,11 +1,13 @@
-import { expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
+import DefaultLocale from '../locales/en-US.json'
+import jaLocale from '../locales/ja-JP.json'
 import { hasPrototype } from '../test/utils'
-import { createCommandContext } from './context'
+import { createCommandContext, DEFAULT_LOCALE } from './context'
 
 import type { ArgOptions } from 'args-tokens'
-import type { Command, LazyCommand } from './types'
+import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types'
 
-test('basic', () => {
+test('basic', async () => {
   const command = {
     name: 'cmd1',
     description: 'this is cmd1',
@@ -25,7 +27,7 @@ test('basic', () => {
   const mockRenderUsage = vi.fn()
   const mockRenderValidationErrors = vi.fn()
 
-  const ctx = createCommandContext({
+  const ctx = await createCommandContext({
     options: {
       foo: {
         type: 'string',
@@ -124,11 +126,11 @@ test('basic', () => {
   expect(Object.isFrozen(ctx.values)).toEqual(true)
 })
 
-test('default', () => {
+test('default', async () => {
   const command = {
     run: vi.fn()
   }
-  const ctx = createCommandContext({
+  const ctx = await createCommandContext({
     options: undefined,
     values: { foo: 'foo', bar: true, baz: 42 },
     positionals: ['bar'],
@@ -166,5 +168,155 @@ test('default', () => {
       help: 'Display this help message',
       version: 'Display this version'
     }
+  })
+})
+
+describe('translation', () => {
+  test('default', async () => {
+    const command = {
+      run: vi.fn()
+    }
+    const ctx = await createCommandContext({
+      options: undefined,
+      values: { foo: 'foo', bar: true, baz: 42 },
+      positionals: ['bar'],
+      command,
+      omitted: false,
+      commandOptions: {}
+    })
+
+    // locale en-US
+    expect(ctx.locale.toString()).toEqual(DEFAULT_LOCALE)
+
+    // built-in command resources
+    expect(ctx.translation('COMMAND')).toEqual('COMMAND')
+    expect(ctx.translation('COMMANDS')).toEqual('COMMANDS')
+    expect(ctx.translation('SUBCOMMAND')).toEqual('SUBCOMMAND')
+    expect(ctx.translation('OPTIONS')).toEqual('OPTIONS')
+    expect(ctx.translation('EXAMPLES')).toEqual('EXAMPLES')
+    expect(ctx.translation('USAGE')).toEqual('USAGE')
+    expect(ctx.translation('FORMORE')).toEqual(
+      'For more info, run any command with the `--help` flag:'
+    )
+
+    // description, options, and examples
+    expect(ctx.translation('description')).toEqual('') // not defined in the command
+    expect(ctx.translation('help')).toEqual(DefaultLocale.help)
+    expect(ctx.translation('version')).toEqual(DefaultLocale.version)
+    expect(ctx.translation('examples')).toEqual('') // not defined in the command
+  })
+
+  test('basic', async () => {
+    const command = {
+      name: 'cmd1',
+      description: 'this is cmd1',
+      usage: {
+        options: {
+          foo: 'this is foo option',
+          bar: 'this is bar option',
+          baz: 'this is baz option'
+        },
+        examples: 'this is an cmd1 example'
+      },
+      run: vi.fn()
+    } satisfies Command<ArgOptions>
+    const ctx = await createCommandContext({
+      options: undefined,
+      values: { foo: 'foo', bar: true, baz: 42 },
+      positionals: ['bar'],
+      command,
+      omitted: false,
+      commandOptions: {}
+    })
+
+    type OptionsKeys = keyof typeof command.usage.options
+
+    // description, options, and examples
+    expect(ctx.translation('description')).toEqual('this is cmd1')
+    expect(ctx.translation('help')).toEqual(DefaultLocale.help)
+    expect(ctx.translation('version')).toEqual(DefaultLocale.version)
+    expect(ctx.translation<OptionsKeys>('foo')).toEqual('this is foo option')
+    expect(ctx.translation<OptionsKeys>('bar')).toEqual('this is bar option')
+    expect(ctx.translation<OptionsKeys>('baz')).toEqual('this is baz option')
+    expect(ctx.translation('examples')).toEqual('this is an cmd1 example')
+  })
+
+  test('load another locale resource', async () => {
+    const options = {
+      foo: {
+        type: 'string',
+        short: 'f'
+      },
+      bar: {
+        type: 'boolean'
+      },
+      baz: {
+        type: 'number',
+        short: 'b',
+        default: 42
+      }
+    } satisfies ArgOptions
+
+    const jaJPResource = {
+      description: 'これはコマンド1です',
+      options: {
+        foo: 'これは foo オプションです',
+        bar: 'これは bar オプションです',
+        baz: 'これは baz オプションです'
+      },
+      examples: 'これはコマンド1の例です'
+    } satisfies CommandResource<typeof options>
+
+    const loadLocale = 'ja-JP'
+
+    const mockResource = vi.fn<CommandResourceFetcher<typeof options>>().mockImplementation(ctx => {
+      if (ctx.locale.toString() === loadLocale) {
+        return Promise.resolve(jaJPResource)
+      } else {
+        throw new Error('not found')
+      }
+    })
+
+    const command = {
+      name: 'cmd1',
+      usage: {
+        options: {
+          foo: 'this is foo option',
+          bar: 'this is bar option',
+          baz: 'this is baz option'
+        },
+        examples: 'this is an cmd1 example'
+      },
+      run: vi.fn(),
+      resource: mockResource
+    } satisfies Command<typeof options>
+
+    const ctx = await createCommandContext({
+      options,
+      values: { foo: 'foo', bar: true, baz: 42 },
+      positionals: ['bar'],
+      command,
+      omitted: false,
+      commandOptions: {
+        description: 'this is cmd1',
+        locale: new Intl.Locale(loadLocale)
+      }
+    })
+
+    expect(ctx.locale.toString()).toEqual(loadLocale)
+
+    type OptionsKeys = keyof typeof command.usage.options
+
+    // built-in command resources
+    expect(ctx.translation('help')).toEqual(jaLocale.help)
+    expect(ctx.translation('version')).toEqual(jaLocale.version)
+    expect(ctx.translation('FORMORE')).toEqual(jaLocale.FORMORE)
+
+    // description, options, and examples
+    expect(ctx.translation('description')).toEqual(jaJPResource.description)
+    expect(ctx.translation<OptionsKeys>('foo')).toEqual(jaJPResource.options.foo)
+    expect(ctx.translation<OptionsKeys>('bar')).toEqual(jaJPResource.options.bar)
+    expect(ctx.translation<OptionsKeys>('baz')).toEqual(jaJPResource.options.baz)
+    expect(ctx.translation('examples')).toEqual(jaJPResource.examples)
   })
 })

@@ -1,0 +1,11 @@
+{
+  "COMMAND": "コマンド",
+  "COMMANDS": "コマンド",
+  "SUBCOMMAND": "サブコマンド",
+  "USAGE": "使い方",
+  "OPTIONS": "オプション",
+  "EXAMPLES": "例",
+  "FORMORE": "詳細は、コマンドと`--help`フラグを実行してください:",
+  "help": "このヘルプメッセージを表示",
+  "version": "このバージョンを表示"
+}

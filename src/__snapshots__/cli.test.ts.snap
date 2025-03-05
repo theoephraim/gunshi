@@ -10,6 +10,25 @@ OPTIONS:
 "
 `;
 
+exports[`aute generate usage > locale resource not found 1`] = `
+"Modern CLI tool (gunshi v0.0.0)
+
+USAGE:
+  gunshi <OPTIONS> 
+
+OPTIONS:
+  -f, --foo <foo>          [string]  The foo option
+  -h, --help               [boolean] Display this help message
+  -v, --version            [boolean] Display this version
+
+EXAMPLES:
+  # Example 1
+  $ gunshi --foo bar
+  # Example 2
+  $ gunshi -f bar
+"
+`;
+
 exports[`aute generate usage > loosely entry command 1`] = `
 "USAGE:
   COMMAND <OPTIONS> 
@@ -62,24 +81,24 @@ EXAMPLES:
 exports[`aute generate usage > strictly sub commands 1`] = `
 "Modern CLI tool (gunshi v0.0.0)
 
-USAGE:
-    gunshi [command1] <OPTIONS> 
-    gunshi <COMMANDS>
+使い方:
+    gunshi [command1] <オプション> 
+    gunshi <コマンド>
 
-COMMANDS:
+コマンド:
     command2                 
     command1                 
 
-For more info, run any command with the \`--help\` flag:
+詳細は、コマンドと\`--help\`フラグを実行してください:
     gunshi command2 --help
     gunshi command1 --help
 
-OPTIONS:
+オプション:
     -f, --foo <foo>               The foo option
     -h, --help                    Display this help message
     -v, --version                 Display this version
 
-EXAMPLES:
+例:
     # Example 1
     $ gunshi --foo bar
     # Example 2
@@ -114,5 +133,7 @@ Options:
   --help       [boolean]   Display this help message
   --version    [boolean]   Display this version
 
-Option '--bar'  is required"
+*******************************
+* Option '--bar'  is required *
+*******************************"
 `;

@@ -1,4 +1,4 @@
-import { generateOptionsUsage, getOptionsPairs, resolveCommandUsageRender } from './utils.js'
+import { create } from './utils.js'
 
 import type { ArgOptions } from 'args-tokens'
 import type { CommandContext } from './types'
@@ -21,7 +21,7 @@ export async function renderUsage<Options extends ArgOptions>(
 
   // render description section (sub command executed only)
   if (!ctx.omitted && hasDescription(ctx)) {
-    messages.push(await resolveCommandUsageRender(ctx, ctx.description!), '')
+    messages.push(ctx.description!, '')
   }
 
   // render usage section
@@ -39,7 +39,7 @@ export async function renderUsage<Options extends ArgOptions>(
 
   // render examples section
   if (hasExamples(ctx)) {
-    messages.push(...(await renderExamplesSection(ctx)), '')
+    messages.push(...renderExamplesSection(ctx), '')
   }
 
   return messages.join('\n')
@@ -61,33 +61,32 @@ async function renderOptionsSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
   const messages: string[] = []
-  messages.push('OPTIONS:')
+  messages.push(`${ctx.translation('OPTIONS')}:`)
   const optionsPairs = getOptionsPairs(ctx)
   messages.push(await generateOptionsUsage(ctx, optionsPairs))
   return messages
 }
 
-async function renderExamplesSection<Options extends ArgOptions>(
+function renderExamplesSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
-): Promise<string[]> {
+): string[] {
   const messages: string[] = []
-  const resolved = await resolveCommandUsageRender(ctx, ctx.usage.examples!)
-  const examples = resolved
-    .split('\n')
+  const examples = ctx.usage
+    .examples!.split('\n')
     .map(example => example.padStart(ctx.env.leftMargin + example.length))
-  messages.push(`EXAMPLES:`, ...examples)
+  messages.push(`${ctx.translation('EXAMPLES')}:`, ...examples)
   return messages
 }
 
 async function renderUsageSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
-  const messages: string[] = ['USAGE:']
+  const messages: string[] = [`${ctx.translation('USAGE')}:`]
   if (ctx.omitted) {
-    const defaultCommand = `${resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${resolveSubCommand(ctx)}]` : ''} ${hasOptions(ctx) ? '<OPTIONS>' : ''} `
+    const defaultCommand = `${resolveEntry(ctx)}${(await hasCommands(ctx)) ? ` [${resolveSubCommand(ctx)}]` : ''} ${hasOptions(ctx) ? `<${ctx.translation('OPTIONS')}>` : ''} `
     messages.push(defaultCommand.padStart(ctx.env.leftMargin + defaultCommand.length))
     if (await hasCommands(ctx)) {
-      const commandsUsage = `${resolveEntry(ctx)} <COMMANDS>`
+      const commandsUsage = `${resolveEntry(ctx)} <${ctx.translation('COMMANDS')}>`
       messages.push(commandsUsage.padStart(ctx.env.leftMargin + commandsUsage.length))
     }
   } else {
@@ -100,21 +99,18 @@ async function renderUsageSection<Options extends ArgOptions>(
 async function renderCommandsSection<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string[]> {
-  const messages: string[] = ['COMMANDS:']
+  const messages: string[] = [`${ctx.translation('COMMANDS')}:`]
   const loadedCommands = await ctx.loadCommands()
   const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
   const commandsStr = await Promise.all(
-    loadedCommands.map(async cmd => {
+    loadedCommands.map(cmd => {
       const key = cmd.name || ''
-      const desc = await resolveCommandUsageRender(
-        ctx as CommandContext<Options>,
-        cmd.description || ''
-      )
+      const desc = cmd.description || ''
       const command = `${key.padEnd(commandMaxLength + ctx.env.middleMargin)}${desc} `
       return `${command.padStart(ctx.env.leftMargin + command.length)} `
     })
   )
-  messages.push(...commandsStr, '', `For more info, run any command with the \`--help\` flag:`)
+  messages.push(...commandsStr, '', ctx.translation('FORMORE'))
   messages.push(
     ...loadedCommands.map(cmd => {
       const commandHelp = `${ctx.env.name} ${cmd.name} --help`
@@ -125,13 +121,13 @@ async function renderCommandsSection<Options extends ArgOptions>(
 }
 
 function resolveEntry<Options extends ArgOptions>(ctx: Readonly<CommandContext<Options>>): string {
-  return ctx.env.name || 'COMMAND'
+  return ctx.env.name || ctx.translation('COMMAND')
 }
 
 function resolveSubCommand<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): string {
-  return ctx.name || 'SUBCOMMAND'
+  return ctx.name || ctx.translation('SUBCOMMAND')
 }
 
 function hasDescription<Options extends ArgOptions>(ctx: CommandContext<Options>): boolean {
@@ -158,5 +154,52 @@ function hasAllDefaultOptions<Options extends ArgOptions>(ctx: CommandContext<Op
 }
 
 function generateOptionsSymbols<Options extends ArgOptions>(ctx: CommandContext<Options>): string {
-  return hasOptions(ctx) ? (hasAllDefaultOptions(ctx) ? '[OPTIONS]' : '<OPTIONS>') : ''
+  return hasOptions(ctx)
+    ? hasAllDefaultOptions(ctx)
+      ? `[${ctx.translation('OPTIONS')}]`
+      : `<${ctx.translation('OPTIONS')}>`
+    : ''
+}
+
+function getOptionsPairs<Options extends ArgOptions>(
+  ctx: CommandContext<Options>
+): Record<string, string> {
+  // eslint-disable-next-line unicorn/no-array-reduce
+  return Object.entries(ctx.options!).reduce((acc, [name, value]) => {
+    let key = `--${name}`
+    if (value.short) {
+      key = `-${value.short}, ${key}`
+    }
+    if (value.type !== 'boolean') {
+      key = value.default ? `${key} [${name}]` : `${key} <${name}>`
+    }
+    acc[name] = key
+    return acc
+  }, create<Record<string, string>>())
+}
+
+async function generateOptionsUsage<Options extends ArgOptions>(
+  ctx: CommandContext<Options>,
+  optionsPairs: Record<string, string>
+): Promise<string> {
+  const optionsMaxLength = Math.max(
+    ...Object.entries(optionsPairs).map(([_, value]) => value.length)
+  )
+
+  const optionSchemaMaxLength = ctx.env.usageOptionType
+    ? Math.max(...Object.entries(optionsPairs).map(([key, _]) => ctx.options![key].type.length))
+    : 0
+
+  const usages = await Promise.all(
+    Object.entries(optionsPairs).map(([key, value]) => {
+      const rawDesc = ctx.translation(key)
+      const optionsSchema = ctx.env.usageOptionType ? `[${ctx.options![key].type}] ` : ''
+      // padEnd is used to align the `[]` symbols
+      const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
+      const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}`
+      return `${option.padStart(ctx.env.leftMargin + option.length)}`
+    })
+  )
+
+  return usages.join('\n')
 }
