@@ -248,6 +248,7 @@ describe('aute generate usage', () => {
       description: 'Modern CLI tool',
       version: '0.0.0',
       leftMargin: 4,
+      locale: 'ja-JP',
       middleMargin: 15
     })
 

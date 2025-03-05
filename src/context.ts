@@ -74,7 +74,7 @@ export async function createCommandContext<
     } else {
       const resource =
         commandResources.get(locale.toString()) || commandResources.get(DEFAULT_LOCALE)!
-      return resource[key as string] || (key as string)
+      return resource[key as string] || ''
     }
   }
 

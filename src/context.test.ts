@@ -200,10 +200,10 @@ describe('translation', () => {
     )
 
     // description, options, and examples
-    expect(ctx.translation('description')).toEqual('description') // not defined in the command
+    expect(ctx.translation('description')).toEqual('') // not defined in the command
     expect(ctx.translation('help')).toEqual(DefaultLocale.help)
     expect(ctx.translation('version')).toEqual(DefaultLocale.version)
-    expect(ctx.translation('examples')).toEqual('examples') // not defined in the command
+    expect(ctx.translation('examples')).toEqual('') // not defined in the command
   })
 
   test('basic', async () => {
