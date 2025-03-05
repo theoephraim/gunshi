@@ -33,3 +33,13 @@ export const COMMAND_OPTIONS_DEFAULT: CommandOptions<ArgOptions> = {
   renderUsage: undefined,
   renderValidationErrors: undefined
 }
+
+export const COMMAND_I18N_RESOURCE_KEYS = [
+  'USAGE',
+  'COMMAND',
+  'SUBCOMMAND',
+  'COMMANDS',
+  'OPTIONS',
+  'EXAMPLES',
+  'FORMORE'
+] as const

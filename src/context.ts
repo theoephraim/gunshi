@@ -1,10 +1,26 @@
-import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS_USAGE } from './constants.js'
-import { create, deepFreeze, resolveLazyCommand } from './utils.js'
+import DefaultResource from '../locales/en-US.json' with { type: 'json' }
+import {
+  COMMAND_I18N_RESOURCE_KEYS,
+  COMMAND_OPTIONS_DEFAULT,
+  COMMON_OPTIONS_USAGE
+} from './constants.js'
+import { create, deepFreeze, resolveCommandUsageRender, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
-import type { Command, CommandContext, CommandEnvironment, CommandOptions } from './types'
+import type {
+  Command,
+  CommandBuiltinResourceKeys,
+  CommandContext,
+  CommandEnvironment,
+  CommandOptions
+} from './types'
 
-export function createCommandContext<Options extends ArgOptions, Values = ArgValues<Options>>({
+export const DEFAULT_LOCALE = 'en-US'
+
+export async function createCommandContext<
+  Options extends ArgOptions,
+  Values = ArgValues<Options>
+>({
   options,
   values,
   positionals,
@@ -18,9 +34,9 @@ export function createCommandContext<Options extends ArgOptions, Values = ArgVal
   omitted: boolean
   command: Command<Options>
   commandOptions: CommandOptions<Options>
-}): Readonly<CommandContext<Options, Values>> {
+}): Promise<Readonly<CommandContext<Options, Values>>> {
   const _options =
-    options == undefined
+    options == null
       ? undefined
       : // eslint-disable-next-line unicorn/no-array-reduce
         Object.entries(options as ArgOptions).reduce((acc, [key, value]) => {
@@ -36,6 +52,37 @@ export function createCommandContext<Options extends ArgOptions, Values = ArgVal
     commandOptions
   )
 
+  const locale = resolveLocale(commandOptions.locale)
+  const localeResouces: Map<string, Record<string, string>> = new Map()
+  const commandResources = new Map<string, Record<string, string>>()
+
+  /**
+   * Load the built-in locale resources
+   */
+
+  localeResouces.set(DEFAULT_LOCALE, DefaultResource as Record<string, string>)
+  if (DEFAULT_LOCALE !== locale.toString()) {
+    const resource = (await import(`../locales/${locale.toString()}.json`, {
+      with: { type: 'json' }
+    })) as Record<string, string>
+    localeResouces.set(locale.toString(), resource)
+  }
+
+  function translation<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
+    if (COMMAND_I18N_RESOURCE_KEYS.includes(key as CommandBuiltinResourceKeys)) {
+      const resource = localeResouces.get(locale.toString()) || localeResouces.get(DEFAULT_LOCALE)!
+      return resource[key as CommandBuiltinResourceKeys] || (key as string)
+    } else {
+      const resource =
+        commandResources.get(locale.toString()) || commandResources.get(DEFAULT_LOCALE)!
+      return resource[key as string] || (key as string)
+    }
+  }
+
+  /**
+   * Load the sub-commands
+   */
+
   let cachedCommands: Command<Options>[] | undefined
   async function loadCommands(): Promise<Command<Options>[]> {
     if (cachedCommands) {
@@ -48,18 +95,63 @@ export function createCommandContext<Options extends ArgOptions, Values = ArgVal
     ))
   }
 
-  return deepFreeze(
+  const ctx = deepFreeze(
     Object.assign(create<CommandContext<Options, Values>>(), {
       name: command.name,
       description: command.description,
       omitted,
-      locale: new Intl.Locale('en'), // TODO: resolve locale on runtime and abstraction
+      locale,
       env,
       options: _options,
       values: _values,
       positionals,
       usage,
-      loadCommands
+      loadCommands,
+      translation
     })
   )
+
+  const loadedOptionsResources = await Promise.all(
+    Object.entries(usage.options || create<Options>()).map(async ([key, _]) => {
+      const option = await resolveCommandUsageRender(ctx, usage.options![key])
+      return [key, option] as [string, string]
+    })
+  )
+  // eslint-disable-next-line unicorn/no-array-reduce
+  const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
+    res[key] = value
+    return res
+  }, create<Record<string, string>>())
+  defaultCommandResource.description = await resolveCommandUsageRender(
+    ctx,
+    command.description || ''
+  )
+  defaultCommandResource.examples = await resolveCommandUsageRender(ctx, usage.examples || '')
+  commandResources.set(DEFAULT_LOCALE, defaultCommandResource)
+
+  if (command.resource) {
+    const originalResource = await command.resource(ctx)
+    // eslint-disable-next-line unicorn/no-array-reduce
+    const resource = Object.entries(originalResource.options).reduce(
+      (res, [key, value]) => {
+        res[key] = value
+        return res
+      },
+      Object.assign(create<Record<string, string>>(), {
+        description: originalResource.description,
+        examples: originalResource.examples
+      } as Record<string, string>)
+    )
+    commandResources.set(locale.toString(), resource)
+  }
+
+  return ctx
+}
+
+function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
+  return locale instanceof Intl.Locale
+    ? locale
+    : typeof locale === 'string'
+      ? new Intl.Locale(locale)
+      : new Intl.Locale(DEFAULT_LOCALE)
 }

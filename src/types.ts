@@ -6,6 +6,30 @@ import type { ArgOptions, ArgValues } from 'args-tokens'
 type Awaitable<T> = T | Promise<T>
 
 /**
+ * The command i18n built-in options keys
+ * @experimental
+ */
+export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants'))['COMMON_OPTIONS_USAGE']
+
+/**
+ * The command i18n built-in resource keys
+ * @experimental
+ */
+export type CommandBuiltinResourceKeys =
+  (typeof import('./constants'))['COMMAND_I18N_RESOURCE_KEYS'][number]
+
+/**
+ * The command i18n built-in keys
+ * @description The command i18n built-in keys are used to {@link CommandContext.translation | translate} function
+ * @experimental
+ */
+export type CommandBuiltinKeys =
+  | CommandBuiltinOptionsKeys
+  | CommandBuiltinResourceKeys
+  | 'description'
+  | 'examples'
+
+/**
  * The command environment
  */
 export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
@@ -96,6 +120,11 @@ export interface CommandOptions<Options extends ArgOptions> {
    */
   version?: string
   /**
+   * The locale of the command
+   * @description The locale of the command that was executed. If you would specify it, gunshi command usage will be localized.
+   */
+  locale?: string | Intl.Locale
+  /**
    * The sub commands
    */
   subCommands?: Map<string, Command<Options> | LazyCommand<Options>>
@@ -181,6 +210,13 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
    * @returns loaded commands
    */
   loadCommands: () => Promise<Command<Options>[]>
+  /**
+   * The translation function
+   * @param key {CommandBuiltinKeys | T} - The key to be translated
+   * @returns The translated string, if the key is not found, the key itself is returned
+   * @experimental
+   */
+  translation: <T = CommandBuiltinKeys, Key = CommandBuiltinKeys | T>(key: Key) => string
 }
 
 /**
@@ -242,7 +278,41 @@ export interface Command<Options extends ArgOptions> {
    * The command runner, that's the command to be executed
    */
   run: CommandRunner<Options>
+  /**
+   * The command resource fetcher
+   * @experimental
+   */
+  resource?: CommadResourceFetcher<Options>
 }
+
+/**
+ * The command resource
+ * @experimental
+ */
+export interface CommandResource<Options extends ArgOptions> {
+  /**
+   * The command description resource
+   */
+  description: string
+  /**
+   * The options usage resources
+   */
+  options: {
+    [Option in keyof Options]: string
+  }
+  /**
+   * The examples usage resources
+   */
+  examples: string
+}
+
+/**
+ * The command resource fetcher
+ * @experimental
+ */
+export type CommadResourceFetcher<Options extends ArgOptions> = (
+  ctx: Readonly<CommandContext<Options>>
+) => Promise<CommandResource<Options>>
 
 /**
  * The command runner interface

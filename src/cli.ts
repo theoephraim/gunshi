@@ -41,7 +41,7 @@ export async function cli<Options extends ArgOptions>(
 
   const { values, positionals, error } = resolveArgs(options, tokens)
   const omitted = !subCommand
-  const ctx = createCommandContext({
+  const ctx = await createCommandContext({
     options,
     values,
     positionals,

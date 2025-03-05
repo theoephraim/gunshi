@@ -338,7 +338,6 @@ describe('custom generate usage', () => {
     } catch {}
 
     const message = log()
-    console.log(message)
     expect(message).toMatchSnapshot()
   })
 })
