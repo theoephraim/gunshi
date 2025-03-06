@@ -32,7 +32,8 @@
   },
   "type": "module",
   "files": [
-    "lib"
+    "lib",
+    "locales"
   ],
   "module": "lib/index.js",
   "exports": {
