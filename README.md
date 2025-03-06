@@ -3,6 +3,14 @@
 </p>
 <h1 align="center">🏯 Gunshi</h1>
 
+[![Version][npm-version-src]][npm-version-href]
+[![CI][ci-src]][ci-href]
+
+<!--
+[![JSR][jsr-src]][jsr-href]
+[![InstallSize][install-size-src]][install-size-src]
+-->
+
 Gunshi is a modern javascript command-line library
 
 > [!TIP]
@@ -21,6 +29,39 @@ Gunshi is designed to simplify the creation of modern command-line interfaces:
 - 🎨 **Custom usage generation**: Usage message generation customizable.
 - 🌍 **Internationalization**: I18n out of the box and locale resource lazy loading.
 
+## 💿 Installation
+
+```sh
+# npm
+npm install --save gunshi
+
+## pnpm
+pnpm add gunshi
+
+## yarn
+yarn add gunshi
+
+```
+
+## 🙌 Contributing guidelines
+
+If you are interested in contributing to `gunshi`, I highly recommend checking out [the contributing guidelines](/CONTRIBUTING.md) here. You'll find all the relevant information such as [how to make a PR](/CONTRIBUTING.md#pull-request-guidelines), [how to setup development](/CONTRIBUTING.md#development-setup)) etc., there.
+
 ## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/gunshi?style=flat
+[npm-version-href]: https://npmjs.com/package/gunshi
+[jsr-src]: https://jsr.io/badges/@kazupon/gunishi
+[jsr-href]: https://jsr.io/@kazupon/gunshi
+
+<!--
+[install-size-src]: https://pkg-size.dev/badge/install/35082
+[install-size-href]: https://pkg-size.dev/gunishi
+-->
+
+[ci-src]: https://github.com/kazupon/gunshi/actions/workflows/ci.yml/badge.svg
+[ci-href]: https://github.com/kazupon/gunshi/actions/workflows/ci.yml
