@@ -55,7 +55,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p ./tsconfig.build.json",
+    "build": "rolldown -c rolldown.config.ts",
     "changelog": "gh-changelogen --repo=kazupon/gunshi",
     "clean": "git clean -df",
     "dev": "pnpx @eslint/config-inspector --config eslint.config.ts",
@@ -96,8 +96,10 @@
     "lint-staged": "^15.4.3",
     "pkg-pr-new": "^0.0.40",
     "prettier": "^3.5.3",
+    "rolldown": "1.0.0-beta.3",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.0",
+    "unplugin-isolated-decl": "^0.13.1",
     "vitest": "^3.0.7"
   },
   "pnpm": {
