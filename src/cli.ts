@@ -49,6 +49,7 @@ export async function cli<Options extends ArgOptions>(
     command,
     commandOptions: opts
   })
+
   if (values.version) {
     showVersion(ctx)
     return
@@ -63,7 +64,7 @@ export async function cli<Options extends ArgOptions>(
 
   if (error) {
     await showValidationErrors(ctx, error)
-    throw error
+    return
   }
 
   await command.run(ctx)
