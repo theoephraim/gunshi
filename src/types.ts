@@ -6,20 +6,20 @@ import type { ArgOptions, ArgValues } from 'args-tokens'
 type Awaitable<T> = T | Promise<T>
 
 /**
- * The command i18n built-in options keys
+ * Command i18n built-in options keys
  * @experimental
  */
 export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants'))['COMMON_OPTIONS']
 
 /**
- * The command i18n built-in resource keys
+ * Command i18n built-in resource keys
  * @experimental
  */
 export type CommandBuiltinResourceKeys =
   (typeof import('./constants'))['COMMAND_I18N_RESOURCE_KEYS'][number]
 
 /**
- * The command i18n built-in keys
+ * Command i18n built-in keys
  * @description The command i18n built-in keys are used to {@link CommandContext.translation | translate} function
  * @experimental
  */
@@ -30,38 +30,38 @@ export type CommandBuiltinKeys =
   | 'examples'
 
 /**
- * The command environment
+ * Command environment
  */
 export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
   /**
-   * The current working directory
+   * Current working directory
    * @see {@link CommandOptions.cwd}
    */
   cwd: string | undefined
   /**
-   * The command name
+   * Command name
    * @see {@link CommandOptions.name}
    */
   name: string | undefined
   /**
-   * The command description
+   * Command description
    * @see {@link CommandOptions.description}
    *
    */
   description: string | undefined
   /**
-   * The command version
+   * Command version
    * @see {@link CommandOptions.version}
    */
   version: string | undefined
   /**
-   * The left margin of the command output
+   * Left margin of the command output
    * @default 2
    * @see {@link CommandOptions.leftMargin}
    */
   leftMargin: number
   /**
-   * The middle margin of the command output
+   * Middle margin of the command output
    * @default 10
    * @see {@link CommandOptions.middleMargin}
    */
@@ -73,7 +73,7 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
    */
   usageOptionType: boolean
   /**
-   * The sub commands
+   * Sub commands
    * @see {@link CommandOptions.subCommands}
    */
   subCommands: Map<string, Command<Options> | LazyCommand<Options>> | undefined
@@ -95,45 +95,40 @@ export interface CommandEnvironment<Options extends ArgOptions = ArgOptions> {
 }
 
 /**
- * The command options
+ * Command options
  */
 export interface CommandOptions<Options extends ArgOptions> {
   /**
-   * The current working directory
-   * @description This is the current working directory path passed in the context of the run command. This is useful if you need your command about the current execution directory.
+   * Current working directory
    */
   cwd?: string
   /**
-   * The command name
-   * @description Please specify the name of the command that was executed. If you would specify it, gunshi will be displayed in the usage.
+   * Command program name
    */
   name?: string
   /**
-   * The command description
-   * @description Please specify the description (summary) of the command that was executed. If you would specify it, gunshi will be displayed in the usage.
+   * Command program description
    *
    */
   description?: string
   /**
-   * The command version
-   * @description Please specify the version of the command that was executed. If you would specify it, gunshi will be displayed in the usage.
+   * Command program version
    */
   version?: string
   /**
-   * The locale of the command
-   * @description The locale of the command that was executed. If you would specify it, gunshi command usage will be localized.
+   * Command program locale
    */
   locale?: string | Intl.Locale
   /**
-   * The sub commands
+   * Sub commands
    */
   subCommands?: Map<string, Command<Options> | LazyCommand<Options>>
   /**
-   * The left margin of the command output
+   * Left margin of the command output
    */
   leftMargin?: number
   /**
-   * The middle margin of the command output
+   * Middle margin of the command output
    */
   middleMargin?: number
   /**
@@ -157,41 +152,41 @@ export interface CommandOptions<Options extends ArgOptions> {
 }
 
 /**
- * The command context
- * @description The command context is the context of the command execution
+ * Command context
+ * @description Command context is the context of the command execution
  */
 export interface CommandContext<Options extends ArgOptions, Values = ArgValues<Options>> {
   /**
-   * The command name, that is the command that is executed
+   * Command name, that is the command that is executed
    * @description The command name is same {@link CommandEnvironment.name}
    */
   name: string | undefined
   /**
-   * The command description, that is the description of the command that is executed
+   * Command description, that is the description of the command that is executed
    * @description The command description is same {@link CommandEnvironment.description}
    */
   description: string | undefined
   /**
-   * The command locale, that is the locale of the command that is executed
+   * Command locale, that is the locale of the command that is executed
    */
   locale: Intl.Locale
   /**
-   * The command environment, that is the environment of the command that is executed
+   * Command environment, that is the environment of the command that is executed
    * @description The command environment is same {@link CommandEnvironment}
    */
   env: CommandEnvironment<Options>
   /**
-   * The command options, that is the options of the command that is executed
+   * Command options, that is the options of the command that is executed
    * @description The command options is same {@link Command.options}
    */
   options: Options | undefined
   /**
-   * The command values, that is the values of the command that is executed
+   * Command values, that is the values of the command that is executed
    * @description Resolve values with `resolveArgs` from command arguments and {@link Command.options}
    */
   values: Values
   /**
-   * The command positionals, that is the positionals of the command that is executed
+   * Command positionals arguments, that is the positionals of the command that is executed
    * @description Resolve positionals with `resolveArgs` from command arguments
    */
   positionals: string[]
@@ -200,63 +195,55 @@ export interface CommandContext<Options extends ArgOptions, Values = ArgValues<O
    */
   omitted: boolean
   /**
-   * The usage of the command
-   * @description The usage of the command is same {@link Command.usage}, and more has `--help` and `--version` options
+   * Command usage
+   * @description Usage of the command is same {@link Command.usage}, and more has `--help` and `--version` options
    */
   usage: CommandUsage<Options>
   /**
-   * Load the sub-commands
+   * Load sub-commands
    * @description The loaded commands are cached and returned when called again
    * @returns loaded commands
    */
   loadCommands: () => Promise<Command<Options>[]>
   /**
-   * The translation function
-   * @param key {CommandBuiltinKeys | T} - The key to be translated
-   * @returns The translated string, if the key is not found, the key itself is returned
+   * Translation function
+   * @param key the key to be translated
+   * @returns A translated string
    * @experimental
    */
   translation: <T = CommandBuiltinKeys, Key = CommandBuiltinKeys | T>(key: Key) => string
 }
 
 /**
- * The command usage render
- * @description if the render function is async, it should return a promise
- */
-export type CommandUsageRender<Options extends ArgOptions> =
-  | ((ctx: Readonly<CommandContext<Options>>) => Promise<string>)
-  | string
-
-/**
- * The command usage
+ * Command usage
  */
 interface CommandUsage<Options extends ArgOptions> {
   /**
-   * The options usage
+   * Options usage
    */
   options?: {
     [Option in keyof Options]: string
   }
   /**
-   * The examples usage
+   * Examples usage
    */
   examples?: string
 }
 
 /**
- * The command interface
+ * Command interface
  */
 export interface Command<Options extends ArgOptions> {
   /**
-   * The command name
+   * Command name
    * @description
-   * The command name is used to find command line arguments to execute from sub commands, so it's recommended to specify.
+   * Command name is used to find command line arguments to execute from sub commands, so it's recommended to specify.
    */
   name?: string
   /**
-   * The command description
+   * Command description
    * @description
-   * The command description is used to describe the command in usage, so it's recommended to specify.
+   * Command description is used to describe the command in usage, so it's recommended to specify.
    */
   description?: string
   /**
@@ -265,49 +252,51 @@ export interface Command<Options extends ArgOptions> {
    */
   default?: boolean
   /**
-   * The command options
+   * Command options
    */
   options?: Options
   /**
-   * The command usage
+   * Command usage
    * @description
-   * The command usage is used to describe the command in usage, so it's recommended to specify.
+   * Command usage is used to describe the command in usage, so it's recommended to specify.
    */
   usage?: CommandUsage<Options>
   /**
-   * The command runner, that's the command to be executed
+   * Command runner, that's the command to be executed
    */
   run: CommandRunner<Options>
   /**
-   * The command resource fetcher
+   * Command resource fetcher
    * @experimental
    */
   resource?: CommandResourceFetcher<Options>
 }
 
 /**
- * The command resource
+ * Command resource
  * @experimental
  */
 export interface CommandResource<Options extends ArgOptions> {
   /**
-   * The command description resource
+   * Command description
    */
   description: string
   /**
-   * The options usage resources
+   * Options usage
    */
   options: {
     [Option in keyof Options]: string
   }
   /**
-   * The examples usage resources
+   * Examples usage
    */
   examples: string
 }
 
 /**
- * The command resource fetcher
+ * Command resource fetcher
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A fetched {@link CommandResource | command resource}
  * @experimental
  */
 export type CommandResourceFetcher<Options extends ArgOptions> = (
@@ -315,15 +304,15 @@ export type CommandResourceFetcher<Options extends ArgOptions> = (
 ) => Promise<CommandResource<Options>>
 
 /**
- * The command runner interface
- * @param ctx - The {@link CommandContext | command context}
+ * Command runner
+ * @param ctx A {@link CommandContext | command context}
  */
 export type CommandRunner<Options extends ArgOptions> = (
   ctx: Readonly<CommandContext<Options>>
 ) => Awaitable<void>
 
 /**
- * The lazy command interface
- * @description The lazy command that's not loaded until it is executed
+ * Lazy command interface
+ * @description lazy command that's not loaded until it is executed
  */
 export type LazyCommand<Options extends ArgOptions> = () => Awaitable<Command<Options>>

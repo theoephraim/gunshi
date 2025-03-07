@@ -12,8 +12,46 @@ import type {
   CommandResource
 } from './types'
 
+/**
+ * The default locale string, which format is BCP 47 language tag
+ */
 export const DEFAULT_LOCALE = 'en-US'
 
+/**
+ * Parameters of {@link createCommandContext}
+ */
+interface CommandContextParams<Options extends ArgOptions, Values> {
+  /**
+   * An options of target command
+   */
+  options: Options | undefined
+  /**
+   * A values of target command
+   */
+  values: Values
+  /**
+   * A positionals arguments, which passed to the target command
+   */
+  positionals: string[]
+  /**
+   * Whether the command is omitted
+   */
+  omitted: boolean
+  /**
+   * A target {@link Command | command}
+   */
+  command: Command<Options>
+  /**
+   * A command options, which is spicialized from `cli` function
+   */
+  commandOptions: CommandOptions<Options>
+}
+
+/**
+ * Create a {@link CommandContext | command context}
+ * @param param A {@link CommandContextParams | parameters} to create a {@link CommandContext | command context}
+ * @returns A {@link CommandContext | command context}, which is readonly
+ */
 export async function createCommandContext<
   Options extends ArgOptions,
   Values = ArgValues<Options>
@@ -24,14 +62,7 @@ export async function createCommandContext<
   command,
   commandOptions,
   omitted = false
-}: {
-  options: Options | undefined
-  values: Values
-  positionals: string[]
-  omitted: boolean
-  command: Command<Options>
-  commandOptions: CommandOptions<Options>
-}): Promise<Readonly<CommandContext<Options, Values>>> {
+}: CommandContextParams<Options, Values>): Promise<Readonly<CommandContext<Options, Values>>> {
   /**
    * tweak the options and values
    */
@@ -65,8 +96,12 @@ export async function createCommandContext<
   )
 
   const locale = resolveLocale(commandOptions.locale)
+
+  // store built-in locale resources in the environment
   const localeResources: Map<string, Record<string, string>> = new Map()
+  // store command resources in sub-commands
   const commandResources = new Map<string, Record<string, string>>()
+
   let builtInLoadedResources: Record<string, string> | undefined
 
   /**
@@ -84,15 +119,22 @@ export async function createCommandContext<
   }
 
   /**
-   * define the translation function
+   * define the translation function, which is used to {@link CommandContext.translation}.
+   *
    */
 
   function translation<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
     if (COMMAND_I18N_RESOURCE_KEYS.includes(key as CommandBuiltinResourceKeys)) {
+      // NOTE:
+      // if the key is one of the `COMMAND_I18N_RESOURCE_KEYS` and the key is not found in the locale resources,
+      // then return the key itself.
       const resource =
         localeResources.get(locale.toString()) || localeResources.get(DEFAULT_LOCALE)!
       return resource[key as CommandBuiltinResourceKeys] || (key as string)
     } else {
+      // NOTE:
+      // for otherwise, if the key is not found in the command resources, then return an empty string.
+      // because should not render the key in usage.
       const resource =
         commandResources.get(locale.toString()) || commandResources.get(DEFAULT_LOCALE)!
       return resource[key as string] || ''

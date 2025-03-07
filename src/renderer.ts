@@ -3,6 +3,11 @@ import { create } from './utils.js'
 import type { ArgOptions } from 'args-tokens'
 import type { CommandContext } from './types'
 
+/**
+ * Render the header
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A rendered header
+ */
 export function renderHeader<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string> {
@@ -14,6 +19,11 @@ export function renderHeader<Options extends ArgOptions>(
   )
 }
 
+/**
+ * Render the usage
+ * @param ctx A {@link CommandContext | command context}
+ * @returns A rendered usage
+ */
 export async function renderUsage<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ): Promise<string> {
@@ -45,6 +55,12 @@ export async function renderUsage<Options extends ArgOptions>(
   return messages.join('\n')
 }
 
+/**
+ * Render the validation errors
+ * @param ctx A {@link CommandContext | command context}
+ * @param error An {@link AggregateError} of option in `args-token` validation
+ * @returns A rendered validation error
+ */
 export function renderValidationErrors<Options extends ArgOptions>(
   _ctx: CommandContext<Options>,
   error: AggregateError
