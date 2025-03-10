@@ -5,10 +5,10 @@
 
 [![Version][npm-version-src]][npm-version-href]
 [![CI][ci-src]][ci-href]
+[![InstallSize][install-size-src]][install-size-src]
 
 <!--
 [![JSR][jsr-src]][jsr-href]
-[![InstallSize][install-size-src]][install-size-src]
 -->
 
 Gunshi is a modern javascript command-line library
@@ -57,11 +57,7 @@ If you are interested in contributing to `gunshi`, I highly recommend checking o
 [npm-version-href]: https://npmjs.com/package/gunshi
 [jsr-src]: https://jsr.io/badges/@kazupon/gunishi
 [jsr-href]: https://jsr.io/@kazupon/gunshi
-
-<!--
-[install-size-src]: https://pkg-size.dev/badge/install/35082
-[install-size-href]: https://pkg-size.dev/gunishi
--->
-
+[install-size-src]: https://pkg-size.dev/badge/install/72346
+[install-size-href]: https://pkg-size.dev/gunshi
 [ci-src]: https://github.com/kazupon/gunshi/actions/workflows/ci.yml/badge.svg
 [ci-href]: https://github.com/kazupon/gunshi/actions/workflows/ci.yml
