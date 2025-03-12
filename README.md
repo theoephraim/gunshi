@@ -28,6 +28,8 @@ Gunshi is designed to simplify the creation of modern command-line interfaces:
 
 ## 💿 Installation
 
+### 🐢 Node
+
 ```sh
 # npm
 npm install --save gunshi
