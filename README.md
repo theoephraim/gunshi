@@ -395,7 +395,7 @@ Thank you!
 
 [npm-version-src]: https://img.shields.io/npm/v/gunshi?style=flat
 [npm-version-href]: https://npmjs.com/package/gunshi
-[jsr-src]: https://jsr.io/badges/@kazupon/gunishi
+[jsr-src]: https://jsr.io/badges/@kazupon/gunshi
 [jsr-href]: https://jsr.io/@kazupon/gunshi
 [install-size-src]: https://pkg-size.dev/badge/install/72346
 [install-size-href]: https://pkg-size.dev/gunshi
