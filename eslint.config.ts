@@ -41,7 +41,15 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   vitest(),
   prettier(),
   {
-    ignores: ['.vscode', '.github', 'lib', 'tsconfig.json', 'pnpm-lock.yaml', 'eslint.config.ts']
+    ignores: [
+      '.vscode',
+      '.github',
+      'lib',
+      'tsconfig.json',
+      'pnpm-lock.yaml',
+      'eslint.config.ts',
+      'README.md'
+    ]
   }
 )
 
