@@ -359,6 +359,10 @@ cli(process.argv.slice(2), command, {
 
 For more detailed examples, check out the [playground/i18n](https://github.com/kazupon/gunshi/tree/main/playground/i18n) in the repository.
 
+## 💁‍♀️ Showcases
+
+- [pnpmc](https://github.com/kazupon/pnpmc): PNPM Catalogs Tooling
+
 ## 🙌 Contributing guidelines
 
 If you are interested in contributing to `gunshi`, I highly recommend checking out [the contributing guidelines](/CONTRIBUTING.md) here. You'll find all the relevant information such as [how to make a PR](/CONTRIBUTING.md#pull-request-guidelines), [how to setup development](/CONTRIBUTING.md#development-setup)) etc., there.
