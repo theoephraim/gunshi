@@ -1,56 +1,34 @@
-import type { ArgOptions, Command, CommandContext } from 'gunshi'
+import type { ArgOptions, Command } from 'gunshi'
 
 import { cli } from 'gunshi'
 
-// Define the interface for our command options
-interface UserOptions extends ArgOptions {
+// Type-safe arguments parsing example
+// This demonstrates how to define and use typed command options with `satisfies`
+
+// Define options with types
+const options = {
+  // Define string option with short alias
   name: {
-    type: 'string'
+    type: 'string',
     short: 'n'
-  }
+  },
+  // Define number option with default value
   age: {
-    type: 'number'
-    short: 'a'
-    default: number
-  }
+    type: 'number',
+    short: 'a',
+    default: 25
+  },
+  // Define boolean flag
   verbose: {
-    type: 'boolean'
+    type: 'boolean',
     short: 'v'
   }
-}
+} satisfies ArgOptions
 
-// Define the interface for our command values
-interface UserValues {
-  name?: string
-  age: number
-  verbose?: boolean
-  help?: boolean
-  version?: boolean
-}
-
-// Type-safe arguments parsing example
-// This demonstrates how to define and use typed command options
-const command: Command<UserOptions> = {
+const command = {
   name: 'type-safe',
   description: 'Demonstrates type-safe argument parsing',
-  options: {
-    // Define string option with short alias
-    name: {
-      type: 'string',
-      short: 'n'
-    },
-    // Define number option with default value
-    age: {
-      type: 'number',
-      short: 'a',
-      default: 25
-    },
-    // Define boolean flag
-    verbose: {
-      type: 'boolean',
-      short: 'v'
-    }
-  },
+  options,
   usage: {
     options: {
       name: 'Your name (string)',
@@ -60,7 +38,7 @@ const command: Command<UserOptions> = {
     examples:
       '# Example usage\n$ tsx index.ts --name John --age 30 --verbose\n$ tsx index.ts -n John -a 30 -v'
   },
-  run: (ctx: CommandContext<UserOptions, UserValues>) => {
+  run: ctx => {
     // Access typed values with proper types
     const { name, age, verbose } = ctx.values
 
@@ -75,12 +53,11 @@ const command: Command<UserOptions> = {
       console.log('All values:', ctx.values)
 
       // TypeScript knows the type of ctx.values
-      const typedValues: UserValues = ctx.values
-      console.log('Age is a number:', typeof typedValues.age === 'number')
-      console.log('Verbose is a boolean:', typeof typedValues.verbose === 'boolean')
+      console.log('Age is a number:', typeof ctx.values.age === 'number')
+      console.log('Verbose is a boolean:', typeof ctx.values.verbose === 'boolean')
     }
   }
-}
+} satisfies Command<typeof options>
 
 // Execute the command with type safety
 await cli(process.argv.slice(2), command)

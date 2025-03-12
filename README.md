@@ -76,21 +76,31 @@ Gunshi provides type-safe argument parsing with TypeScript:
 import { cli } from 'gunshi'
 import type { ArgOptions, Command, CommandContext } from 'gunshi'
 
-// Define interfaces for options and values
-interface UserOptions extends ArgOptions {
-  name: { type: 'string'; short: 'n' }
-  age: { type: 'number'; short: 'a'; default: number }
-  verbose: { type: 'boolean'; short: 'v' }
-}
+// Type-safe arguments parsing example
+// This demonstrates how to define and use typed command options with `satisfies`
 
-interface UserValues {
-  name?: string
-  age: number
-  verbose?: boolean
-}
+// Define options with types
+const options = {
+  // Define string option with short alias
+  name: {
+    type: 'string',
+    short: 'n'
+  },
+  // Define number option with default value
+  age: {
+    type: 'number',
+    short: 'a',
+    default: 25
+  },
+  // Define boolean flag
+  verbose: {
+    type: 'boolean',
+    short: 'v'
+  }
+} satisfies ArgOptions
 
 // Create a type-safe command
-const command: Command<UserOptions> = {
+const command = {
   name: 'type-safe',
   options: {
     name: { type: 'string', short: 'n' },
@@ -101,7 +111,7 @@ const command: Command<UserOptions> = {
     const { name, age, verbose } = ctx.values
     console.log(`Hello, ${name || 'World'}! You are ${age} years old.`)
   }
-}
+} satisfies Command<typeof options>
 
 await cli(process.argv.slice(2), command)
 ```
