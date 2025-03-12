@@ -14,7 +14,7 @@
 Gunshi is a modern javascript command-line library
 
 > [!TIP]
-> gunshi (軍師) is a position in ancient Japanese samurai battle in which a amurai devised strategies and gave orders. That name is inspired by the word "command".
+> gunshi (軍師) is a position in ancient Japanese samurai battle in which a samurai devised strategies and gave orders. That name is inspired by the word "command".
 
 ## ✨ Features
 
@@ -44,7 +44,7 @@ yarn add gunshi
 
 ## 🚀 Usage
 
-### Simple API
+### 📏 Simple API
 
 Gunshi has a simple API that is a facade:
 
@@ -57,7 +57,7 @@ cli(process.argv.slice(2), () => {
 })
 ```
 
-### Type-Safe Arguments
+### 🛡️ Type-Safe Arguments
 
 Gunshi provides type-safe argument parsing with TypeScript:
 
@@ -97,7 +97,7 @@ await cli(process.argv.slice(2), command)
 
 For more detailed examples, check out the [playground/type-safe](https://github.com/kazupon/gunshi/tree/main/playground/type-safe) in the repository.
 
-### Declarative Configuration
+### ⚙️ Declarative Configuration
 
 Configure commands declaratively:
 
@@ -137,7 +137,7 @@ cli(process.argv.slice(2), command, {
 
 For more detailed examples, check out the [playground/declarative](https://github.com/kazupon/gunshi/tree/main/playground/declarative) in the repository.
 
-### Composable Sub-commands
+### 🧩 Composable Sub-commands
 
 Create a CLI with composable sub-commands:
 
@@ -188,7 +188,7 @@ cli(process.argv.slice(2), mainCommand, {
 
 For more detailed examples, check out the [playground/composable](https://github.com/kazupon/gunshi/tree/main/playground/composable) in the repository.
 
-### Lazy & Async Command Loading
+### ⏳ Lazy & Async Command Loading
 
 Load commands lazily and execute them asynchronously:
 
@@ -229,7 +229,7 @@ cli(
 
 For more detailed examples, check out the [playground/lazy-async](https://github.com/kazupon/gunshi/tree/main/playground/lazy-async) in the repository.
 
-### Auto Usage Generation
+### 📜 Auto Usage Generation
 
 Gunshi automatically generates usage information:
 
@@ -266,7 +266,7 @@ cli(process.argv.slice(2), command, {
 
 For more detailed examples, check out the [playground/auto-usage](https://github.com/kazupon/gunshi/tree/main/playground/auto-usage) in the repository.
 
-### Custom Usage Generation
+### 🎨 Custom Usage Generation
 
 Customize the usage message generation:
 
@@ -316,7 +316,7 @@ cli(
 
 For more detailed examples, check out the [playground/custom-usage](https://github.com/kazupon/gunshi/tree/main/playground/custom-usage) in the repository.
 
-### Internationalization
+### 🌍 Internationalization
 
 Support internationalization:
 
