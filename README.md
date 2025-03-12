@@ -6,10 +6,7 @@
 [![Version][npm-version-src]][npm-version-href]
 [![CI][ci-src]][ci-href]
 [![InstallSize][install-size-src]][install-size-src]
-
-<!--
 [![JSR][jsr-src]][jsr-href]
--->
 
 Gunshi is a modern javascript command-line library
 
@@ -40,6 +37,18 @@ pnpm add gunshi
 
 ## yarn
 yarn add gunshi
+```
+
+### 🦕 Deno
+
+```sh
+deno add jsr:@kazupon/gunshi
+```
+
+### 🥟 Bun
+
+```sh
+bun add gunshi
 ```
 
 ## 🚀 Usage

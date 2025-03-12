@@ -1,0 +1,15 @@
+{
+  "name": "bun",
+  "private": true,
+  "type": "module",
+  "module": "index.ts",
+  "dependencies": {
+    "gunshi": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
