@@ -47,6 +47,14 @@ yarn add gunshi
 
 If you are interested in contributing to `gunshi`, I highly recommend checking out [the contributing guidelines](/CONTRIBUTING.md) here. You'll find all the relevant information such as [how to make a PR](/CONTRIBUTING.md#pull-request-guidelines), [how to setup development](/CONTRIBUTING.md#development-setup)) etc., there.
 
+## 💖 Credits
+
+This project is inspired by:
+
+- [`citty`](https://github.com/unjs/citty), created by UnJS team and contributors
+
+Thank you!
+
 ## ©️ License
 
 [MIT](http://opensource.org/licenses/MIT)
