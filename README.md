@@ -62,9 +62,11 @@ Gunshi has a simple API that is a facade:
 ```js
 import { cli } from 'gunshi'
 
+const args = process.argv.slice(2)
 // run a simple command
-cli(process.argv.slice(2), () => {
-  console.log('Hello from Gunshi!')
+cli(args, () => {
+  // something logic ...
+  console.log('Hello from Gunshi!', args)
 })
 ```
 
@@ -75,7 +77,7 @@ Configure commands declaratively:
 ```js
 import { cli } from 'gunshi'
 
-// define a command with declarative configuration
+// define a command with declarative configuration, using commandable object
 const command = {
   name: 'greet',
   description: 'A greeting command',
@@ -99,6 +101,8 @@ const command = {
   }
 }
 
+// run a command that is defined above
+// (the 3rd argument of `cli` is the command option)
 cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0',
@@ -119,7 +123,7 @@ import type { ArgOptions, Command, CommandContext } from 'gunshi'
 // type-safe arguments parsing example
 // this demonstrates how to define and use typed command options with `satisfies`
 
-// define options with types
+// define 'type-safe' command options with types
 const options = {
   // define string option with short alias
   name: {
@@ -139,7 +143,7 @@ const options = {
   }
 } satisfies ArgOptions
 
-// create a type-safe command
+// define 'type-safe' command
 const command = {
   name: 'type-safe',
   options,
@@ -156,12 +160,12 @@ For more detailed examples, check out the [playground/type-safe](https://github.
 
 ### 🧩 Composable Sub-commands
 
-Create a CLI with composable sub-commands:
+Run a CLI with composable sub-commands:
 
 ```js
 import { cli } from 'gunshi'
 
-// define sub-commands
+// define 'create' command
 const createCommand = {
   name: 'create',
   description: 'Create a new resource',
@@ -173,6 +177,7 @@ const createCommand = {
   }
 }
 
+// define 'list' command
 const listCommand = {
   name: 'list',
   description: 'List all resources',
@@ -181,12 +186,12 @@ const listCommand = {
   }
 }
 
-// create a Map of sub-commands
+// prepare a Map of sub-commands
 const subCommands = new Map()
 subCommands.set('create', createCommand)
 subCommands.set('list', listCommand)
 
-// define the main command
+// define the main ('resource-manager') command
 const mainCommand = {
   name: 'resource-manager',
   description: 'Manage resources',
@@ -229,7 +234,7 @@ const lazyCommand = async () => {
   }
 }
 
-// create a Map of sub-commands with lazy-loaded commands
+// prepare a Map of sub-commands with lazy-loaded commands
 const subCommands = new Map()
 subCommands.set('lazy', lazyCommand)
 
@@ -261,6 +266,7 @@ const command = {
     recursive: { type: 'boolean', short: 'r' },
     operation: { type: 'string', short: 'o', required: true }
   },
+  // define usage with object
   usage: {
     options: {
       path: 'File or directory path',
@@ -290,7 +296,7 @@ Customize the usage message generation:
 ```js
 import { cli } from 'gunshi'
 
-// custom header renderer
+// define custom header renderer
 const customHeaderRenderer = ctx => {
   return Promise.resolve(`
 ╔═══════════════════════╗
@@ -301,7 +307,7 @@ Version: ${ctx.env.version}
 `)
 }
 
-// custom usage renderer
+// define custom usage renderer
 const customUsageRenderer = ctx => {
   const lines = []
   lines.push('USAGE:')
@@ -386,7 +392,7 @@ If you are interested in contributing to `gunshi`, I highly recommend checking o
 
 ## 💖 Credits
 
-This project is inspired by:
+This project is inspired and powered by:
 
 - [`citty`](https://github.com/unjs/citty), created by UnJS team and contributors
 - cline and claude 3.7 sonnet, examples and docs is generated
