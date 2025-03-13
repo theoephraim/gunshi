@@ -1,22 +1,24 @@
-import type { ArgOptions, Command } from 'gunshi'
+import { cli } from '@kazupon/gunshi'
 
-import { cli } from 'gunshi'
+import type { ArgOptions, Command } from '@kazupon/gunshi'
 
 if (import.meta.main) {
+  const options = {
+    name: {
+      type: 'string',
+      short: 'n'
+    },
+    type: {
+      type: 'string',
+      short: 't',
+      default: 'default'
+    }
+  } satisfies ArgOptions
+
   const create = {
     name: 'create',
     description: 'Create a new resource',
-    options: {
-      name: {
-        type: 'string',
-        short: 'n'
-      },
-      type: {
-        type: 'string',
-        short: 't',
-        default: 'default'
-      }
-    },
+    options,
     usage: {
       options: {
         name: 'Name of the resource to create',
@@ -27,7 +29,7 @@ if (import.meta.main) {
     run: ctx => {
       console.log(`Creating ${ctx.values.type} resource: ${ctx.values.name}`)
     }
-  } satisfies Command<ArgOptions>
+  } satisfies Command<typeof options>
 
   const subCommands = new Map<string, Command<ArgOptions>>()
   subCommands.set(create.name, create as unknown as Command<ArgOptions>)
