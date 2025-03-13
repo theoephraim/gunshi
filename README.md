@@ -62,7 +62,7 @@ Gunshi has a simple API that is a facade:
 ```js
 import { cli } from 'gunshi'
 
-// Run a simple command
+// run a simple command
 cli(process.argv.slice(2), () => {
   console.log('Hello from Gunshi!')
 })
@@ -75,7 +75,7 @@ Configure commands declaratively:
 ```js
 import { cli } from 'gunshi'
 
-// Define a command with declarative configuration
+// define a command with declarative configuration
 const command = {
   name: 'greet',
   description: 'A greeting command',
@@ -116,30 +116,30 @@ Gunshi provides type-safe argument parsing with TypeScript:
 import { cli } from 'gunshi'
 import type { ArgOptions, Command, CommandContext } from 'gunshi'
 
-// Type-safe arguments parsing example
-// This demonstrates how to define and use typed command options with `satisfies`
+// type-safe arguments parsing example
+// this demonstrates how to define and use typed command options with `satisfies`
 
-// Define options with types
+// define options with types
 const options = {
-  // Define string option with short alias
+  // define string option with short alias
   name: {
     type: 'string',
     short: 'n'
   },
-  // Define number option with default value
+  // define number option with default value
   age: {
     type: 'number',
     short: 'a',
     default: 25
   },
-  // Define boolean flag
+  // define boolean flag
   verbose: {
     type: 'boolean',
     short: 'v'
   }
 } satisfies ArgOptions
 
-// Create a type-safe command
+// create a type-safe command
 const command = {
   name: 'type-safe',
   options,
@@ -161,7 +161,7 @@ Create a CLI with composable sub-commands:
 ```js
 import { cli } from 'gunshi'
 
-// Define sub-commands
+// define sub-commands
 const createCommand = {
   name: 'create',
   description: 'Create a new resource',
@@ -181,12 +181,12 @@ const listCommand = {
   }
 }
 
-// Create a Map of sub-commands
+// create a Map of sub-commands
 const subCommands = new Map()
 subCommands.set('create', createCommand)
 subCommands.set('list', listCommand)
 
-// Define the main command
+// define the main command
 const mainCommand = {
   name: 'resource-manager',
   description: 'Manage resources',
@@ -195,7 +195,7 @@ const mainCommand = {
   }
 }
 
-// Run the CLI with composable sub-commands
+// run the CLI with composable sub-commands
 cli(process.argv.slice(2), mainCommand, {
   name: 'my-app',
   version: '1.0.0',
@@ -212,28 +212,28 @@ Load commands lazily and execute them asynchronously:
 ```js
 import { cli } from 'gunshi'
 
-// Define a command that will be loaded lazily
+// define a command that will be loaded lazily
 const lazyCommand = async () => {
-  // Simulate async loading
+  // simulate async loading
   await new Promise(resolve => setTimeout(resolve, 1000))
 
-  // Return the actual command
+  // return the actual command
   return {
     name: 'lazy',
     description: 'A command that is loaded lazily',
     run: async ctx => {
-      // Async execution
+      // async execution
       await new Promise(resolve => setTimeout(resolve, 500))
       console.log('Command executed!')
     }
   }
 }
 
-// Create a Map of sub-commands with lazy-loaded commands
+// create a Map of sub-commands with lazy-loaded commands
 const subCommands = new Map()
 subCommands.set('lazy', lazyCommand)
 
-// Run the CLI with lazy-loaded commands
+// run the CLI with lazy-loaded commands
 cli(
   process.argv.slice(2),
   { name: 'main', run: () => {} },
@@ -270,11 +270,11 @@ const command = {
     examples: '# Example\n$ my-app --operation list --path ./src'
   },
   run: ctx => {
-    // Command implementation
+    // command implementation
   }
 }
 
-// Run with --help to see the automatically generated usage information
+// run with --help to see the automatically generated usage information
 cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0'
@@ -290,7 +290,7 @@ Customize the usage message generation:
 ```js
 import { cli } from 'gunshi'
 
-// Custom header renderer
+// custom header renderer
 const customHeaderRenderer = ctx => {
   return Promise.resolve(`
 ╔═══════════════════════╗
@@ -301,7 +301,7 @@ Version: ${ctx.env.version}
 `)
 }
 
-// Custom usage renderer
+// custom usage renderer
 const customUsageRenderer = ctx => {
   const lines = []
   lines.push('USAGE:')
@@ -317,7 +317,7 @@ const customUsageRenderer = ctx => {
   return Promise.resolve(lines.join('\n'))
 }
 
-// Run with custom renderers
+// run with custom renderers
 cli(
   process.argv.slice(2),
   { name: 'app', run: () => {} },
@@ -347,14 +347,14 @@ const command = {
     name: { type: 'string', short: 'n' },
     formal: { type: 'boolean', short: 'f' }
   },
-  // Resource fetcher for translations
+  // resource fetcher for translations
   resource: async ctx => {
     if (ctx.locale.toString() === 'ja-JP') {
       const resource = await import('./locales/ja-JP.json', { with: { type: 'json' } })
       return resource.default
     }
 
-    // Default to English
+    // default to English
     return enUS
   },
   run: ctx => {
@@ -364,12 +364,12 @@ const command = {
   }
 }
 
-// Run with locale support
+// run with locale support
 cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0',
-  // Set the locale via an environment variable
-  // If Node v21 or later is used, you can use the built-in `navigator.language` instead)
+  // set the locale via an environment variable
+  // if Node v21 or later is used, you can use the built-in `navigator.language` instead)
   locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
 })
 ```
