@@ -1,8 +1,10 @@
 import { cli } from '@kazupon/gunshi'
+import enUS from './locales/en-US.json' with { type: 'json' }
 
 import type { ArgOptions, Command } from '@kazupon/gunshi'
 
 if (import.meta.main) {
+  // define options
   const options = {
     name: {
       type: 'string',
@@ -15,29 +17,37 @@ if (import.meta.main) {
     }
   } satisfies ArgOptions
 
+  // define create sub command
   const create = {
     name: 'create',
-    description: 'Create a new resource',
+    description: enUS.description,
     options,
     usage: {
-      options: {
-        name: 'Name of the resource to create',
-        type: 'Type of resource to create (default: "default")'
-      },
-      examples: '# Create a resource\n$ deno run index.ts create --name my-resource --type special'
+      options: enUS.options,
+      examples: enUS.examples
+    },
+    resource: async ctx => {
+      if (ctx.locale.toString() === 'ja-JP') {
+        const resource = await import('./locales/ja-JP.json', { with: { type: 'json' } })
+        return resource.default
+      }
+      return enUS
     },
     run: ctx => {
       console.log(`Creating ${ctx.values.type} resource: ${ctx.values.name}`)
     }
   } satisfies Command<typeof options>
 
-  const subCommands = new Map<string, Command<ArgOptions>>()
-  subCommands.set(create.name, create as unknown as Command<ArgOptions>)
+  // prepare sub commands map
+  const subCommands = new Map()
+  subCommands.set(create.name, create)
 
+  // run CLI
   await cli(
     Deno.args,
     {
       name: 'main',
+      description: 'A CLI application with Deno',
       options: {
         count: {
           type: 'number',
@@ -51,6 +61,7 @@ if (import.meta.main) {
     {
       name: 'deno-cli-app',
       version: '0.1.0',
+      locale: navigator.language,
       subCommands
     }
   )
