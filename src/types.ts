@@ -1,9 +1,16 @@
 import type { ArgOptions, ArgValues } from 'args-tokens'
 
+import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.js'
+
 /**
  * Define a promise type that can be await from T
  */
 type Awaitable<T> = T | Promise<T>
+
+export type GenerateNamespacedKey<
+  Key extends string,
+  Prefixed extends string = typeof BUILT_IN_PREFIX
+> = `${Prefixed}${typeof BUILT_IN_KEY_SEPARATOR}${Key}`
 
 /**
  * Command i18n built-in options keys
@@ -16,16 +23,16 @@ export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants'))['CO
  * @experimental
  */
 export type CommandBuiltinResourceKeys =
-  (typeof import('./constants'))['COMMAND_I18N_RESOURCE_KEYS'][number]
+  (typeof import('./constants'))['COMMAND_BUILTIN_RESOURCE_KEYS'][number]
 
 /**
  * Command i18n built-in keys
- * @description The command i18n built-in keys are used to {@link CommandContext.translation | translate} function
+ * @description The command i18n built-in keys are used to {@link CommandContext.translate | translate} function
  * @experimental
  */
 export type CommandBuiltinKeys =
-  | CommandBuiltinOptionsKeys
-  | CommandBuiltinResourceKeys
+  | GenerateNamespacedKey<CommandBuiltinOptionsKeys>
+  | GenerateNamespacedKey<CommandBuiltinResourceKeys>
   | 'description'
   | 'examples'
 
@@ -182,7 +189,7 @@ export interface CommandContext<
    * Command options, that is the options of the command that is executed
    * @description The command options is same {@link Command.options}
    */
-  options: Options | undefined
+  options: Options
   /**
    * Command values, that is the values of the command that is executed
    * @description Resolve values with `resolveArgs` from command arguments and {@link Command.options}
@@ -209,12 +216,14 @@ export interface CommandContext<
    */
   loadCommands: () => Promise<Command<Options>[]>
   /**
-   * Translation function
+   * Translate function
    * @param key the key to be translated
    * @returns A translated string
    * @experimental
    */
-  translation: <T = CommandBuiltinKeys, Key = CommandBuiltinKeys | T>(key: Key) => string
+  translate: <T extends string = CommandBuiltinKeys, Key = CommandBuiltinKeys | keyof Options | T>(
+    key: Key
+  ) => string
 }
 
 /**
@@ -279,22 +288,16 @@ export interface Command<Options extends ArgOptions = ArgOptions> {
  * Command resource
  * @experimental
  */
-export interface CommandResource<Options extends ArgOptions = ArgOptions> {
+export type CommandResource<Options extends ArgOptions = ArgOptions> = {
   /**
    * Command description
    */
   description: string
   /**
-   * Options usage
-   */
-  options: {
-    [Option in keyof Options]: string
-  }
-  /**
    * Examples usage
    */
   examples: string
-}
+} & { [Option in keyof Options]: string } & { [key: string]: string } // Infer the options usage // Define the user resources
 
 /**
  * Command resource fetcher

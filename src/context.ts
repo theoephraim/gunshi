@@ -1,6 +1,6 @@
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
-import { COMMAND_I18N_RESOURCE_KEYS, COMMAND_OPTIONS_DEFAULT } from './constants.js'
-import { create, deepFreeze, resolveLazyCommand } from './utils.js'
+import { BUILT_IN_PREFIX, COMMAND_OPTIONS_DEFAULT, DEFAULT_LOCALE } from './constants.js'
+import { create, deepFreeze, mapResourceWithBuiltinKey, resolveLazyCommand } from './utils.js'
 
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 import type {
@@ -12,10 +12,7 @@ import type {
   CommandResource
 } from './types'
 
-/**
- * The default locale string, which format is BCP 47 language tag
- */
-export const DEFAULT_LOCALE = 'en-US'
+const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 
 /**
  * Parameters of {@link createCommandContext}
@@ -24,7 +21,7 @@ interface CommandContextParams<Options extends ArgOptions, Values> {
   /**
    * An options of target command
    */
-  options: Options | undefined
+  options: Options
   /**
    * A values of target command
    */
@@ -67,14 +64,10 @@ export async function createCommandContext<
    * tweak the options and values
    */
 
-  const _options =
-    options == null
-      ? undefined
-      : // eslint-disable-next-line unicorn/no-array-reduce
-        Object.entries(options as ArgOptions).reduce((acc, [key, value]) => {
-          acc[key] = Object.assign(create<ArgOptionSchema>(), value)
-          return acc
-        }, create<ArgOptions>())
+  const _options = Object.entries(options as ArgOptions).reduce((acc, [key, value]) => {
+    acc[key] = Object.assign(create<ArgOptionSchema>(), value)
+    return acc
+  }, create<ArgOptions>())
   const _values = Object.assign(create<ArgValues<Options>>(), values)
 
   /**
@@ -108,25 +101,25 @@ export async function createCommandContext<
    * load the built-in locale resources
    */
 
-  localeResources.set(DEFAULT_LOCALE, DefaultResource as Record<string, string>)
+  localeResources.set(DEFAULT_LOCALE, mapResourceWithBuiltinKey(DefaultResource))
   if (DEFAULT_LOCALE !== locale.toString()) {
     try {
       builtInLoadedResources = (await import(`../locales/${locale.toString()}.json`, {
         with: { type: 'json' }
       })) as Record<string, string>
-      localeResources.set(locale.toString(), builtInLoadedResources)
+      localeResources.set(locale.toString(), mapResourceWithBuiltinKey(builtInLoadedResources))
     } catch {} // eslint-disable-line no-empty
   }
 
   /**
-   * define the translation function, which is used to {@link CommandContext.translation}.
+   * define the translation function, which is used to {@link CommandContext.translate}.
    *
    */
 
-  function translation<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
-    if (COMMAND_I18N_RESOURCE_KEYS.includes(key as CommandBuiltinResourceKeys)) {
+  function translate<T, Key = CommandBuiltinResourceKeys | T>(key: Key): string {
+    if ((key as string).codePointAt(0) === BUILT_IN_PREFIX_CODE) {
       // NOTE:
-      // if the key is one of the `COMMAND_I18N_RESOURCE_KEYS` and the key is not found in the locale resources,
+      // if the key is one of the `COMMAND_BUILTIN_RESOURCE_KEYS` and the key is not found in the locale resources,
       // then return the key itself.
       const resource =
         localeResources.get(locale.toString()) || localeResources.get(DEFAULT_LOCALE)!
@@ -173,7 +166,7 @@ export async function createCommandContext<
       positionals,
       usage,
       loadCommands,
-      translation
+      translate
     })
   )
 
@@ -187,7 +180,7 @@ export async function createCommandContext<
       return [key, option] as [string, string]
     }
   )
-  // eslint-disable-next-line unicorn/no-array-reduce
+
   const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
     res[key] = value
     return res
@@ -198,17 +191,24 @@ export async function createCommandContext<
 
   const originalResource = await loadCommandResource(ctx, command)
   if (originalResource) {
-    // eslint-disable-next-line unicorn/no-array-reduce
-    const resource = Object.entries(originalResource.options).reduce(
-      (res, [key, value]) => {
-        res[key] = value
-        return res
-      },
-      Object.assign(create<Record<string, string>>(), {
+    const resource = Object.assign(
+      create<Record<string, string>>(),
+      {
         description: originalResource.description,
         examples: originalResource.examples
-      } as Record<string, string>)
+      } as Record<string, string>,
+      originalResource as Record<string, string>
     )
+    // const resource = Object.entries(originalResource.options).reduce(
+    //   (res, [key, value]) => {
+    //     res[key] = value
+    //     return res
+    //   },
+    //   Object.assign(create<Record<string, string>>(), {
+    //     description: originalResource.description,
+    //     examples: originalResource.examples
+    //   } as Record<string, string>)
+    // )
     if (builtInLoadedResources) {
       resource.help = builtInLoadedResources.help
       resource.version = builtInLoadedResources.version
@@ -233,6 +233,7 @@ async function loadCommandResource<Options extends ArgOptions>(
 ): Promise<CommandResource<Options> | undefined> {
   let resource: CommandResource<Options> | undefined
   try {
+    // TODO: should check the resource which is a dictionary object
     resource = await command.resource?.(ctx)
   } catch {} // eslint-disable-line no-empty
   return resource
