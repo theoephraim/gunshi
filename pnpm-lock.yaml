@@ -21,6 +21,9 @@ importers:
       '@eslint/markdown':
         specifier: ^6.2.2
         version: 6.2.2
+      '@intlify/core':
+        specifier: next
+        version: 12.0.0-alpha.1
       '@kazupon/eslint-config':
         specifier: ^0.22.0
         version: 0.22.0(@eslint/markdown@6.2.2)(@vitest/eslint-plugin@1.1.36(@typescript-eslint/utils@8.26.0(eslint@9.21.0(jiti@2.4.2))(typescript@5.8.2))(eslint@9.21.0(jiti@2.4.2))(typescript@5.8.2)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(jiti@2.4.2)(tsx@4.19.3)(yaml@2.7.0)))(eslint-config-prettier@10.0.2(eslint@9.21.0(jiti@2.4.2)))(eslint-plugin-jsonc@2.19.1(eslint@9.21.0(jiti@2.4.2)))(eslint-plugin-promise@7.2.1(eslint@9.21.0(jiti@2.4.2)))(eslint-plugin-regexp@2.7.0(eslint@9.21.0(jiti@2.4.2)))(eslint-plugin-unicorn@57.0.0(eslint@9.21.0(jiti@2.4.2)))(eslint-plugin-yml@1.17.0(eslint@9.21.0(jiti@2.4.2)))(eslint@9.21.0(jiti@2.4.2))(typescript-eslint@8.26.0(eslint@9.21.0(jiti@2.4.2))(typescript@5.8.2))(typescript@5.8.2)
@@ -69,6 +72,9 @@ importers:
       lint-staged:
         specifier: ^15.4.3
         version: 15.4.3
+      messageformat:
+        specifier: 4.0.0-9
+        version: 4.0.0-9
       pkg-pr-new:
         specifier: ^0.0.41
         version: 0.0.41
@@ -549,6 +555,22 @@ packages:
   '@humanwhocodes/retry@0.4.2':
     resolution: {integrity: sha512-xeO57FpIu4p1Ri3Jq/EXq4ClRm86dVF2z/+kvFnyqVYRavTZmaFaUBbWCOuuTh0o/g7DSsk6kc2vrS4Vl5oPOQ==}
     engines: {node: '>=18.18'}
+
+  '@intlify/core-base@12.0.0-alpha.1':
+    resolution: {integrity: sha512-1H0AKcnN/bqUBtNuMGmFwMJAkVZ1H1KATvoZGChXj46tgIxSEjQW/Es7R/jTewsFwXGQjO2rvxEk1kADFC1G8A==}
+    engines: {node: '>= 16'}
+
+  '@intlify/core@12.0.0-alpha.1':
+    resolution: {integrity: sha512-ZacnCWmzDc2amU4ij9hrE5Ecg1XJueev4i9e62XyDQFUz0xnAL4CPd20HeI1dp3PHaUYrirBnLUCpVyirwq5rg==}
+    engines: {node: '>= 16'}
+
+  '@intlify/message-compiler@12.0.0-alpha.1':
+    resolution: {integrity: sha512-rS1Lc99D2uaGqWxlrpGPWdgkq2Jox8xxOS9gdIRhuF2CsuJISWQmwd/TjMnWNhwv9olE0aPEBh1323a61Tfp+g==}
+    engines: {node: '>= 16'}
+
+  '@intlify/shared@12.0.0-alpha.1':
+    resolution: {integrity: sha512-ZZ5rtlUcEnhhFS+MTrl0V1UoN3yRninGawP3f1YituJN9217xJvpqCSLa9t8NLaVwVIxsRcq4lQe48D0SigmBg==}
+    engines: {node: '>= 16'}
 
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
@@ -1957,6 +1979,9 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
+  messageformat@4.0.0-9:
+    resolution: {integrity: sha512-4QHEgN5EiK0w8XmMztn+hdnuJuaChp0bv6D1iw1GvFMR9FVDF9sDk0KfIM9XnBjqa0ekK8wBsX7lyMNfD53dqQ==}
+
   micromark-core-commonmark@2.0.2:
     resolution: {integrity: sha512-FKjQKbxd1cibWMM1P9N+H8TwlgGgSkWZMmfuVucLCHaYqeSvJ0hFeHsIa65pA2nYbes0f8LDHPMrd9X7Ujxg9w==}
 
@@ -3023,6 +3048,23 @@ snapshots:
   '@humanwhocodes/retry@0.3.1': {}
 
   '@humanwhocodes/retry@0.4.2': {}
+
+  '@intlify/core-base@12.0.0-alpha.1':
+    dependencies:
+      '@intlify/message-compiler': 12.0.0-alpha.1
+      '@intlify/shared': 12.0.0-alpha.1
+
+  '@intlify/core@12.0.0-alpha.1':
+    dependencies:
+      '@intlify/core-base': 12.0.0-alpha.1
+      '@intlify/shared': 12.0.0-alpha.1
+
+  '@intlify/message-compiler@12.0.0-alpha.1':
+    dependencies:
+      '@intlify/shared': 12.0.0-alpha.1
+      source-map-js: 1.2.1
+
+  '@intlify/shared@12.0.0-alpha.1': {}
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
@@ -4416,6 +4458,8 @@ snapshots:
   merge-stream@2.0.0: {}
 
   merge2@1.4.1: {}
+
+  messageformat@4.0.0-9: {}
 
   micromark-core-commonmark@2.0.2:
     dependencies:

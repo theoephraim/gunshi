@@ -1,7 +1,12 @@
+import { MessageFormat } from 'messageformat'
 import { describe, expect, test, vi } from 'vitest'
 import DefaultLocale from '../locales/en-US.json'
 import jaLocale from '../locales/ja-JP.json'
-import { hasPrototype } from '../test/utils.js'
+import {
+  createTranslationAdapterForIntlifyMessageFormat,
+  createTranslationAdapterForMessageFormat2,
+  hasPrototype
+} from '../test/utils.js'
 import { DEFAULT_LOCALE } from './constants.js'
 import { createCommandContext } from './context.js'
 import { resolveBuiltInKey } from './utils.js'
@@ -334,5 +339,114 @@ describe('translation', () => {
 
     // user defined resource
     expect(ctx.translate<keyof typeof jaJPResource>('test')).toEqual(jaJPResource.test)
+  })
+})
+
+describe('translation adapter', () => {
+  test('Intl.MessageFormat (MF2)', async () => {
+    const options = {
+      foo: {
+        type: 'string',
+        short: 'f'
+      }
+    } satisfies ArgOptions
+
+    const jaJPResource = {
+      description: 'これはコマンド1です',
+      foo: 'これは foo オプションです',
+      examples: 'これはコマンド1の例です',
+      user: 'こんにちは、{$user}'
+    } satisfies CommandResource<typeof options>
+
+    const loadLocale = 'ja-JP'
+
+    const mockResource = vi.fn<CommandResourceFetcher<typeof options>>().mockImplementation(ctx => {
+      if (ctx.locale.toString() === loadLocale) {
+        return Promise.resolve(jaJPResource)
+      } else {
+        throw new Error('not found')
+      }
+    })
+
+    const command = {
+      name: 'cmd1',
+      usage: {
+        options: {
+          foo: 'this is foo option'
+        },
+        examples: 'this is an cmd1 example'
+      },
+      run: vi.fn(),
+      resource: mockResource
+    } satisfies Command<typeof options>
+
+    const ctx = await createCommandContext({
+      options,
+      values: { foo: 'foo', bar: true, baz: 42 },
+      positionals: ['bar'],
+      command,
+      omitted: false,
+      commandOptions: {
+        description: 'this is cmd1',
+        locale: new Intl.Locale(loadLocale),
+        translationAdapterFactory: createTranslationAdapterForMessageFormat2
+      }
+    })
+
+    const mf = new MessageFormat('ja-JP', jaJPResource.user)
+    expect(ctx.translate('user', { user: 'kazupon' })).toEqual(mf.format({ user: 'kazupon' }))
+  })
+
+  test('Intlify Message Format', async () => {
+    const options = {
+      foo: {
+        type: 'string',
+        short: 'f'
+      }
+    } satisfies ArgOptions
+
+    const jaJPResource = {
+      description: 'これはコマンド1です',
+      foo: 'これは foo オプションです',
+      examples: 'これはコマンド1の例です',
+      user: 'こんにちは、{user}'
+    } satisfies CommandResource<typeof options>
+
+    const loadLocale = 'ja-JP'
+
+    const mockResource = vi.fn<CommandResourceFetcher<typeof options>>().mockImplementation(ctx => {
+      if (ctx.locale.toString() === loadLocale) {
+        return Promise.resolve(jaJPResource)
+      } else {
+        throw new Error('not found')
+      }
+    })
+
+    const command = {
+      name: 'cmd1',
+      usage: {
+        options: {
+          foo: 'this is foo option'
+        },
+        examples: 'this is an cmd1 example'
+      },
+      run: vi.fn(),
+      resource: mockResource
+    } satisfies Command<typeof options>
+
+    const ctx = await createCommandContext({
+      options,
+      values: { foo: 'foo', bar: true, baz: 42 },
+      positionals: ['bar'],
+      command,
+      omitted: false,
+      commandOptions: {
+        description: 'this is cmd1',
+        locale: new Intl.Locale(loadLocale),
+        translationAdapterFactory: createTranslationAdapterForIntlifyMessageFormat
+      }
+    })
+
+    expect(ctx.translate('user', { user: 'kazupon' })).toEqual(`こんにちは、kazupon`)
   })
 })
