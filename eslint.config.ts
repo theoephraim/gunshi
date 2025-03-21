@@ -44,8 +44,12 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   prettier(),
   {
     ignores: [
+      'docs/**', // TODO: vitepress docs override on @typescript-eslint
+      // files: ["**/*.md/*.ts"],
       '.vscode',
       '.github',
+      'docs/.vitepress/cache',
+      '**/dist/**',
       'lib',
       'tsconfig.json',
       'pnpm-lock.yaml',
