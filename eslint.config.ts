@@ -43,18 +43,24 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   vitest(),
   prettier(),
   {
+    name: 'docs',
+    files: ['**/*.md/*.ts', '**/*.md/*.js'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off'
+    }
+  },
+  {
+    name: 'ignores',
     ignores: [
-      'docs/**', // TODO: vitepress docs override on @typescript-eslint
-      // files: ["**/*.md/*.ts"],
       '.vscode',
       '.github',
       'docs/.vitepress/cache',
+      '**/*.md/*.ts', // TODO: tweak for typescript on markdown
       '**/dist/**',
       'lib',
       'tsconfig.json',
       'pnpm-lock.yaml',
       'eslint.config.ts',
-      'README.md',
       'playground/bun',
       'playground/deno'
     ]
