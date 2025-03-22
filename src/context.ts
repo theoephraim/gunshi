@@ -1,7 +1,7 @@
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
-import { BUILT_IN_PREFIX, COMMAND_OPTIONS_DEFAULT, DEFAULT_LOCALE } from './constants.js'
-import { createTranslationAdapter } from './translation.js'
-import { create, deepFreeze, mapResourceWithBuiltinKey, resolveLazyCommand } from './utils.js'
+import { BUILT_IN_PREFIX, COMMAND_OPTIONS_DEFAULT, DEFAULT_LOCALE } from './constants.ts'
+import { createTranslationAdapter } from './translation.ts'
+import { create, deepFreeze, mapResourceWithBuiltinKey, resolveLazyCommand } from './utils.ts'
 
 import type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 import type {
@@ -11,7 +11,7 @@ import type {
   CommandEnvironment,
   CommandOptions,
   CommandResource
-} from './types'
+} from './types.ts'
 
 const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 

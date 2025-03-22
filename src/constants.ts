@@ -1,5 +1,5 @@
 import type { ArgOptions } from 'args-tokens'
-import type { CommandOptions } from './types'
+import type { CommandOptions } from './types.ts'
 
 /**
  * The default locale string, which format is BCP 47 language tag

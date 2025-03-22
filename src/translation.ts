@@ -1,6 +1,6 @@
-import { create } from './utils.js'
+import { create } from './utils.ts'
 
-import type { TranslationAdapter, TranslationAdapterFactoryOptions } from './types'
+import type { TranslationAdapter, TranslationAdapterFactoryOptions } from './types.ts'
 
 export function createTranslationAdapter(
   options: TranslationAdapterFactoryOptions

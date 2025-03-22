@@ -6,13 +6,13 @@ import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2,
   hasPrototype
-} from '../test/utils.js'
-import { DEFAULT_LOCALE } from './constants.js'
-import { createCommandContext } from './context.js'
-import { resolveBuiltInKey } from './utils.js'
+} from '../test/utils.ts'
+import { DEFAULT_LOCALE } from './constants.ts'
+import { createCommandContext } from './context.ts'
+import { resolveBuiltInKey } from './utils.ts'
 
 import type { ArgOptions } from 'args-tokens'
-import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types'
+import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types.ts'
 
 test('basic', async () => {
   const command = {

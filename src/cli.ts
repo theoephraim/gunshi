@@ -1,11 +1,11 @@
 import { parseArgs, resolveArgs } from 'args-tokens'
-import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS } from './constants.js'
-import { createCommandContext } from './context.js'
-import { renderHeader, renderUsage, renderValidationErrors } from './renderer/index.js'
-import { create, log, resolveLazyCommand } from './utils.js'
+import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS } from './constants.ts'
+import { createCommandContext } from './context.ts'
+import { renderHeader, renderUsage, renderValidationErrors } from './renderer/index.ts'
+import { create, log, resolveLazyCommand } from './utils.ts'
 
 import type { ArgOptions, ArgToken } from 'args-tokens'
-import type { Command, CommandContext, CommandOptions, CommandRunner } from './types'
+import type { Command, CommandContext, CommandOptions, CommandRunner } from './types.ts'
 
 /**
  * Run the command

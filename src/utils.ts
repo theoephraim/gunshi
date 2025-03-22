@@ -1,4 +1,4 @@
-import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.js'
+import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
 import type { ArgOptions } from 'args-tokens'
 import type {
@@ -7,7 +7,7 @@ import type {
   CommandBuiltinOptionsKeys,
   CommandBuiltinResourceKeys,
   GenerateNamespacedKey
-} from './types'
+} from './types.ts'
 
 export async function resolveLazyCommand<Options extends ArgOptions = ArgOptions>(
   cmd: Commandable<Options>,

@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { defineMockLog } from '../test/utils'
-import { cli } from './cli'
-import { renderValidationErrors } from './renderer/index.js'
+import { defineMockLog } from '../test/utils.ts'
+import { cli } from './cli.ts'
+import { renderValidationErrors } from './renderer/index.ts'
 
 import type { ArgOptions } from 'args-tokens'
-import type { Command, CommandOptions } from './types'
+import type { Command, CommandOptions } from './types.ts'
 
 afterEach(() => {
   vi.resetAllMocks()
@@ -126,7 +126,7 @@ describe('execute command', () => {
 
 describe('aute generate usage', () => {
   test('inline function', async () => {
-    const utils = await import('./utils')
+    const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const renderedUsage = await cli(['-h'], vi.fn())
 
@@ -136,7 +136,7 @@ describe('aute generate usage', () => {
   })
 
   test('loosely entry command', async () => {
-    const utils = await import('./utils')
+    const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const renderedUsage = await cli(['-h'], {
       options: {
@@ -154,7 +154,7 @@ describe('aute generate usage', () => {
   })
 
   test('strictly entry command', async () => {
-    const utils = await import('./utils')
+    const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const renderedUsage = await cli(
       ['-h'],
@@ -187,7 +187,7 @@ describe('aute generate usage', () => {
   })
 
   test('loosely sub commands', async () => {
-    const utils = await import('./utils')
+    const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
 
     const entryOptions = {
@@ -224,7 +224,7 @@ describe('aute generate usage', () => {
   })
 
   test('strictly sub commands', async () => {
-    const utils = await import('./utils')
+    const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
 
     const entryOptions = {
@@ -294,7 +294,7 @@ describe('aute generate usage', () => {
   })
 
   test('locale resource not found', async () => {
-    const utils = await import('./utils')
+    const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
     const mockResource = vi.fn().mockRejectedValue(new Error('Resource not found'))
     await cli(
@@ -332,7 +332,7 @@ describe('aute generate usage', () => {
 
 describe('custom generate usage', () => {
   test('basic', async () => {
-    const utils = await import('./utils')
+    const utils = await import('./utils.ts')
     const log = defineMockLog(utils)
 
     const entryOptions = {

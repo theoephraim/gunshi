@@ -1,6 +1,7 @@
 import {
   comments,
   defineConfig,
+  imports,
   javascript,
   jsonc,
   markdown,
@@ -12,13 +13,14 @@ import {
   vitest,
   yaml
 } from '@kazupon/eslint-config'
+import { globalIgnores } from 'eslint/config'
 
 const config: ReturnType<typeof defineConfig> = defineConfig(
   javascript(),
-  typescript({
+  imports({
+    typescript: true,
     rules: {
-      '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off'
+      'import/extensions': ['error', 'always', { ignorePackages: true }]
     }
   }),
   comments(),
@@ -31,6 +33,12 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
       'unicorn/prevent-abbreviations': 'off',
       'unicorn/filename-case': 'off',
       'unicorn/no-null': 'off'
+    }
+  }),
+  typescript({
+    rules: {
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off'
     }
   }),
   jsonc({
@@ -46,25 +54,24 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     name: 'docs',
     files: ['**/*.md/*.ts', '**/*.md/*.js'],
     rules: {
+      'import/no-unresolved': 'off',
+      'unused-imports/no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off'
     }
   },
-  {
-    name: 'ignores',
-    ignores: [
-      '.vscode',
-      '.github',
-      'docs/.vitepress/cache',
-      '**/*.md/*.ts', // TODO: tweak for typescript on markdown
-      '**/dist/**',
-      'lib',
-      'tsconfig.json',
-      'pnpm-lock.yaml',
-      'eslint.config.ts',
-      'playground/bun',
-      'playground/deno'
-    ]
-  }
+  globalIgnores([
+    '.vscode',
+    '.github',
+    'docs/.vitepress/cache',
+    '**/*.md/*.ts', // TODO: tweak for typescript on markdown
+    '**/dist/**',
+    'lib',
+    'tsconfig.json',
+    'pnpm-lock.yaml',
+    'eslint.config.ts',
+    'playground/bun',
+    'playground/deno'
+  ])
 )
 
 export default config

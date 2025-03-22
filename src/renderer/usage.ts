@@ -1,7 +1,7 @@
-import { create, resolveBuiltInKey } from '../utils.js'
+import { create, resolveBuiltInKey } from '../utils.ts'
 
 import type { ArgOptions } from 'args-tokens'
-import type { CommandContext } from '../types'
+import type { CommandContext } from '../types.ts'
 
 /**
  * Render the usage

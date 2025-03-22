@@ -1,5 +1,5 @@
 import type { ArgOptions } from 'args-tokens'
-import type { CommandContext } from '../types'
+import type { CommandContext } from '../types.ts'
 
 /**
  * Render the header

@@ -7,12 +7,12 @@ import {
 } from '@intlify/core'
 import { MessageFormat } from 'messageformat'
 import { vi } from 'vitest'
-import { DefaultTranslation } from '../src/translation.js'
+import { DefaultTranslation } from '../src/translation.ts'
 
 import type { CoreContext, LocaleMessage, LocaleMessageValue } from '@intlify/core'
-import type { TranslationAdapter, TranslationAdapterFactoryOptions } from '../src/types'
+import type { TranslationAdapter, TranslationAdapterFactoryOptions } from '../src/types.ts'
 
-export function defineMockLog(utils: typeof import('../src/utils')) {
+export function defineMockLog(utils: typeof import('../src/utils.ts')) {
   const logs: unknown[] = []
   vi.spyOn(utils, 'log').mockImplementation((...args: unknown[]) => {
     logs.push(args)

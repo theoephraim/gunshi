@@ -1,6 +1,6 @@
 import type { ArgOptions, ArgValues } from 'args-tokens'
 
-import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.js'
+import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
 /**
  * Define a promise type that can be await from T

@@ -1,4 +1,4 @@
 export type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
-export * from './cli.js'
-export { DefaultTranslation } from './translation.js'
-export type * from './types'
+export * from './cli.ts'
+export { DefaultTranslation } from './translation.ts'
+export type * from './types.ts'
