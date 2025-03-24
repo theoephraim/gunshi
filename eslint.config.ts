@@ -36,6 +36,9 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     }
   }),
   typescript({
+    parserOptions: {
+      tsconfigRootDir: import.meta.dirname
+    },
     rules: {
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/ban-ts-comment': 'off'
@@ -44,31 +47,22 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   jsonc({
     json: true,
     json5: true,
-    jsonc: true
+    jsonc: true,
+    prettier: true
   }),
-  yaml(),
+  yaml({
+    prettier: true
+  }),
   markdown(),
   vitest(),
   prettier(),
-  {
-    name: 'docs',
-    files: ['**/*.md/*.ts', '**/*.md/*.js'],
-    rules: {
-      'import/no-unresolved': 'off',
-      'unused-imports/no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off'
-    }
-  },
   globalIgnores([
     '.vscode',
-    '.github',
     'docs/.vitepress/cache',
-    '**/*.md/*.ts', // TODO: tweak for typescript on markdown
     '**/dist/**',
     'lib',
     'tsconfig.json',
     'pnpm-lock.yaml',
-    'eslint.config.ts',
     'playground/bun',
     'playground/deno'
   ])

@@ -97,7 +97,7 @@ TypeScript 4.9+ introduced the `satisfies` operator, which provides a more flexi
 
 ```ts
 import { cli } from 'gunshi'
-import type { ArgOptions, Command, CommandContext } from 'gunshi'
+import type { ArgOptions, Command } from 'gunshi'
 
 // Define options with types
 const options = {
