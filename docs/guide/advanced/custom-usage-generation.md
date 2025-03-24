@@ -83,7 +83,7 @@ cli(process.argv.slice(2), command, {
 
 When users run `node app.js --help`, they'll see your custom header:
 
-```
+```sh
 ╔═════════════════════════════════════════╗
 ║               MY-APP                    ║
 ╚═════════════════════════════════════════╝
@@ -198,7 +198,7 @@ cli(process.argv.slice(2), command, {
 
 When users run the command with invalid options, they'll see your custom error message:
 
-```
+```sh
 ╔═════════════════════════════════════════╗
 ║               MY-APP                    ║
 ╚═════════════════════════════════════════╝
@@ -277,7 +277,7 @@ cli(process.argv.slice(2), command, {
 
 When users run the command without the required `--action` option, they'll see your custom error message:
 
-```
+```sh
 A task management utility (task-manager v1.0.0)
 
 ❌ ERROR:

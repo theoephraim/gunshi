@@ -402,7 +402,6 @@ describe('custom generate usage', () => {
     // validation errors
     try {
       await cli([''], entry, options)
-      // eslint-disable-next-line no-empty
     } catch {}
 
     const message = log()

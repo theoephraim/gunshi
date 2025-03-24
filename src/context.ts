@@ -113,7 +113,7 @@ export async function createCommandContext<
         with: { type: 'json' }
       })) as Record<string, string>
       localeResources.set(locale.toString(), mapResourceWithBuiltinKey(builtInLoadedResources))
-    } catch {} // eslint-disable-line no-empty
+    } catch {}
   }
 
   /**
@@ -232,6 +232,6 @@ async function loadCommandResource<Options extends ArgOptions>(
   try {
     // TODO: should check the resource which is a dictionary object
     resource = await command.resource?.(ctx)
-  } catch {} // eslint-disable-line no-empty
+  } catch {}
   return resource
 }

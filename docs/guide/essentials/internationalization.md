@@ -199,7 +199,7 @@ When users run `node index.js --help` with different locales, they'll see help m
 
 English:
 
-```
+```sh
 USAGE:
   COMMAND <OPTIONS>
 
@@ -212,7 +212,7 @@ OPTIONS:
 
 Japanese:
 
-```
+```sh
 USAGE:
   COMMAND <OPTIONS>
 

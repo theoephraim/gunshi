@@ -63,7 +63,7 @@ cli(process.argv.slice(2), command, {
 
 With this enhanced documentation, the help output will include the examples:
 
-```
+```sh
 app (app v1.0.0)
 
 USAGE:
@@ -101,7 +101,7 @@ cli(process.argv.slice(2), command, {
 
 This will show the data type for each option:
 
-```
+```sh
 Options:
   -p, --path        [string]   File or directory path
   -r, --recursive   [boolean]  Operate recursively
@@ -174,7 +174,7 @@ cli(process.argv.slice(2), mainCommand, {
 
 When users run `node app.js --help`, they'll see:
 
-```
+```sh
 app (app v1.0.0)
 
 USAGE:
@@ -198,7 +198,7 @@ OPTIONS:
 
 And when they run `node app.js create --help`, they'll see:
 
-```
+```sh
 app (app v1.0.0)
 
 Create a new resource

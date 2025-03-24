@@ -163,7 +163,7 @@ cli(process.argv.slice(2), command, {
 
 [MessageFormat2](https://messageformat.dev/) is a Unicode standard for localizable dynamic message strings, designed to make it simple to create natural sounding localized messages. Here's how to create a translation adapter for MessageFormat:
 
-> [!WARNING]
+> [!WARNING] <!-- eslint-disable-line markdown/no-missing-label-refs -->
 > MessageFormat2 is **work in progress**.
 > MessageFormat2 is currently being standardized and can be provided as an `Intl.MessageFormat` in the future. About see [TC39 proposal](https://github.com/tc39/proposal-intl-messageformat)
 

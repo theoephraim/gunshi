@@ -1,7 +1,7 @@
 import { MessageFormat } from 'messageformat'
 import { describe, expect, test, vi } from 'vitest'
-import DefaultLocale from '../locales/en-US.json'
-import jaLocale from '../locales/ja-JP.json'
+import DefaultLocale from '../locales/en-US.json' with { type: 'json' }
+import jaLocale from '../locales/ja-JP.json' with { type: 'json' }
 import {
   createTranslationAdapterForIntlifyMessageFormat,
   createTranslationAdapterForMessageFormat2,

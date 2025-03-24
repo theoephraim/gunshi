@@ -27,7 +27,7 @@ node index.js
 
 You should see the output:
 
-```
+```sh
 Hello, World!
 ```
 
@@ -53,7 +53,7 @@ node index.js Alice
 
 And you'll see:
 
-```
+```sh
 Hello, Alice!
 ```
 
@@ -108,7 +108,7 @@ node index.js -n Alice -u
 
 And you'll see:
 
-```
+```sh
 HELLO, ALICE!
 ```
 

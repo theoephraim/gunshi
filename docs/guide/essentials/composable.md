@@ -15,13 +15,13 @@ Sub-commands are useful when your CLI needs to perform different operations that
 
 A CLI with sub-commands typically has this structure:
 
-```
+```sh
 cli <command> [command options]
 ```
 
 For example:
 
-```
+```sh
 cli create --name my-resource
 ```
 

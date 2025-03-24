@@ -56,7 +56,6 @@ export function deepFreeze<T extends Record<string, any>>(obj: T): Readonly<T> {
   }
 
   for (const key of Object.keys(obj)) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const value = obj[key]
     if (typeof value === 'object' && value !== null) {
       deepFreeze(value)
