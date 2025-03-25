@@ -59,7 +59,7 @@ const command = {
 }
 
 // Run the command with the declarative configuration
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'declarative-example',
   version: '1.0.0',
   description: 'Example of declarative command configuration'

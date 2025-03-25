@@ -142,7 +142,7 @@ const mainCommand = {
 }
 
 // Run the CLI with composable sub-commands
-cli(process.argv.slice(2), mainCommand, {
+await cli(process.argv.slice(2), mainCommand, {
   name: 'resource-manager',
   version: '1.0.0',
   description: 'Example of composable sub-commands',

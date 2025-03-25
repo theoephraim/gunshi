@@ -67,7 +67,7 @@ const mainCommand = {
 }
 
 // Run the CLI with composable sub-commands
-cli(process.argv.slice(2), mainCommand, {
+await cli(process.argv.slice(2), mainCommand, {
   name: 'my-app',
   version: '1.0.0',
   subCommands
@@ -114,7 +114,7 @@ const mainCommand: Command<ArgOptions> = {
 }
 
 // Execute with type-safe sub-commands
-cli(process.argv.slice(2), mainCommand, {
+await cli(process.argv.slice(2), mainCommand, {
   subCommands
 })
 ```

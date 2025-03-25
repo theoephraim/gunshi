@@ -64,7 +64,7 @@ import { cli } from 'gunshi'
 
 const args = process.argv.slice(2)
 // run a simple command
-cli(args, () => {
+await cli(args, () => {
   // something logic ...
   console.log('Hello from Gunshi!', args)
 })
@@ -103,7 +103,7 @@ const command = {
 
 // run a command that is defined above
 // (the 3rd argument of `cli` is the command option)
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0',
   description: 'My CLI application'
@@ -201,7 +201,7 @@ const mainCommand = {
 }
 
 // run the CLI with composable sub-commands
-cli(process.argv.slice(2), mainCommand, {
+await cli(process.argv.slice(2), mainCommand, {
   name: 'my-app',
   version: '1.0.0',
   subCommands
@@ -239,7 +239,7 @@ const subCommands = new Map()
 subCommands.set('lazy', lazyCommand)
 
 // run the CLI with lazy-loaded commands
-cli(
+await cli(
   process.argv.slice(2),
   { name: 'main', run: () => {} },
   {
@@ -281,7 +281,7 @@ const command = {
 }
 
 // run with --help to see the automatically generated usage information
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0'
 })
@@ -324,7 +324,7 @@ const customUsageRenderer = ctx => {
 }
 
 // run with custom renderers
-cli(
+await cli(
   process.argv.slice(2),
   { name: 'app', run: () => {} },
   {
@@ -371,7 +371,7 @@ const command = {
 }
 
 // run with locale support
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0',
   // set the locale via an environment variable

@@ -35,7 +35,7 @@ const command: Command<ArgOptions> = {
 }
 
 // Execute the command
-cli(process.argv.slice(2), command)
+await cli(process.argv.slice(2), command)
 ```
 
 ## Type-Safe Options and Values
@@ -88,7 +88,7 @@ const command: Command<UserOptions> = {
 }
 
 // Execute the command with type safety
-cli(process.argv.slice(2), command)
+await cli(process.argv.slice(2), command)
 ```
 
 ## Using `satisfies` for Type Checking
@@ -124,7 +124,7 @@ const command = {
 } satisfies Command<typeof options>
 
 // Execute the command
-cli(process.argv.slice(2), command)
+await cli(process.argv.slice(2), command)
 ```
 
 The `satisfies` approach has the advantage of letting TypeScript infer the types from your options definition, while still ensuring type safety.

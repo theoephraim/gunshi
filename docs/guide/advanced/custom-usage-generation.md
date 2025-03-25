@@ -73,7 +73,7 @@ const command = {
 }
 
 // Run the command with the custom header renderer
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0',
   description: 'A CLI application with custom usage generation',
@@ -153,7 +153,7 @@ const customUsageRenderer = ctx => {
 }
 
 // Run the command with the custom usage renderer
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0',
   description: 'A CLI application with custom usage generation',
@@ -188,7 +188,7 @@ const customValidationErrorsRenderer = (ctx, error) => {
 }
 
 // Run the command with the custom validation errors renderer
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'my-app',
   version: '1.0.0',
   description: 'A CLI application with custom usage generation',
@@ -267,7 +267,7 @@ const command = {
 }
 
 // Run the CLI with the custom validation errors renderer
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'task-manager',
   version: '1.0.0',
   description: 'A task management utility',
@@ -347,7 +347,7 @@ $ task-manager --complete "Complete the project"`
 }
 
 // Run the CLI with all custom renderers
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'task-manager',
   version: '1.0.0',
   description: 'A task management utility',
@@ -438,7 +438,7 @@ const coloredUsageRenderer = ctx => {
 }
 
 // Run the CLI with colored renderers
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'task-manager',
   version: '1.0.0',
   description: 'A task management utility',
@@ -620,7 +620,7 @@ $ task-manager --complete "Complete the project"`
 }
 
 // Run the command with custom usage generation
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'task-manager',
   version: '1.0.0',
   description: 'A task management utility with custom usage generation',

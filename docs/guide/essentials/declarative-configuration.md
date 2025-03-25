@@ -83,7 +83,7 @@ const command = {
 }
 
 // Run the command with the declarative configuration
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'declarative-example',
   version: '1.0.0',
   description: 'Example of declarative command configuration'
@@ -130,7 +130,7 @@ The `run` function receives a context object (`ctx`) with:
 When calling the `cli` function, you can provide additional configuration:
 
 ```js
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'app-name',
   version: '1.0.0',
   description: 'Application description'

@@ -10,7 +10,7 @@ Let's create a simple CLI application that greets the user. Create a new file (e
 import { cli } from 'gunshi'
 
 // Run a simple command
-cli(process.argv.slice(2), () => {
+await cli(process.argv.slice(2), () => {
   console.log('Hello, World!')
 })
 ```
@@ -38,7 +38,7 @@ Let's enhance our example to accept a name as an argument:
 ```js
 import { cli } from 'gunshi'
 
-cli(process.argv.slice(2), ctx => {
+await cli(process.argv.slice(2), ctx => {
   // Access positional arguments
   const name = ctx.positionals[0] || 'World'
   console.log(`Hello, ${name}!`)
@@ -95,7 +95,7 @@ const command = {
   }
 }
 
-cli(process.argv.slice(2), command)
+await cli(process.argv.slice(2), command)
 ```
 
 Now you can run:

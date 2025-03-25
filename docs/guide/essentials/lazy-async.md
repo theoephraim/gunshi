@@ -48,7 +48,7 @@ const mainCommand = {
 }
 
 // Run the CLI with lazy-loaded commands
-cli(process.argv.slice(2), mainCommand, {
+await cli(process.argv.slice(2), mainCommand, {
   name: 'my-app',
   version: '1.0.0',
   subCommands
@@ -90,7 +90,7 @@ const command = {
   }
 }
 
-cli(process.argv.slice(2), command)
+await cli(process.argv.slice(2), command)
 ```
 
 ## Combining Lazy Loading and Async Execution
@@ -143,7 +143,7 @@ const subCommands = new Map()
 subCommands.set('lazy', lazyCommand)
 
 // Run the CLI with lazy-loaded commands
-cli(
+await cli(
   process.argv.slice(2),
   { name: 'main', run: () => {} },
   {
@@ -222,7 +222,7 @@ const subCommands = new Map()
 subCommands.set('data', dataCommand)
 
 // Run the CLI
-cli(
+await cli(
   process.argv.slice(2),
   { name: 'main', run: () => {} },
   {
@@ -262,7 +262,7 @@ const command: Command<ArgOptions> = {
 }
 
 // Execute the async command
-cli(process.argv.slice(2), command)
+await cli(process.argv.slice(2), command)
 ```
 
 ## Performance Benefits

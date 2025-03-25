@@ -151,7 +151,7 @@ const command = {
 }
 
 // Run the command with the custom translation adapter
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'translation-adapter-example',
   version: '1.0.0',
   locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),
@@ -299,7 +299,7 @@ one {{Hello, {$name}!}}
 }
 
 // Run the command with the MessageFormat translation adapter
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'messageformat-example',
   version: '1.0.0',
   locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),
@@ -418,7 +418,7 @@ const command = {
 }
 
 // Run the command with the Intlify translation adapter
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'intlify-example',
   version: '1.0.0',
   locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),

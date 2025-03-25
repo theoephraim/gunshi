@@ -127,7 +127,7 @@ const mainCommand = {
 }
 
 // Run the CLI with lazy-loaded commands
-cli(process.argv.slice(2), mainCommand, {
+await cli(process.argv.slice(2), mainCommand, {
   name: 'lazy-async-example',
   version: '1.0.0',
   description: 'Example of lazy loading and async command execution',

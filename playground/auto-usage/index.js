@@ -85,7 +85,7 @@ $ node index.js --operation list --format json`
 }
 
 // Run the command with auto usage generation
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'file-manager',
   version: '1.0.0',
   description: 'Example of automatic usage generation',

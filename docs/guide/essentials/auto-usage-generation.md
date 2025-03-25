@@ -55,7 +55,7 @@ $ app --operation delete --path ./temp`
   }
 }
 
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'app',
   version: '1.0.0'
 })
@@ -92,7 +92,7 @@ EXAMPLES:
 You can enable the display of option types in the usage information:
 
 ```js
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'app',
   version: '1.0.0',
   usageOptionType: true
@@ -165,7 +165,7 @@ const mainCommand = {
 }
 
 // Run the CLI with sub-commands
-cli(process.argv.slice(2), mainCommand, {
+await cli(process.argv.slice(2), mainCommand, {
   name: 'app',
   version: '1.0.0',
   subCommands

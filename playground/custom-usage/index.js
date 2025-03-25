@@ -158,7 +158,7 @@ const customValidationErrorsRenderer = (ctx, error) => {
 }
 
 // Run the command with custom usage generation
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'task-manager',
   version: '1.0.0',
   description: 'A task management utility with custom usage generation',

@@ -71,7 +71,7 @@ const command = {
 }
 
 // Run the command with i18n support
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'i18n-example',
   version: '1.0.0',
   // Set the locale via an environment variable
@@ -139,7 +139,7 @@ const command = {
   }
 }
 
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'i18n-example',
   version: '1.0.0',
   locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
@@ -228,7 +228,7 @@ OPTIONS:
 In Node.js v21 or later, you can use the built-in `navigator.language` to detect the user's locale:
 
 ```js
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'i18n-example',
   version: '1.0.0',
   // Use the system locale if available, otherwise fall back to en-US
@@ -300,7 +300,7 @@ const subCommands = new Map()
 subCommands.set('create', createCommand)
 
 // Run the CLI with i18n support
-cli(process.argv.slice(2), mainCommand, {
+await cli(process.argv.slice(2), mainCommand, {
   name: 'i18n-example',
   version: '1.0.0',
   locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US'),
@@ -369,7 +369,7 @@ const command = {
 }
 
 // Run the command with i18n support
-cli(process.argv.slice(2), command, {
+await cli(process.argv.slice(2), command, {
   name: 'i18n-example',
   version: '1.0.0',
   description: 'Example of internationalization support',
