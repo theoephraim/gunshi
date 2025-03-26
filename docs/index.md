@@ -7,7 +7,8 @@ hero:
   text: 'Modern JavaScript Command-line Library'
   tagline: 'Build powerful, type-safe, and user-friendly command-line interfaces with ease'
   image:
-    src: /logo.webp
+    light: /gunshi.png
+    dark: /gunshi_dark.png
     alt: Gunshi
   actions:
     - theme: brand
