@@ -4,6 +4,20 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Gunshi',
   description: 'Modern JavaScript Command-line library',
+  lastUpdated: true,
+  cleanUrls: true,
+
+  head: [
+    ['meta', { name: 'theme-color', content: '#468c56' }],
+    // TODO: og
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:locale', content: 'en' }],
+    ['meta', { property: 'og:title', content: 'Gunshi | Modern javascript command-line library' }],
+    ['meta', { property: 'og:image', content: 'https://gunshi.dev/og-image.png' }],
+    ['meta', { property: 'og:site_name', content: 'Gunshi' }],
+    ['meta', { property: 'og:url', content: 'https://gunshi.dev/' }]
+  ],
+
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -48,6 +62,11 @@ export default defineConfig({
       }
     ],
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/kazupon/gunshi' }]
+    socialLinks: [{ icon: 'github', link: 'https://github.com/kazupon/gunshi' }],
+
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2025 kazuya kawaguchi.'
+    }
   }
 })
