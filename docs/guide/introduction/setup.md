@@ -1,4 +1,4 @@
-# Installation
+# Setup
 
 Gunshi can be installed in various JavaScript environments. Choose the installation method that matches your project setup.
 

@@ -26,6 +26,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/introduction/what-is-gunshi' },
+      { text: 'Showcase', link: '/showcase' },
       { text: 'GitHub', link: 'https://github.com/kazupon/gunshi' }
     ],
 
@@ -35,7 +36,7 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: "What's Gunshi?", link: '/guide/introduction/what-is-gunshi' },
-          { text: 'Installation', link: '/guide/introduction/installation' }
+          { text: 'Setup', link: '/guide/introduction/setup' }
         ]
       },
       {
@@ -62,6 +63,10 @@ export default defineConfig({
           { text: 'Documentation Generation', link: '/guide/advanced/documentation-generation' },
           { text: 'Translation Adapter', link: '/guide/advanced/translation-adapter' }
         ]
+      },
+      {
+        text: 'Showcase',
+        link: '/showcase'
       }
     ],
 
