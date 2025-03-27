@@ -10,7 +10,7 @@ export default defineConfig({
 
   head: [
     ['meta', { name: 'theme-color', content: '#468c56' }],
-    // TODO: og
+    ['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:locale', content: 'en' }],
     ['meta', { property: 'og:title', content: 'Gunshi | Modern javascript command-line library' }],
