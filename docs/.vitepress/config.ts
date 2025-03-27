@@ -65,8 +65,18 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Showcase',
-        link: '/showcase'
+        text: 'Extra Topics',
+        collapsed: false,
+        items: [
+          {
+            text: 'Showcase',
+            link: '/showcase'
+          },
+          {
+            text: 'Credits',
+            link: '/credits'
+          }
+        ]
       }
     ],
 
