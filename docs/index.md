@@ -19,16 +19,16 @@ hero:
 
 features:
   - icon: 📏
-    title: Simple
-    details: Run commands with a minimal, easy-to-use API that simplifies CLI development.
-
-  - icon: 🛡️
-    title: Type Safe
-    details: Enjoy full TypeScript support with type-safe argument parsing and option resolution.
+    title: Simple & Universal
+    details: Run the commands with simple API and support universal runtime.
 
   - icon: ⚙️
     title: Declarative Configuration
     details: Configure command modules declaratively for better organization and maintainability.
+
+  - icon: 🛡️
+    title: Type Safe
+    details: TypeScript support with type-safe argument parsing and option resolution.
 
   - icon: 🧩
     title: Composable
@@ -48,5 +48,5 @@ features:
 
   - icon: 🌍
     title: Internationalization
-    details: Support multiple languages with built-in i18n and locale resource lazy loading.
+    details: Support multiple languages with built-in i18n, locale resource lazy loading and i18n library integration.
 ---

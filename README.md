@@ -21,14 +21,14 @@ Gunshi is a modern javascript command-line library
 
 Gunshi is designed to simplify the creation of modern command-line interfaces:
 
-- 📏 **Simple**: Run the commands with a simple API.
-- ⚙️ **Declarative configuration**: Configure the command modules declaratively.
-- 🛡️ **Type Safe**: Arguments parsing and options value resolution type-safely by [args-tokens](https://github.com/kazupon/args-tokens)
-- 🧩 **Composable**: Sub-commands that can be composed with modularized commands.
-- ⏳ **Lazy & Async**: Command modules lazy loading and asynchronously executing.
-- 📜 **Auto usage generation**: Automatic usage message generation with modularized commands.
-- 🎨 **Custom usage generation**: Usage message generation customizable.
-- 🌍 **Internationalization**: I18n out of the box and locale resource lazy loading.
+- 📏 **Simple & Universal**: Run the commands with simple API and support universal runtime.
+- ⚙️ **Declarative configuration**: Configure command modules declaratively for better organization and maintainability.
+- 🛡️ **Type Safe**: TypeScript support with type-safe argument parsing and option resolution by [args-tokens](https://github.com/kazupon/args-tokens)
+- 🧩 **Composable**: Create modular sub-commands that can be composed together for complex CLIs.
+- ⏳ **Lazy & Async**: Load command modules lazily and execute them asynchronously for better performance.
+- 📜 **Auto usage generation**: Generate helpful usage messages automatically for your commands.
+- 🎨 **Custom usage generation**: Customize how usage messages are generated to match your CLI's style.
+- 🌍 **Internationalization**: Support multiple languages with built-in i18n, locale resource lazy loading and i18n library integration.
 
 ## 💿 Installation
 
