@@ -10,8 +10,12 @@
 
 Gunshi is a modern javascript command-line library
 
-> [!TIP] <!-- eslint-disable-line markdown/no-missing-label-refs -->
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!TIP]
 > gunshi (軍師) is a position in ancient Japanese samurai battle in which a samurai devised strategies and gave orders. That name is inspired by the word "command".
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 ## ✨ Features
 
