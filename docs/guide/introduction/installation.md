@@ -2,9 +2,7 @@
 
 Gunshi can be installed in various JavaScript environments. Choose the installation method that matches your project setup.
 
-## Node.js
-
-You can install Gunshi using npm, pnpm, or yarn:
+## Install
 
 ::: code-group
 
@@ -20,23 +18,16 @@ pnpm add gunshi
 yarn add gunshi
 ```
 
-:::
-
-## Deno
-
-For Deno projects, you can add Gunshi from JSR:
-
-```sh
+```sh [deno]
+# For Deno projects, you can add Gunshi from JSR:
 deno add jsr:@kazupon/gunshi
 ```
 
-## Bun
-
-For Bun projects, you can install Gunshi with:
-
-```sh
+```sh [bun]
 bun add gunshi
 ```
+
+:::
 
 ## Requirements
 

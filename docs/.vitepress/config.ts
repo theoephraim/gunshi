@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -20,6 +21,8 @@ export default defineConfig({
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    logo: '/symbol.png',
+
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/introduction/what-is-gunshi' },
@@ -68,5 +71,15 @@ export default defineConfig({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2025 kazuya kawaguchi.'
     }
+  },
+
+  markdown: {
+    config(md) {
+      md.use(groupIconMdPlugin)
+    }
+  },
+
+  vite: {
+    plugins: [groupIconVitePlugin()]
   }
 })
