@@ -5,7 +5,7 @@ layout: home
 hero:
   name: 'Gunshi'
   text: 'Modern JavaScript Command-line Library'
-  tagline: 'Build powerful, type-safe, and user-friendly command-line interfaces with ease'
+  tagline: 'Robust, modular, flexible, and localizable CLI library'
   image:
     src: /logo.png
     alt: Gunshi
