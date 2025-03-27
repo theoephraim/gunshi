@@ -12,6 +12,7 @@ import type { Command, CommandContext, CommandOptions, CommandRunner } from './t
  * @param args - command line arguments
  * @param entry - A {@link Command | entry command} or an {@link CommandRunner | inline command runner}
  * @param opts - A {@link CommandOptions | command options}
+ * @returns A rendered usage or undefined. if you will use {@link CommandOptions.usageSilent} option, it will return rendered usage string.
  */
 export async function cli<Options extends ArgOptions = ArgOptions>(
   args: string[],
