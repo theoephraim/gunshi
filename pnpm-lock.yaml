@@ -39,6 +39,9 @@ importers:
       bumpp:
         specifier: ^10.0.3
         version: 10.1.0
+      deno:
+        specifier: ^2.2.6
+        version: 2.2.6
       eslint:
         specifier: ^9.22.0
         version: 9.23.0(jiti@2.4.2)
@@ -286,6 +289,36 @@ packages:
   '@babel/types@7.26.10':
     resolution: {integrity: sha512-emqcG3vHrpxUKTrxcblR36dcrcoRDvKmnL/dCL6ZsHaShW80qxCAcNhzQZrpeM765VzEos+xOi4s+r4IXzTwdQ==}
     engines: {node: '>=6.9.0'}
+
+  '@deno/darwin-arm64@2.2.6':
+    resolution: {integrity: sha512-pkSo0QCl75YJJ3Q0MhLyIVv99/cAnMoKa8ptZS9oRubZ+TiQjuvTHfK0v0xsXKyzmJoNd47avztZdEZJ4jj1OQ==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@deno/darwin-x64@2.2.6':
+    resolution: {integrity: sha512-MrGZ2WCLQAfHb3obLMZM44Lsf3tHML1wj5d20oZLKttnKlMhn+4S5/PHa/8m1Xh+sjydg0H26VPUv5bCALiVPA==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@deno/linux-arm64-glibc@2.2.6':
+    resolution: {integrity: sha512-c9WZhpxxKpDHxL93S06jcN22ZuRkCjeIPPKz5bS7024FCy8Ko8yHhN08VOD9xmJlqpa4xGT3WwCW6LXKf8XqbA==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@deno/linux-x64-glibc@2.2.6':
+    resolution: {integrity: sha512-dTawn/yIiu0TDb87varTBPWwuZ9SFT2Tng/zkV1q3auuKVtF5hoAublZVKEpi/tMGoyEOnuCi/rWh/AEd4NV5g==}
+    cpu: [x64]
+    os: [linux]
+
+  '@deno/win32-arm64@2.2.6':
+    resolution: {integrity: sha512-/VlLS3zpCtpBOqCBy1vihOt1pn/++KPFwV3AsRbpyU9tYztS8yyF7yIup+CYlhdHU+on9L5Fg8c8s1KDgqTiUQ==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@deno/win32-x64@2.2.6':
+    resolution: {integrity: sha512-uXNA3xWT/4Wiw1ByUaKrO5FUP5QNB1jT/kXhFBfeiVnxXeXRFX+6HPYw64yEYBjE2ckJLrwEhUteX3sFGDRDTg==}
+    cpu: [x64]
+    os: [win32]
 
   '@docsearch/css@3.8.2':
     resolution: {integrity: sha512-y05ayQFyUmCXze79+56v/4HpycYF3uFqB78pLPrSV5ZKAlDuIAAJNhaRi8tTdRNXh05yxX/TyNnzD6LwSM89vQ==}
@@ -2156,6 +2189,10 @@ packages:
 
   defu@6.1.4:
     resolution: {integrity: sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg==}
+
+  deno@2.2.6:
+    resolution: {integrity: sha512-mrMLP9yDBhhiwjo+NulG/zNk34KOGk+/FxJl6Ov8zakHH2fZ4CcJdomb4NcIeeHrKHC9z0wDLBRT6BjxmGBuaA==}
+    hasBin: true
 
   deprecation@2.3.1:
     resolution: {integrity: sha512-xmHIy4F3scKVwMsQ4WnVaS8bHOx0DmVwRywosKhaILI0ywMDWPtBSku2HNxRvF7jtwDRsoEwYQSfbxj8b7RlJQ==}
@@ -4165,6 +4202,24 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
+  '@deno/darwin-arm64@2.2.6':
+    optional: true
+
+  '@deno/darwin-x64@2.2.6':
+    optional: true
+
+  '@deno/linux-arm64-glibc@2.2.6':
+    optional: true
+
+  '@deno/linux-x64-glibc@2.2.6':
+    optional: true
+
+  '@deno/win32-arm64@2.2.6':
+    optional: true
+
+  '@deno/win32-x64@2.2.6':
+    optional: true
+
   '@docsearch/css@3.8.2': {}
 
   '@docsearch/js@3.8.2(@algolia/client-search@5.21.0)(search-insights@2.17.3)':
@@ -5697,6 +5752,15 @@ snapshots:
       object-keys: 1.1.1
 
   defu@6.1.4: {}
+
+  deno@2.2.6:
+    optionalDependencies:
+      '@deno/darwin-arm64': 2.2.6
+      '@deno/darwin-x64': 2.2.6
+      '@deno/linux-arm64-glibc': 2.2.6
+      '@deno/linux-x64-glibc': 2.2.6
+      '@deno/win32-arm64': 2.2.6
+      '@deno/win32-x64': 2.2.6
 
   deprecation@2.3.1: {}
 

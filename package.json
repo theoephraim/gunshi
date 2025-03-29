@@ -94,7 +94,9 @@
     "prepare": "git config --local core.hooksPath .githooks",
     "release": "bumpp --commit \"release: v%s\" --all --push --tag",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "pnpm run --stream --color \"/^typecheck:/\"",
+    "typecheck:deno": "deno check --all ./src",
+    "typecheck:tsc": "tsc --noEmit"
   },
   "dependencies": {
     "args-tokens": "^0.12.0"
@@ -107,6 +109,7 @@
     "@types/node": "^22.13.9",
     "@vitest/eslint-plugin": "^1.1.36",
     "bumpp": "^10.0.3",
+    "deno": "^2.2.6",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.0.2",
     "eslint-import-resolver-typescript": "^4.2.2",

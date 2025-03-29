@@ -42,8 +42,11 @@ class MessageFormat2Translation extends DefaultTranslation {
     this.#messageFormatCaches = new Map()
   }
 
-  // override
-  translate(locale: string, key: string, values: Record<string, unknown>): string | undefined {
+  override translate(
+    locale: string,
+    key: string,
+    values: Record<string, unknown>
+  ): string | undefined {
     const message = super.translate(locale, key, values)
     if (message == null) {
       return message
