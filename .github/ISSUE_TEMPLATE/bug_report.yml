@@ -22,13 +22,24 @@ body:
       placeholder: Reproduction
     validations:
       required: true
+  - type: dropdown
+    id: issue-runtime
+    attributes:
+      label: Issue Runtime
+      description: Select the JavaScript Runtime
+      options:
+        - Node.js
+        - Deno
+        - Bun
+    validations:
+      required: true
   - type: textarea
     id: system-info
     attributes:
       label: System Info
-      description: Output of `npx envinfo --system --binaries`
+      description: Output of `npx envinfo --system --binaries` for (Node) / `deno run -A npm:envinfo --system --binaries && deno -v` (for Deno) / `bunx envinfo --system --binaries` (for Bun)
       render: Shell
-      placeholder: System, Binaries, Browsers
+      placeholder: System, Binaries
     validations:
       required: true
   - type: textarea
