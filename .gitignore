@@ -8,7 +8,6 @@ dist
 docs/.vitepress/dist
 docs/.vitepress/cache
 generated-docs
-
 *.log
 *.swp
 *.tgz
