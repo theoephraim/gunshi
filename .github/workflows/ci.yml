@@ -127,4 +127,4 @@ jobs:
         run: pnpm build
 
       - name: Type checking
-        run: pnpm typecheck
+        run: pnpm typecheck:deno && pnpm typecheck:tsc -p ./tsconfig.ci.json

@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["**/*.ts"],
+  "exclude": ["playground/bun/index.ts", "playground/deno/main.ts", "docs/.vitepress/config.ts"]
+}
