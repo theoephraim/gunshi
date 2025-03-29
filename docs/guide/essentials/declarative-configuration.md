@@ -108,7 +108,7 @@ The `examples` property provides example commands showing how to use the CLI.
 
 ### Command Execution
 
-The `run` function receives a context object (`ctx`) with:
+The `run` function receives a command context object (`ctx`) with:
 
 - `values`: The parsed option values
 - `positionals`: Positional arguments

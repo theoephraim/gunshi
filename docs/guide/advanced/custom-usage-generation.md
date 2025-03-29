@@ -19,7 +19,7 @@ Gunshi allows you to customize usage generation by providing custom renderer fun
 - `renderUsage`: Renders the usage section of the help message
 - `renderValidationErrors`: Renders validation error messages
 
-Each renderer function receives a context object and should return a string or a Promise that resolves to a string.
+Each renderer function receives a command context object and should return a string or a Promise that resolves to a string.
 
 ## Basic Custom Header
 
@@ -420,9 +420,9 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
-## Renderer Context
+## Commander Context on Renderer
 
-The renderer functions receive a context object (`ctx`) with the following properties:
+The renderer functions receive a command context object (`ctx`) with the following properties:
 
 - `env`: Environment information (name, version, description)
 - `name`: Command name

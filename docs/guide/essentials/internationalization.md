@@ -98,7 +98,7 @@ MY_LOCALE=ja-JP node index.js --name 田中 --formal
 
 # i18n-example (i18n-example v1.0.0)
 #
-# こんにちは, John!
+# こんにちは, 田中!
 #
 # Translation Information:
 # Current locale: ja-JP

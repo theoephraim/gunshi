@@ -33,6 +33,9 @@ bun add gunshi
 
 Gunshi requires:
 
-- **Node.js**: Version 20 or higher
-- **ES Modules**: `"type": "module"` in `package.json`
+- **JavaScript Runtime**:
+  - **Node.js**: v20 or later
+  - **Deno**: v2 or later
+  - **Bun**: v1.1 or later
+- **ES Modules**: `"type": "module"` in `package.json` (for Node.js)
 - **TypeScript**: Version 5.0 or higher (if using TypeScript)
