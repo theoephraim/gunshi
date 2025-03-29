@@ -63,6 +63,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   globalIgnores([
     '.vscode',
     'docs/.vitepress/cache',
+    'docs/api',
     '**/dist/**',
     'lib',
     'tsconfig.json',
