@@ -124,7 +124,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Building
-        run: pnpm build && pnpm docs:build:typedoc
+        run: pnpm build
 
       - name: Type checking
         run: pnpm typecheck
