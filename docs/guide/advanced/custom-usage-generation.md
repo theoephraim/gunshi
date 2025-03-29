@@ -420,7 +420,7 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
-## Commander Context on Renderer
+## Command Context on Renderer
 
 The renderer functions receive a command context object (`ctx`) with the following properties:
 
