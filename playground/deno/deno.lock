@@ -1,12 +1,12 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@kazupon/gunshi@~0.10.3": "0.10.3",
+    "jsr:@kazupon/gunshi@~0.10.4": "0.10.4",
     "npm:args-tokens@0.12": "0.12.0"
   },
   "jsr": {
-    "@kazupon/gunshi@0.10.3": {
-      "integrity": "9744c15399f9e7bee8ebe3653ddce43472a74fc29a44c8a51d3bfa1408ebcfa0",
+    "@kazupon/gunshi@0.10.4": {
+      "integrity": "ee836f0b415108363e01a8c90d29f3382a633cfda71a06ccfce0e827983a0010",
       "dependencies": [
         "npm:args-tokens"
       ]
@@ -19,7 +19,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@kazupon/gunshi@~0.10.3"
+      "jsr:@kazupon/gunshi@~0.10.4"
     ]
   }
 }
