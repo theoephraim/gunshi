@@ -1,25 +1,25 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@kazupon/gunshi@~0.6.2": "0.6.2",
-    "npm:args-tokens@~0.10.2": "0.10.2"
+    "jsr:@kazupon/gunshi@~0.10.1": "0.10.1",
+    "npm:args-tokens@0.12": "0.12.0"
   },
   "jsr": {
-    "@kazupon/gunshi@0.6.2": {
-      "integrity": "d4dcfce288d49b926d97f68b6e35b1405c0562e0c9a5960a3cdca8f46b60a890",
+    "@kazupon/gunshi@0.10.1": {
+      "integrity": "30655aa6898e3d141cc17a74b9c1dfe8d6d0d074766f1f31644618413229075f",
       "dependencies": [
         "npm:args-tokens"
       ]
     }
   },
   "npm": {
-    "args-tokens@0.10.2": {
-      "integrity": "sha512-TmoGNFG7kH0o1z6WykoM0AkQrSTNUR52QcZdXAfugZUvhtiAv6q9ciiASwpwU7uR1IY/8U80QYwNry5ysuMdLA=="
+    "args-tokens@0.12.0": {
+      "integrity": "sha512-xWrKvIA8k8z/8X+yvu29oQwBm867i0Rn21KO9BCMtuJ8HiB8TK8ZHCqPLeXabc2FAdRAbOAR/2wMPHqsjXWAaw=="
     }
   },
   "workspace": {
     "dependencies": [
-      "jsr:@kazupon/gunshi@~0.6.2"
+      "jsr:@kazupon/gunshi@~0.10.1"
     ]
   }
 }
