@@ -26,6 +26,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/introduction/what-is-gunshi' },
+      { text: 'API', link: 'https://jsr.io/@kazupon/gunshi/doc' },
       { text: 'Showcase', link: '/showcase' },
       { text: 'GitHub', link: 'https://github.com/kazupon/gunshi' }
     ],
