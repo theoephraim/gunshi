@@ -116,9 +116,9 @@ const customUsageRenderer = ctx => {
   }
 
   // Add examples section with custom formatting
-  if (command.examples) {
+  if (ctx.examples) {
     lines.push('EXAMPLES:')
-    const examples = command.examples.split('\n')
+    const examples = ctx.examples.split('\n')
 
     for (const example of examples) {
       // Add extra indentation to examples

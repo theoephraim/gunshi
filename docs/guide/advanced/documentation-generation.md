@@ -368,7 +368,7 @@ function renderManPageUsage(ctx) {
 
   // EXAMPLES
   lines.push('## EXAMPLES')
-  lines.push(ctx.usage.examples, '')
+  lines.push(ctx.examples, '')
 
   // AUTHOR
   lines.push('## AUTHOR')

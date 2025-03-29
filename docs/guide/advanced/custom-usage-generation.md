@@ -59,12 +59,8 @@ const command = {
   options: {
     name: {
       type: 'string',
-      short: 'n'
-    }
-  },
-  usage: {
-    options: {
-      name: 'Name to use'
+      short: 'n',
+      description: 'Name to use'
     }
   },
   run: ctx => {
@@ -132,16 +128,16 @@ const customUsageRenderer = ctx => {
 
       // Format the option with custom styling
       lines.push(`  ${shortFlag}--${key}${type}${required}`)
-      lines.push(`      ${ctx.translation(key)}`)
+      lines.push(`      ${ctx.translate(key)}`)
       lines.push('')
     }
   }
 
   // Add examples section with custom formatting
-  if (ctx.usage?.examples) {
+  if (ctx.examples) {
     lines.push('EXAMPLES:')
     lines.push('```')
-    lines.push(ctx.usage.examples)
+    lines.push(ctx.examples)
     lines.push('```')
     lines.push('')
   }
@@ -248,17 +244,13 @@ const command = {
     action: {
       type: 'string',
       short: 'a',
-      required: true
+      required: true,
+      description: 'Action to perform (add, list, remove)'
     },
     name: {
       type: 'string',
-      short: 'n'
-    }
-  },
-  usage: {
-    options: {
-      action: 'Action to perform (add, list, remove)',
-      name: 'Task name'
+      short: 'n',
+      description: 'Task name'
     }
   },
   run: ctx => {
@@ -302,34 +294,31 @@ const command = {
   options: {
     add: {
       type: 'string',
-      short: 'a'
+      short: 'a',
+      description: 'Add a new task'
     },
     list: {
       type: 'boolean',
-      short: 'l'
+      short: 'l',
+      description: 'List all tasks'
     },
     complete: {
       type: 'string',
-      short: 'c'
+      short: 'c',
+      description: 'Mark a task as complete'
     },
     priority: {
       type: 'string',
-      short: 'p'
+      short: 'p',
+      description: 'Set task priority (low, medium, high)'
     },
     due: {
       type: 'string',
-      short: 'd'
+      short: 'd',
+      description: 'Set due date in YYYY-MM-DD format'
     }
   },
-  usage: {
-    options: {
-      add: 'Add a new task',
-      list: 'List all tasks',
-      complete: 'Mark a task as complete',
-      priority: 'Set task priority (low, medium, high)',
-      due: 'Set due date in YYYY-MM-DD format'
-    },
-    examples: `# Add a new task
+  examples: `# Add a new task
 $ task-manager --add "Complete the project"
 
 # Add a task with priority and due date
@@ -339,8 +328,7 @@ $ task-manager --add "Important meeting" --priority high --due 2023-12-31
 $ task-manager --list
 
 # Mark a task as complete
-$ task-manager --complete "Complete the project"`
-  },
+$ task-manager --complete "Complete the project"`,
   run: ctx => {
     // Command implementation
   }
@@ -419,21 +407,6 @@ const coloredUsageRenderer = ctx => {
     lines.push('')
   }
 
-  if (ctx.usage.examples) {
-    lines.push(chalk.white.bold('EXAMPLES:'))
-    const examples = ctx.usage.examples.split('\n')
-
-    for (const example of examples) {
-      if (example.startsWith('#')) {
-        lines.push(`  ${chalk.cyan(example)}`)
-      } else {
-        lines.push(`  ${chalk.white(example)}`)
-      }
-    }
-
-    lines.push('')
-  }
-
   return Promise.resolve(lines.join('\n'))
 }
 
@@ -455,7 +428,7 @@ The renderer functions receive a context object (`ctx`) with the following prope
 - `name`: Command name
 - `description`: Command description
 - `options`: Command options
-- `usage`: Usage information (options, examples)
+- `examples`: Command examples
 - `translate`: Translation function
 - `locale`: Current locale
 
@@ -519,9 +492,9 @@ const customUsageRenderer = ctx => {
   }
 
   // Add examples section with custom formatting
-  if (ctx.usage.examples) {
+  if (ctx.examples) {
     lines.push('EXAMPLES:')
-    const examples = ctx.usage.examples.split('\n')
+    const examples = ctx.examples.split('\n')
 
     for (const example of examples) {
       // Add extra indentation to examples
@@ -563,34 +536,31 @@ const command = {
   options: {
     add: {
       type: 'string',
-      short: 'a'
+      short: 'a',
+      description: 'Add a new task'
     },
     list: {
       type: 'boolean',
-      short: 'l'
+      short: 'l',
+      description: 'List all tasks'
     },
     complete: {
       type: 'string',
-      short: 'c'
+      short: 'c',
+      description: 'Mark a task as complete'
     },
     priority: {
       type: 'string',
-      short: 'p'
+      short: 'p',
+      description: 'Set task priority (low, medium, high)'
     },
     due: {
       type: 'string',
-      short: 'd'
+      short: 'd',
+      description: 'Set due date in YYYY-MM-DD format'
     }
   },
-  usage: {
-    options: {
-      add: 'Add a new task',
-      list: 'List all tasks',
-      complete: 'Mark a task as complete',
-      priority: 'Set task priority (low, medium, high)',
-      due: 'Set due date in YYYY-MM-DD format'
-    },
-    examples: `# Add a new task
+  examples: `# Add a new task
 $ task-manager --add "Complete the project"
 
 # Add a task with priority and due date
@@ -600,8 +570,7 @@ $ task-manager --add "Important meeting" --priority high --due 2023-12-31
 $ task-manager --list
 
 # Mark a task as complete
-$ task-manager --complete "Complete the project"`
-  },
+$ task-manager --complete "Complete the project"`,
   run: ctx => {
     const { add, list, complete, priority, due } = ctx.values
 

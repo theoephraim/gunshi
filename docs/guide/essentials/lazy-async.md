@@ -70,12 +70,8 @@ const command = {
   options: {
     delay: {
       type: 'number',
-      default: 1000
-    }
-  },
-  usage: {
-    options: {
-      delay: 'Delay in milliseconds'
+      default: 1000,
+      description: 'Delay in milliseconds'
     }
   },
   run: async ctx => {

@@ -341,11 +341,9 @@ const command = {
     return enUS
   },
 
-  // Define usage examples
-  usage: {
-    examples:
-      '# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal'
-  },
+  // Define examples
+  examples:
+    '# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal',
 
   // Command execution function
   run: ctx => {
