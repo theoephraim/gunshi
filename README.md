@@ -369,17 +369,13 @@ const command = {
   options: {
     name: {
       type: 'string',
-      short: 'n',
-      description: 'Name to greet'
+      short: 'n'
     },
     formal: {
       type: 'boolean',
-      short: 'f',
-      description: 'Use formal greeting'
+      short: 'f'
     }
   },
-  examples:
-    '# Basic greeting\n$ node index.js --name John\n\n# Formal greeting in Japanese\n$ MY_LOCALE=ja-JP node index.js --name 田中 --formal',
   // resource fetcher for translations
   resource: async ctx => {
     if (ctx.locale.toString() === 'ja-JP') {
