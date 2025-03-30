@@ -99,8 +99,8 @@ Options:
   -p, --path        [string]   File or directory path
   -r, --recursive   [boolean]  Operate recursively
   -o, --operation   [string]   Operation to perform (required)
-  -h, --help        [boolean]  Show help
-  --version         [boolean]  Show version
+  -h, --help        [boolean]  Display this help message
+  -v, --version     [boolean]  Display this version
 ```
 
 ## Usage for Sub-commands
