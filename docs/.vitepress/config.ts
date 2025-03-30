@@ -2,31 +2,6 @@ import { defineConfig } from 'vitepress'
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
 import typedocSidebar from '../api/typedoc-sidebar.json' with { type: 'json' }
 
-type UnionToIntersection<U> = (U extends unknown ? (x: U) => void : never) extends (
-  x: infer I
-) => void
-  ? I
-  : never
-type LastOf<U> =
-  UnionToIntersection<U extends unknown ? () => U : never> extends () => infer R ? R : never
-type UnionToTuple<T, L = LastOf<T>> = [T] extends [never] ? [] : [...UnionToTuple<Exclude<T, L>>, L]
-type ThemeConfig = NonNullable<Parameters<typeof defineConfig>[0]['themeConfig']>
-type SidebarItems = UnionToTuple<NonNullable<ThemeConfig['sidebar']>>[0]
-
-function normalizeSidebarItems(items: SidebarItems): SidebarItems {
-  return items.map(item => {
-    const mapped = { ...item }
-    if (item.link) {
-      const splied = item.link.split('/docs')
-      mapped.link = splied[1] || item.link
-    }
-    if (item.items) {
-      mapped.items = normalizeSidebarItems(item.items) as typeof item.items
-    }
-    return mapped
-  })
-}
-
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Gunshi',
@@ -94,7 +69,7 @@ export default defineConfig({
       {
         text: 'API References',
         collapsed: false,
-        items: normalizeSidebarItems(typedocSidebar)
+        items: typedocSidebar
       },
       {
         text: 'Extra Topics',
