@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
 import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
+import llmstxt from 'vitepress-plugin-llms'
 import typedocSidebar from '../api/typedoc-sidebar.json' with { type: 'json' }
 
 // https://vitepress.dev/reference/site-config
@@ -106,6 +107,6 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [groupIconVitePlugin()]
+    plugins: [groupIconVitePlugin(), llmstxt()]
   }
 })
