@@ -16,7 +16,7 @@ export default {
    * ref: https://typedoc-plugin-markdown.org/docs/options
    */
   entryFileName: 'index',
-  hidePageTitle: true,
+  hidePageTitle: false,
   useCodeBlocks: true,
   disableSources: true,
   indexFormat: 'table',
