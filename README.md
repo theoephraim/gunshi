@@ -32,8 +32,6 @@ Gunshi is designed to simplify the creation of modern command-line interfaces:
 
 ## 💿 Installation
 
-### 🐢 Node
-
 ```sh
 # npm
 npm install --save gunshi
@@ -43,40 +41,15 @@ pnpm add gunshi
 
 ## yarn
 yarn add gunshi
-```
 
-### 🦕 Deno
-
-```sh
+## deno
 deno add jsr:@kazupon/gunshi
-```
 
-### 🥟 Bun
-
-```sh
+## bun
 bun add gunshi
 ```
 
 ## 🚀 Usage
-
-### 📏 Simple API
-
-Gunshi has a simple API that is a facade:
-
-```js
-import { cli } from 'gunshi'
-
-const args = process.argv.slice(2)
-// run a simple command
-await cli(args, () => {
-  // something logic ...
-  console.log('Hello from Gunshi!', args)
-})
-```
-
-### ⚙️ Declarative Configuration
-
-Configure commands declaratively:
 
 ```js
 import { cli } from 'gunshi'
@@ -121,289 +94,7 @@ await cli(process.argv.slice(2), command, {
 })
 ```
 
-For more detailed examples, check out the [playground/declarative](https://github.com/kazupon/gunshi/tree/main/playground/declarative) in the repository.
-
-### 🛡️ Type-Safe Arguments
-
-Gunshi provides type-safe argument parsing with TypeScript:
-
-```ts
-import { cli } from 'gunshi'
-import type { ArgOptions, Command, CommandContext } from 'gunshi'
-
-// type-safe arguments parsing example
-// this demonstrates how to define and use typed command options with `satisfies`
-
-// define 'type-safe' command options with types
-const options = {
-  // define string option with short alias
-  name: {
-    type: 'string',
-    short: 'n'
-  },
-  // define number option with default value
-  age: {
-    type: 'number',
-    short: 'a',
-    default: 25
-  },
-  // define boolean flag
-  verbose: {
-    type: 'boolean',
-    short: 'v'
-  }
-} satisfies ArgOptions
-
-// define 'type-safe' command
-const command = {
-  name: 'type-safe',
-  options,
-  run: (ctx: CommandContext<UserOptions, UserValues>) => {
-    const { name, age, verbose } = ctx.values
-    console.log(`Hello, ${name || 'World'}! You are ${age} years old.`)
-  }
-} satisfies Command<typeof options>
-
-await cli(process.argv.slice(2), command)
-```
-
-For more detailed examples, check out the [playground/type-safe](https://github.com/kazupon/gunshi/tree/main/playground/type-safe) in the repository.
-
-### 🧩 Composable Sub-commands
-
-Run a CLI with composable sub-commands:
-
-```js
-import { cli } from 'gunshi'
-
-// define 'create' command
-const createCommand = {
-  name: 'create',
-  description: 'Create a new resource',
-  options: {
-    name: { type: 'string', short: 'n' }
-  },
-  run: ctx => {
-    console.log(`Creating resource: ${ctx.values.name}`)
-  }
-}
-
-// define 'list' command
-const listCommand = {
-  name: 'list',
-  description: 'List all resources',
-  run: () => {
-    console.log('Listing all resources...')
-  }
-}
-
-// prepare a Map of sub-commands
-const subCommands = new Map()
-subCommands.set('create', createCommand)
-subCommands.set('list', listCommand)
-
-// define the main ('resource-manager') command
-const mainCommand = {
-  name: 'resource-manager',
-  description: 'Manage resources',
-  run: () => {
-    console.log('Use one of the sub-commands: create, list')
-  }
-}
-
-// run the CLI with composable sub-commands
-await cli(process.argv.slice(2), mainCommand, {
-  name: 'my-app',
-  version: '1.0.0',
-  subCommands
-})
-```
-
-For more detailed examples, check out the [playground/composable](https://github.com/kazupon/gunshi/tree/main/playground/composable) in the repository.
-
-### ⏳ Lazy & Async Command Loading
-
-Load commands lazily and execute them asynchronously:
-
-```js
-import { cli } from 'gunshi'
-
-// define a command that will be loaded lazily
-const lazyCommand = async () => {
-  // simulate async loading
-  await new Promise(resolve => setTimeout(resolve, 1000))
-
-  // return the actual command
-  return {
-    name: 'lazy',
-    description: 'A command that is loaded lazily',
-    run: async ctx => {
-      // async execution
-      await new Promise(resolve => setTimeout(resolve, 500))
-      console.log('Command executed!')
-    }
-  }
-}
-
-// prepare a Map of sub-commands with lazy-loaded commands
-const subCommands = new Map()
-subCommands.set('lazy', lazyCommand)
-
-// run the CLI with lazy-loaded commands
-await cli(
-  process.argv.slice(2),
-  { name: 'main', run: () => {} },
-  {
-    name: 'my-app',
-    subCommands
-  }
-)
-```
-
-For more detailed examples, check out the [playground/lazy-async](https://github.com/kazupon/gunshi/tree/main/playground/lazy-async) in the repository.
-
-### 📜 Auto Usage Generation
-
-Gunshi automatically generates usage information:
-
-```js
-import { cli } from 'gunshi'
-
-const command = {
-  name: 'app',
-  description: 'My application',
-  options: {
-    path: {
-      type: 'string',
-      short: 'p',
-      description: 'File or directory path'
-    },
-    recursive: {
-      type: 'boolean',
-      short: 'r',
-      description: 'Operate recursively on directories'
-    },
-    operation: {
-      type: 'string',
-      short: 'o',
-      required: true,
-      description: 'Operation to perform (list, copy, move, delete)'
-    }
-  },
-  // define examples
-  examples: '# Example\n$ my-app --operation list --path ./src',
-  run: ctx => {
-    // command implementation
-  }
-}
-
-// run with --help to see the automatically generated usage information
-await cli(process.argv.slice(2), command, {
-  name: 'my-app',
-  version: '1.0.0'
-})
-```
-
-For more detailed examples, check out the [playground/auto-usage](https://github.com/kazupon/gunshi/tree/main/playground/auto-usage) in the repository.
-
-### 🎨 Custom Usage Generation
-
-Customize the usage message generation:
-
-```js
-import { cli } from 'gunshi'
-
-// define custom header renderer
-const customHeaderRenderer = ctx => {
-  return Promise.resolve(`
-╔═══════════════════════╗
-║      ${ctx.env.name.toUpperCase()}      ║
-╚═══════════════════════╝
-${ctx.env.description}
-Version: ${ctx.env.version}
-`)
-}
-
-// define custom usage renderer
-const customUsageRenderer = ctx => {
-  const lines = []
-  lines.push('USAGE:')
-  lines.push(`  $ ${ctx.env.name} [options]`)
-  lines.push('')
-  lines.push('OPTIONS:')
-
-  for (const [key, option] of Object.entries(ctx.options || Object.create(null))) {
-    const shortFlag = option.short ? `-${option.short}, ` : '    '
-    lines.push(`  ${shortFlag}--${key.padEnd(10)} ${ctx.translate(key)}`)
-  }
-
-  return Promise.resolve(lines.join('\n'))
-}
-
-// run with custom renderers
-await cli(
-  process.argv.slice(2),
-  { name: 'app', run: () => {} },
-  {
-    name: 'my-app',
-    version: '1.0.0',
-    description: 'My application',
-    renderHeader: customHeaderRenderer,
-    renderUsage: customUsageRenderer
-  }
-)
-```
-
-For more detailed examples, check out the [playground/custom-usage](https://github.com/kazupon/gunshi/tree/main/playground/custom-usage) in the repository.
-
-### 🌍 Internationalization
-
-Support internationalization:
-
-```js
-import { cli } from 'gunshi'
-import enUS from './locales/en-US.json' with { type: 'json' }
-
-const command = {
-  name: 'greeter',
-  options: {
-    name: {
-      type: 'string',
-      short: 'n'
-    },
-    formal: {
-      type: 'boolean',
-      short: 'f'
-    }
-  },
-  // resource fetcher for translations
-  resource: async ctx => {
-    if (ctx.locale.toString() === 'ja-JP') {
-      const resource = await import('./locales/ja-JP.json', { with: { type: 'json' } })
-      return resource.default
-    }
-
-    // default to English
-    return enUS
-  },
-  run: ctx => {
-    const { name = 'World', formal } = ctx.values
-    const greeting = formal ? ctx.translate('formal_greeting') : ctx.translate('informal_greeting')
-    console.log(`${greeting}, ${name}!`)
-  }
-}
-
-// run with locale support
-await cli(process.argv.slice(2), command, {
-  name: 'my-app',
-  version: '1.0.0',
-  // set the locale via an environment variable
-  // if Node v21 or later is used, you can use the built-in `navigator.language` instead)
-  locale: new Intl.Locale(process.env.MY_LOCALE || 'en-US')
-})
-```
-
-For more detailed examples, check out the [playground/i18n](https://github.com/kazupon/gunshi/tree/main/playground/i18n) in the repository.
+About more details and usage, see [documentations](https://gunshi.dev)
 
 ## 💁‍♀️ Showcases
 
@@ -422,6 +113,14 @@ This project is inspired and powered by:
 - cline and claude 3.7 sonnet, examples and docs is generated
 
 Thank you!
+
+## 🤝 Sponsors
+
+<p align="center">
+  <a href="https://cdn.jsdelivr.net/gh/kazupon/sponsors/sponsors.svg">
+    <img src='https://cdn.jsdelivr.net/gh/kazupon/sponsors/sponsors.svg'/>
+  </a>
+</p>
 
 ## ©️ License
 
