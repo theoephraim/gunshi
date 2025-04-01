@@ -11,6 +11,7 @@ import {
   typescript,
   unicorn,
   vitest,
+  vue,
   yaml
 } from '@kazupon/eslint-config'
 import { globalIgnores } from 'eslint/config'
@@ -43,6 +44,13 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/ban-ts-comment': 'off'
     }
+  }),
+  vue({
+    parserOptions: {
+      tsconfigRootDir: import.meta.dirname
+    },
+    composable: true,
+    typescript: true
   }),
   jsonc({
     json: true,
