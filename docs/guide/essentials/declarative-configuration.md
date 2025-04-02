@@ -97,9 +97,9 @@ Each option can have the following properties:
 
 - `type`: The data type ('string', 'number', 'boolean')
 - `short`: A single-character alias for the option
+- `description`: A description of what the option does
 - `default`: Default value if the option is not provided
 - `required`: Set to `true` if the option is required
-- `description`: A description of what the option does
 
 ### Examples
 
@@ -109,11 +109,12 @@ The `examples` property provides example commands showing how to use the CLI.
 
 The `run` function receives a command context object (`ctx`) with:
 
-- `values`: The parsed option values
+- `options`: The command options configuration
+- `values`: The resolved option values
+- `_`: The raw arguments is passed from `cli` function
 - `positionals`: Positional arguments
 - `name`: The command name
 - `description`: The command description
-- `options`: The command options configuration
 - `env`: The command environment
 
 ## CLI Configuration
