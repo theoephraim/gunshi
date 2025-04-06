@@ -106,8 +106,8 @@ importers:
         specifier: ^0.3.10
         version: 0.3.10
       tsdown:
-        specifier: ^0.7.5
-        version: 0.7.5(publint@0.3.10)(typescript@5.8.3)
+        specifier: 0.7.4
+        version: 0.7.4(publint@0.3.10)(typescript@5.8.3)
       typedoc:
         specifier: ^0.28.1
         version: 0.28.1(typescript@5.8.3)
@@ -3804,8 +3804,8 @@ packages:
   rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
 
-  rolldown-plugin-dts@0.1.0:
-    resolution: {integrity: sha512-kmXQzvRJVQ+bWtZXX345S4H6tNtrqIdBsZX7mmL+M4tLj2YsgCNXuS/XKAzUKD8BCqSwK/dEkzIxZ+BjiaHLeQ==}
+  rolldown-plugin-types@0.0.0:
+    resolution: {integrity: sha512-Jk7TXLiTQiSktmOi2UNvU0IcPMwFYTSS7LiJBWcMQteD1cmxdKBJikL8p/zrqxuJ9tUKI5GX77i9V8Cpd9zDfg==}
     engines: {node: '>=20.18.0'}
 
   rolldown@1.0.0-beta.7:
@@ -4121,8 +4121,8 @@ packages:
       unplugin-unused:
         optional: true
 
-  tsdown@0.7.5:
-    resolution: {integrity: sha512-Y+/BG3n8ZPVVEocRa7nMOBSvNJer4TvDji4nLz9wzlN2RaOqdKnvzx4JZVOt+4cQS+ThDU9166ZXuqN0sbtEEw==}
+  tsdown@0.7.4:
+    resolution: {integrity: sha512-hgBD66mh9GGeV7CYdQxcx9u6GQr8fQmNlVMA/jGbJB4HV3tSCwswy2bjeLea9a+4WZaGQftOjx8uuvK8DHQoRg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -8190,7 +8190,7 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rolldown-plugin-dts@0.1.0:
+  rolldown-plugin-types@0.0.0:
     dependencies:
       magic-string-ast: 0.9.1
       oxc-parser: 0.62.0
@@ -8585,7 +8585,7 @@ snapshots:
       - supports-color
       - typescript
 
-  tsdown@0.7.5(publint@0.3.10)(typescript@5.8.3):
+  tsdown@0.7.4(publint@0.3.10)(typescript@5.8.3):
     dependencies:
       ansis: 3.17.0
       cac: 6.7.14
@@ -8596,7 +8596,7 @@ snapshots:
       find-up-simple: 1.0.1
       oxc-resolver: 5.1.1
       rolldown: 1.0.0-beta.7(typescript@5.8.3)
-      rolldown-plugin-dts: 0.1.0
+      rolldown-plugin-types: 0.0.0
       tinyglobby: 0.2.12
       unconfig: 7.3.1
       unplugin-isolated-decl: 0.13.6(typescript@5.8.3)

@@ -135,7 +135,7 @@
     "pkg-pr-new": "^0.0.42",
     "prettier": "^3.5.3",
     "publint": "^0.3.10",
-    "tsdown": "^0.7.5",
+    "tsdown": "0.7.4",
     "typedoc": "^0.28.1",
     "typedoc-plugin-markdown": "^4.6.1",
     "typedoc-vitepress-theme": "^1.1.2",
@@ -149,6 +149,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "deno",
       "esbuild"
     ]
   },
