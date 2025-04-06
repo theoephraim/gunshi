@@ -37,8 +37,8 @@ const command = {
     if (ctx.locale.toString() === 'ja-JP') {
       return {
         description: '挨拶アプリケーション',
-        name: '挨拶する相手の名前',
-        formal: '丁寧な挨拶を使用する',
+        'Option:name': '挨拶する相手の名前',
+        'Option:formal': '丁寧な挨拶を使用する',
         informal_greeting: 'こんにちは',
         formal_greeting: 'はじめまして'
       }
@@ -47,8 +47,8 @@ const command = {
     // Default to English
     return {
       description: 'Greeting application',
-      name: 'Name to greet',
-      formal: 'Use formal greeting',
+      'Option:name': 'Name to greet',
+      'Option:formal': 'Use formal greeting',
       informal_greeting: 'Hello',
       formal_greeting: 'Good day'
     }
@@ -153,8 +153,8 @@ Example locale files:
 ```json
 {
   "description": "Greeting application",
-  "name": "Name to greet",
-  "formal": "Use formal greeting",
+  "Option:name": "Name to greet",
+  "Option:formal": "Use formal greeting",
   "informal_greeting": "Hello",
   "formal_greeting": "Good day"
 }
@@ -165,8 +165,8 @@ Example locale files:
 ```json
 {
   "description": "挨拶アプリケーション",
-  "name": "挨拶する相手の名前",
-  "formal": "丁寧な挨拶を使用する",
+  "Option:name": "挨拶する相手の名前",
+  "Option:formal": "丁寧な挨拶を使用する",
   "informal_greeting": "こんにちは",
   "formal_greeting": "はじめまして"
 }
@@ -241,9 +241,71 @@ await cli(process.argv.slice(2), command, {
 
 For earlier Node.js versions, you can use environment variables or configuration files to determine the locale.
 
-## Resource structure and reserved resource keys
+## Resource Key Naming Conventions
 
-TODO:
+When defining your localization resources (either directly in the `resource` function or in separate files), there are specific naming conventions to follow for the keys:
+
+- **Command Description**: Use the key `description` for the main description of the command.
+- **Examples**: Use the key `examples` for usage examples.
+- **Option Descriptions**: Keys for the descriptions of command options **must** be prefixed with `Option:`. For example, if you have an option named `target`, its description key must be `Option:target`. This prefix is crucial to avoid naming conflicts with other keys like `description` or custom keys.
+- **Custom Keys**: Any other keys you define for custom translation messages (like greetings, error messages, etc.) do not require a prefix and can be named freely (e.g., `informal_greeting`, `error_file_not_found`).
+- **Built-in Keys**: Keys for built-in functionalities like `help` and `version` are generally handled by Gunshi's default locales. While you can technically override them using keys like `_help` and `_version`, it's usually sufficient to rely on the default translations provided.
+
+Here's an example illustrating the convention:
+
+```ts
+import { define } from 'gunshi'
+
+const command = define({
+  name: 'my-command',
+  options: {
+    target: { type: 'string' },
+    verbose: { type: 'boolean' }
+  },
+  resource: async ctx => {
+    // Example for 'en-US' locale
+    return {
+      description: 'This is my command.', // No prefix
+      examples: '$ my-command --target file.txt', // No prefix
+      'Option:target': 'The target file to process.', // 'Option:' prefix
+      'Option:verbose': 'Enable verbose output.', // 'Option:' prefix
+      processing_message: 'Processing target...' // No prefix
+    }
+  },
+  run: ctx => {
+    /* ... */
+  }
+})
+```
+
+Adhering to these conventions ensures that Gunshi correctly identifies and uses your translations for descriptions, help messages, and within your command's logic via `ctx.translate()`.
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!IMPORTANT]
+> The resource object returned by the `resource` function (or loaded from external files like JSON) **must** be a flat key-value structure. Nested objects are not supported for translations using `ctx.translate()`. Keep your translation keys simple and at the top level.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+Good Flat structure:
+
+```json
+{
+  "greeting": "Hello",
+  "farewell": "Goodbye"
+}
+```
+
+Bad Nested structure (won't work with `ctx.translate('messages.greeting')`:
+
+```json
+{
+  "messages": {
+    "greeting": "Hello",
+    "farewell": "Goodbye"
+  }
+}
+```
 
 ## Internationalization with Sub-commands
 
@@ -361,8 +423,8 @@ const command = {
     // Show translation information
     console.log('\nTranslation Information:')
     console.log(`Command Description: ${ctx.translate('description')}`)
-    console.log(`Name Option: ${ctx.translate('name')}`)
-    console.log(`Formal Option: ${ctx.translate('formal')}`)
+    console.log(`Name Option: ${ctx.translate('Option:name')}`)
+    console.log(`Formal Option: ${ctx.translate('Option:formal')}`)
   }
 }
 
@@ -383,8 +445,8 @@ With locale files:
 ```json
 {
   "description": "Greeting application",
-  "name": "Name to greet",
-  "formal": "Use formal greeting",
+  "Option:name": "Name to greet",
+  "Option:formal": "Use formal greeting",
   "informal_greeting": "Hello",
   "formal_greeting": "Good day"
 }
@@ -395,8 +457,8 @@ With locale files:
 ```json
 {
   "description": "挨拶アプリケーション",
-  "name": "挨拶する相手の名前",
-  "formal": "丁寧な挨拶を使用する",
+  "Option:name": "挨拶する相手の名前",
+  "Option:formal": "丁寧な挨拶を使用する",
   "informal_greeting": "こんにちは",
   "formal_greeting": "はじめまして"
 }
