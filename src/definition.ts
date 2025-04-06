@@ -1,3 +1,12 @@
+/**
+ * The entry for command deifinition.
+ * @example
+ * ```js
+ * import { define } from 'gunshi/definition'
+ * ```
+ * @module
+ */
+
 import type { ArgOptions } from 'args-tokens'
 import type { Command } from './types.ts'
 
