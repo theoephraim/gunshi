@@ -7,11 +7,13 @@ const dirname = import.meta.dirname
 const config: ReturnType<typeof defineConfig> = defineConfig({
   entry: ['src/index.ts', 'src/definition.ts', 'src/renderer/index.ts', 'src/generator.ts'],
   outDir: 'lib',
+  publint: true,
   dts: true,
   plugins: [
     {
       name: 'locale-copy',
-      closeBundle() {
+      closeBundle(this) {
+        console.log('Copying locales...')
         const localesDir = path.join(dirname, './src/locales')
         const outDir = path.join(dirname, 'lib', 'locales')
         if (fs.existsSync(localesDir)) {
