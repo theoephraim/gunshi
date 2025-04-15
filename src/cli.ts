@@ -1,3 +1,8 @@
+/**
+ * @author kazuya kawaguchi (a.k.a. kazupon)
+ * @license MIT
+ */
+
 import { parseArgs, resolveArgs } from 'args-tokens'
 import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS } from './constants.ts'
 import { createCommandContext } from './context.ts'

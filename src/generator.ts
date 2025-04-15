@@ -7,6 +7,11 @@
  * @module
  */
 
+/**
+ * @author kazuya kawaguchi (a.k.a. kazupon)
+ * @license MIT
+ */
+
 import { cli } from './cli.ts'
 import { create } from './utils.ts'
 

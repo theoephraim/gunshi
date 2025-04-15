@@ -1,3 +1,8 @@
+/**
+ * @author kazuya kawaguchi (a.k.a. kazupon)
+ * @license MIT
+ */
+
 import { create, resolveBuiltInKey, resolveOptionKey } from '../utils.ts'
 
 import type { ArgOptions } from 'args-tokens'

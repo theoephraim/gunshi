@@ -7,6 +7,11 @@
  * @module default
  */
 
+/**
+ * @author kazuya kawaguchi (a.k.a. kazupon)
+ * @license MIT
+ */
+
 export { parseArgs, resolveArgs } from 'args-tokens'
 export type { ArgOptions, ArgOptionSchema, ArgValues } from 'args-tokens'
 export * from './cli.ts'

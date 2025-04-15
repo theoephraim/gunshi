@@ -1,3 +1,8 @@
+/**
+ * @author kazuya kawaguchi (a.k.a. kazupon)
+ * @license MIT
+ */
+
 import { create } from './utils.ts'
 
 import type { TranslationAdapter, TranslationAdapterFactoryOptions } from './types.ts'

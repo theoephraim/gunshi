@@ -8,6 +8,7 @@ import {
   prettier,
   promise,
   regexp,
+  stylistic,
   typescript,
   unicorn,
   vitest,
@@ -18,13 +19,18 @@ import { globalIgnores } from 'eslint/config'
 
 const config: ReturnType<typeof defineConfig> = defineConfig(
   javascript(),
+  stylistic(),
+  comments({
+    kazupon: {
+      ignores: ['./playground/**', './docs/**', './test/**', './src/**.test.ts']
+    }
+  }),
   imports({
     typescript: true,
     rules: {
       'import/extensions': ['error', 'always', { ignorePackages: true }]
     }
   }),
-  comments(),
   promise(),
   regexp(),
   unicorn({
@@ -68,6 +74,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   }),
   vitest(),
   prettier(),
+  // @ts-expect-error -- FIXME
   globalIgnores([
     '.vscode',
     'docs/.vitepress/cache',

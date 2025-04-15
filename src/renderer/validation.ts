@@ -1,3 +1,8 @@
+/**
+ * @author kazuya kawaguchi (a.k.a. kazupon)
+ * @license MIT
+ */
+
 import type { ArgOptions } from 'args-tokens'
 import type { CommandContext } from '../types.ts'
 
