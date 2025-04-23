@@ -121,7 +121,11 @@ await cli(process.argv.slice(2), command, {
 Each option can have the following properties:
 
 - `type`: The data type ('string', 'number', 'boolean')
-- `short`: A single-character alias for the option. Multiple **boolean** short options can be grouped together (e.g., `-Vb` is equivalent to `-V -b`). Options requiring values (like `string` or `number`) cannot be part of a group.
+- `short`: A single-character alias for the option.
+  <!-- eslint-disable markdown/no-missing-label-refs -->
+  > [!TIP] Multiple boolean short options can be grouped together.
+  > (e.g., `-Vb` is equivalent to `-V -b`). Options requiring values (like `string` or `number`) cannot be part of a group.
+  <!-- eslint-enable markdown/no-missing-label-refs -->
 - `description`: A description of what the option does
 - `default`: Default value if the option is not provided
 - `required`: Set to `true` if the option is required
@@ -136,8 +140,8 @@ The `run` function receives a command context object (`ctx`) with:
 
 - `options`: The command options configuration
 - `values`: The resolved option values
-- `_`: The raw arguments is passed from `cli` function
 - `positionals`: Positional arguments
+- `_`: The raw arguments is passed from `cli` function
 - `name`: The command name
 - `description`: The command description
 - `env`: The command environment
