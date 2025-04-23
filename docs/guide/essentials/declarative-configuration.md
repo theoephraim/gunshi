@@ -135,7 +135,7 @@ Each option can have the following properties:
 - `short`: A single-character alias for the option.
   <!-- eslint-disable markdown/no-missing-label-refs -->
   > [!TIP] Multiple boolean short options can be grouped together.
-  > (e.g., `-Vb` is equivalent to `-V -b`). Options requiring values (like `string` or `number`) cannot be part of a group.
+  > (e.g., `-Vb` is equivalent to `-V -b`). Options requiring values (like `string`, `number`, `enum`) cannot be part of a group.
   <!-- eslint-enable markdown/no-missing-label-refs -->
 - `description`: A description of what the option does
 - `default`: Default value if the option is not provided
