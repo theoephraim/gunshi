@@ -17,12 +17,20 @@ import {
 } from '@kazupon/eslint-config'
 import { globalIgnores } from 'eslint/config'
 
+import type { Linter } from 'eslint'
+
 const config: ReturnType<typeof defineConfig> = defineConfig(
   javascript(),
   stylistic(),
   comments({
     kazupon: {
-      ignores: ['./playground/**', './docs/**', './test/**', './src/**.test.ts']
+      ignores: [
+        './playground/**',
+        './docs/**',
+        './test/**',
+        './src/**.test.ts',
+        './src/**.test-d.ts'
+      ]
     }
   }),
   imports({
@@ -74,7 +82,6 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   }),
   vitest(),
   prettier(),
-  // @ts-expect-error -- FIXME
   globalIgnores([
     '.vscode',
     'docs/.vitepress/cache',
@@ -84,9 +91,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     'lib',
     'tsconfig.json',
     'pnpm-lock.yaml',
-    'playground/bun',
-    'playground/deno'
-  ])
+    'playground/**'
+  ]) as Linter.Config
 )
 
 export default config
