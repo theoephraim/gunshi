@@ -128,14 +128,14 @@
     "eslint-plugin-yml": "^1.17.0",
     "gh-changelogen": "^0.2.8",
     "jsr": "^0.13.4",
+    "jsr-exports-lint": "^0.2.0",
     "knip": "^5.50.2",
     "lint-staged": "^15.5.0",
     "messageformat": "4.0.0-10",
     "pkg-pr-new": "^0.0.43",
     "prettier": "^3.5.3",
     "publint": "^0.3.11",
-    "tsdown": "^0.9.1",
-    "tsdown-jsr-exports-lint": "^0.1.4",
+    "tsdown": "^0.9.6",
     "typedoc": "^0.28.2",
     "typedoc-plugin-markdown": "^4.6.2",
     "typedoc-vitepress-theme": "^1.1.2",
@@ -151,6 +151,7 @@
     "onlyBuiltDependencies": [
       "deno",
       "esbuild",
+      "rolldown",
       "unrs-resolver"
     ]
   },

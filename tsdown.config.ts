@@ -1,7 +1,7 @@
+import { lintJsrExports } from 'jsr-exports-lint/tsdown'
 import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig } from 'tsdown'
-import { jsrExportsLint } from 'tsdown-jsr-exports-lint'
 
 const dirname = import.meta.dirname
 
@@ -11,7 +11,9 @@ const config: ReturnType<typeof defineConfig> = defineConfig({
   clean: true,
   publint: true,
   dts: true,
-  onSuccess: jsrExportsLint(),
+  hooks: {
+    'build:done': lintJsrExports()
+  },
   plugins: [
     {
       name: 'locale-copy',
