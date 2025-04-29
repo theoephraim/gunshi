@@ -62,8 +62,8 @@ const command = {
     verbose: {
       type: 'boolean',
       short: 'V',
-      description: 'Enable verbose output (use --no-verbose to disable)'
-      // Boolean options automatically get a negatable --no- prefix
+      description: 'Enable verbose output',
+      negatable: true // Add this to enable --no-verbose
     },
     banner: {
       // Added another boolean option for grouping example
@@ -87,8 +87,10 @@ $ node index.js -n User -- --foo --bar buz
 
   // Command execution function
   run: ctx => {
-    // 'verbose' will be true if -V or --verbose is passed,
-    // false if --no-verbose is passed.
+    // If 'verbose' is defined with negatable: true:
+    // - true if -V or --verbose is passed
+    // - false if --no-verbose is passed
+    // - undefined if neither is passed (or default value if set)
     const { name = 'World', greeting, times, verbose, banner } = ctx.values // Added banner
 
     if (banner) {
@@ -147,11 +149,14 @@ Each option can have the following properties:
 
 #### Negatable Boolean Options
 
-For any option defined with `type: 'boolean'`, Gunshi automatically provides a corresponding negatable option by prefixing the name with `no-`.
+To enable a negatable version of a boolean option (e.g., allowing both `--verbose` and `--no-verbose`), you need to add the `negatable: true` property to the option's definition.
 
-- If you define `--verbose`, `--no-verbose` becomes available automatically.
+- If you define an option like `verbose: { type: 'boolean', negatable: true }`, Gunshi will recognize both `--verbose` and `--no-verbose`.
 - If `-V` or `--verbose` is passed, the value will be `true`.
 - If `--no-verbose` is passed, the value will be `false`.
+- If neither is passed, the value will be `undefined` (unless a `default` is specified).
+
+Without `negatable: true`, only the positive form (e.g., `--verbose`) is recognized, and passing it sets the value to `true`.
 
 The description for the negatable option (e.g., `--no-verbose`) is automatically generated (e.g., "Negatable of --verbose"). You can customize this message using [internationalization resource files](../essentials/internationalization.md) by providing a translation for the specific `Option:no-<optionName>` key (e.g., `Option:no-verbose`).
 
