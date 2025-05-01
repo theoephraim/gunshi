@@ -197,6 +197,12 @@ importers:
         specifier: workspace:*
         version: link:../..
 
+  playground/modularization-lazy-async:
+    dependencies:
+      gunshi:
+        specifier: workspace:*
+        version: link:../..
+
   playground/simple:
     dependencies:
       gunshi:
