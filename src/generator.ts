@@ -1,9 +1,11 @@
 /**
  * The entry for usage generator.
+ *
  * @example
  * ```js
  * import { generate } from 'gunshi/generator'
  * ```
+ *
  * @module
  */
 

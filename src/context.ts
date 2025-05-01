@@ -1,10 +1,12 @@
 /**
  * The entry for gunshi context.
  * This module is exported for the purpose of testing the command.
+ *
  * @example
  * ```js
  * import { createCommandContext } from 'gunshi/context'
  * ```
+ *
  * @module
  */
 

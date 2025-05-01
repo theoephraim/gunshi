@@ -1,9 +1,11 @@
 /**
  * The main entry point for Gunshi.
+ *
  * @example
  * ```js
  * import { cli } from 'gunshi'
  * ```
+ *
  * @module default
  */
 

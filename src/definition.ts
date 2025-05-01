@@ -1,9 +1,11 @@
 /**
  * The entry for command deifinition.
+ *
  * @example
  * ```js
  * import { define } from 'gunshi/definition'
  * ```
+ *
  * @module
  */
 
@@ -28,6 +30,12 @@ export function define<Options extends ArgOptions = ArgOptions>(
   return definition
 }
 
+/**
+ * Define a {@link LazyCommand | lazy command} with command loader, which is attached with command definition as usage metadata.
+ * @param loader A {@link CommandLoader | command loader}
+ * @param definition A {@link Command | command} definition
+ * @returns A {@link LazyCommand | lazy command} loader
+ */
 export function lazy<Options extends ArgOptions = ArgOptions>(
   loader: CommandLoader<Options>,
   definition?: Command<Options>
