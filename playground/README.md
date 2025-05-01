@@ -73,7 +73,18 @@ pnpx tsx index.ts --help
 pnpx tsx index.ts hello --name "Lazy TypeScript"
 ```
 
-### 7. Auto Usage Generation (`auto-usage`)
+### 7. Modularization with Lazy Loading (`modularization-lazy-async`)
+
+Demonstrates how to structure commands into separate modules and use lazy loading with `define` (from `gunshi/definition`) and `lazy`.
+
+```sh
+cd modularization-lazy-async
+node index.js --help
+node index.js foo --id 123
+node index.js bar --msg "hello world"
+```
+
+### 8. Auto Usage Generation (`auto-usage`)
 
 Demonstrates automatic usage message generation.
 
@@ -83,7 +94,7 @@ node index.js --help
 node index.js --operation list --format json
 ```
 
-### 8. Custom Usage Generation (`custom-usage`)
+### 9. Custom Usage Generation (`custom-usage`)
 
 Demonstrates customizing the usage message generation.
 
@@ -94,7 +105,7 @@ node index.js --help
 node index.js --add "Complete the project" --priority high --due 2023-12-31
 ```
 
-### 9. Documentation Generation (`docs-gen`)
+### 10. Documentation Generation (`docs-gen`)
 
 Documentation generation support
 
@@ -103,7 +114,7 @@ cd docs-gen
 node index.js
 ```
 
-### 10. Internationalization (`i18n`)
+### 11. Internationalization (`i18n`)
 
 Demonstrates internationalization support.
 
