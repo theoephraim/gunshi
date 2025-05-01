@@ -1,50 +1,46 @@
-import { cli, lazy } from 'gunshi'
+import { cli, define, lazy } from 'gunshi'
 
-import type { ArgOptions, Command, CommandContext, CommandRunner, LazyCommand } from 'gunshi'
+import type { CommandContext, CommandRunner } from 'gunshi'
 
-// Define options as a constant object
-const helloOptions = {
-  name: {
-    type: 'string',
-    description: 'Name to greet',
-    default: 'type-safe world'
-  }
-} satisfies ArgOptions // Use 'satisfies' for checking
-
-// Define the command definition with the inferred options type
-const typedHelloDefinition: Command<typeof helloOptions> = {
+// Define the command definition with define function
+const helloDefinition = define({
   name: 'hello',
   description: 'A type-safe lazy command',
-  options: helloOptions // Use the options object
+  options: {
+    name: {
+      type: 'string',
+      description: 'Name to greet',
+      default: 'type-safe world'
+    }
+  }
   // No 'run' needed in definition
-}
+})
 
-// Define the typed loader function
+type HelloOptions = NonNullable<typeof helloDefinition.options>
+
+// Define the loader function
 // It must return a function matching CommandRunner<HelloOptionsType>
-// or a Command<HelloOptionsType> containing a 'run' function.
-const typedHelloLoader = async (): Promise<CommandRunner<typeof helloOptions>> => {
+// or a Command<HelloOptions> containing a 'run' function.
+const helloLoader = async (): Promise<CommandRunner<HelloOptions>> => {
   console.log('Loading typed hello runner...')
   // Simulate loading delay
   await new Promise(resolve => setTimeout(resolve, 500))
-  // const { runTypedHello } = await import('./commands/typedHello.js')
-  // return runTypedHello
+  // const { run } = await import('./commands/typedHello.js')
+  // return run
 
   // Define typed runner inline
-  const runTypedHello = (ctx: CommandContext<typeof helloOptions>) => {
+  const run = (ctx: CommandContext<HelloOptions>) => {
     // ctx.values is properly typed based on helloOptions
     console.log(`Hello, ${ctx.values.name}! (Typed)`)
   }
-  return runTypedHello
+  return run
 }
 
 // Create the type-safe LazyCommand
-const lazyTypedHello: LazyCommand<typeof helloOptions> = lazy(
-  typedHelloLoader,
-  typedHelloDefinition
-)
+const lazyHello = lazy(helloLoader, helloDefinition)
 
 const subCommands = new Map()
-subCommands.set('hello', lazyTypedHello)
+subCommands.set(lazyHello.commandName, lazyHello)
 
 // Define the main command
 const mainCommand = {
@@ -57,7 +53,7 @@ const mainCommand = {
 
 // Run the CLI
 await cli(process.argv.slice(2), mainCommand, {
-  name: 'typed-lazy-example', // Application name
+  name: 'typed-lazy-example',
   version: '1.0.0',
   description: 'Example CLI demonstrating type-safe lazy loading.',
   subCommands

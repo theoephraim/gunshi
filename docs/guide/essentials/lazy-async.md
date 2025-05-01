@@ -45,14 +45,14 @@ const helloLoader = async () => {
   // Simulate loading time or dynamic import
   await new Promise(resolve => setTimeout(resolve, 500))
   // Dynamically import the actual run function (CommandRunner)
-  // const { runHello } = await import('./commands/hello.js')
-  // return runHello
+  // const { run } = await import('./commands/hello.js')
+  // return run
 
   // For simplicity, we define the runner inline here
-  const runHello = ctx => {
+  const run = ctx => {
     console.log(`Hello, ${ctx.values.name}!`)
   }
-  return runHello // Return only the runner function
+  return run // Return only the runner function
 }
 
 // Create the LazyCommand using the lazy helper
@@ -61,7 +61,7 @@ const lazyHello = lazy(helloLoader, helloDefinition)
 // Create a Map of sub-commands using the LazyCommand
 const subCommands = new Map()
 // Use the name from the definition as the key
-subCommands.set(lazyHello.name, lazyHello)
+subCommands.set(lazyHello.commandName, lazyHello)
 
 // Define the main command
 const mainCommand = {
@@ -76,7 +76,7 @@ const mainCommand = {
 // Run the CLI
 // Gunshi automatically resolves the LazyCommand and loads the runner when needed
 await cli(process.argv.slice(2), mainCommand, {
-  name: 'my-app', // Application name used in help messages
+  name: 'my-app',
   version: '1.0.0',
   subCommands
 })
@@ -170,53 +170,49 @@ await cli(
 
 ## Type Safety with Lazy Loading
 
-When using TypeScript, you can ensure type safety with lazy commands. Use plain objects for options and leverage `typeof` for type inference.
+When using TypeScript, you can ensure type safety with lazy commands. Use `define` function and leverage `typeof` for type inference.
 
 ```ts
-import { cli, lazy } from 'gunshi'
-import type { Command, CommandContext, CommandRunner, LazyCommand, ArgOptions } from 'gunshi'
+import { cli, define, lazy } from 'gunshi'
+import type { CommandContext, CommandRunner } from 'gunshi'
 
-// Define options as a constant object
-const helloOptions = {
-  name: {
-    type: 'string',
-    description: 'Name to greet',
-    default: 'type-safe world'
-  }
-} satisfies ArgOptions // Use 'satisfies' for checking
-
-// Define the command definition with the inferred options type
-const typedHelloDefinition: Command<typeof helloOptions> = {
-  name: 'hello-typed',
+// Define the command definition with define function
+const helloDefinition = define({
+  name: 'hello',
   description: 'A type-safe lazy command',
-  options: helloOptions // Use the options object
+  options: {
+    name: {
+      type: 'string',
+      description: 'Name to greet',
+      default: 'type-safe world'
+    }
+  }
   // No 'run' needed in definition
-}
+})
+
+type HelloOptions = NonNullable<typeof helloDefinition.options>
 
 // Define the typed loader function
 // It must return a function matching CommandRunner<typeof helloOptions>
-// or a Command<typeof helloOptions> containing a 'run' function.
-const typedHelloLoader = async (): Promise<CommandRunner<typeof helloOptions>> => {
+// or a Command<HelloOptions> containing a 'run' function.
+const helloLoader = async (): Promise<CommandRunner<HelloOptions>> => {
   console.log('Loading typed hello runner...')
-  // const { runTypedHello } = await import('./commands/typedHello.js')
-  // return runTypedHello
+  // const { run } = await import('./commands/typedHello.js')
+  // return run
 
   // Define typed runner inline
-  const runTypedHello = (ctx: CommandContext<typeof helloOptions>) => {
+  const run = (ctx: CommandContext<HelloOptions>) => {
     // ctx.values is properly typed based on helloOptions
     console.log(`Hello, ${ctx.values.name}! (Typed)`)
   }
-  return runTypedHello
+  return run
 }
 
 // Create the type-safe LazyCommand
-const lazyTypedHello: LazyCommand<typeof helloOptions> = lazy(
-  typedHelloLoader,
-  typedHelloDefinition
-)
+const lazyHello = lazy(helloLoader, helloDefinition)
 
 const subCommands = new Map()
-subCommands.set(lazyTypedHello.commandName, lazyTypedHello)
+subCommands.set(lazyHello.commandName, lazyHello)
 
 await cli(
   process.argv.slice(2),
@@ -225,7 +221,7 @@ await cli(
     run: () => console.log('Use the hello-typed sub-command')
   },
   {
-    name: 'typed-lazy-example', // Application name
+    name: 'typed-lazy-example',
     version: '1.0.0',
     subCommands
   }
