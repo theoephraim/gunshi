@@ -17,6 +17,13 @@ Gunshi provides a `lazy` helper function to facilitate lazy loading. It takes tw
 1. `loader`: An asynchronous function that returns the actual command logic when invoked. This can be either just the `CommandRunner` function (the `run` function) or the full `Command` object (which must include the `run` function).
 2. `definition` (optional): A `Command` object containing the command's metadata (like `name`, `description`, `options`, `examples`). The `run` property in this definition object is ignored if provided, as the actual runner comes from the `loader`.
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!TIP]
+> Note that the command name attached to the loader in the metadata of the `definition` specified as `lazy` is `commandName`, not `name`. This is because Lazy Command are **functions** and `name` is controlled by the JavaScript runtime.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 The `lazy` function attaches the metadata from the `definition` to the `loader` function itself. Gunshi uses this attached metadata to generate help messages (`--help`) without executing the `loader`. The `loader` is only executed when the command is actually run.
 
 Here's how to implement lazy loading using the `lazy` helper:
