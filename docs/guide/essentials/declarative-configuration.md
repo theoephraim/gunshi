@@ -76,11 +76,15 @@ const command = {
   // Command examples
   examples: `# Examples
 $ node index.js --name World
+
 $ node index.js -n World -g "Hey there" -t 3
+
 # Boolean short options can be grouped: -V -b is the same as -Vb
 $ node index.js -Vb -n World
+
 # Using the negatable option
 $ node index.js --no-verbose -n World
+
 # Using rest arguments after \`--\` (arguments after \`--\` are not parsed by gunshi)
 $ node index.js -n User -- --foo --bar buz
 `,
