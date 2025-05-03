@@ -3,10 +3,13 @@
  * @license MIT
  */
 
+import { COMMON_OPTIONS } from '../constants.ts'
 import { create, resolveBuiltInKey, resolveOptionKey } from '../utils.ts'
 
 import type { ArgOptions, ArgOptionSchema } from 'args-tokens'
 import type { Command, CommandContext } from '../types.ts'
+
+const COMMON_OPTIONS_KEYS = Object.keys(COMMON_OPTIONS)
 
 /**
  * Render the usage.
@@ -243,7 +246,7 @@ function getOptionsPairs<Options extends ArgOptions>(
       key = value.default ? `${key} [${name}]` : `${key} <${name}>`
     }
     acc[name] = key
-    if (value.type === 'boolean' && value.negatable && !(name === 'help' || name === 'version')) {
+    if (value.type === 'boolean' && value.negatable && !COMMON_OPTIONS_KEYS.includes(name)) {
       acc[`no-${name}`] = `--no-${name}`
     }
     return acc
@@ -257,6 +260,40 @@ function resolveNegatableType<Options extends ArgOptions>(
   ctx: Readonly<CommandContext<Options>>
 ) {
   return ctx.options[key.startsWith('no-') ? resolveNegatableKey(key) : key].type
+}
+
+function generateDefaultDisplayValue<Options extends ArgOptions>(
+  ctx: Readonly<CommandContext<Options>>,
+  schema: ArgOptionSchema
+): string {
+  return `${ctx.translate(resolveBuiltInKey('DEFAULT'))}: ${schema.default}`
+}
+
+function resolveDisplayValue<Options extends ArgOptions>(
+  ctx: Readonly<CommandContext<Options>>,
+  key: string
+): string {
+  if (COMMON_OPTIONS_KEYS.includes(key)) {
+    return ''
+  }
+
+  const schema = ctx.options[key]
+  if (
+    (schema.type === 'boolean' || schema.type === 'number' || schema.type === 'string') &&
+    schema.default !== undefined
+  ) {
+    return `(${generateDefaultDisplayValue(ctx, schema)})`
+  }
+  if (schema.type === 'enum') {
+    const _default =
+      schema.default !== undefined // eslint-disable-line unicorn/no-negated-condition
+        ? generateDefaultDisplayValue(ctx, schema)
+        : ''
+    const choices = `${ctx.translate(resolveBuiltInKey('CHOICES'))}: ${schema.choices!.join(' | ')}`
+    return `(${_default ? `${_default}, ${choices}` : choices})`
+  }
+
+  return ''
 }
 
 /**
@@ -289,9 +326,10 @@ async function generateOptionsUsage<Options extends ArgOptions>(
         rawDesc = `${ctx.translate(resolveBuiltInKey('NEGATABLE'))} ${optionKey}`
       }
       const optionsSchema = ctx.env.usageOptionType ? `[${resolveNegatableType(key, ctx)}] ` : ''
+      const valueDesc = key.startsWith('no-') ? '' : resolveDisplayValue(ctx, key)
       // padEnd is used to align the `[]` symbols
       const desc = `${optionsSchema ? optionsSchema.padEnd(optionSchemaMaxLength + 3) : ''}${rawDesc}`
-      const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}`
+      const option = `${value.padEnd(optionsMaxLength + ctx.env.middleMargin)}${desc}${valueDesc ? ` ${valueDesc}` : ''}`
       return `${option.padStart(ctx.env.leftMargin + option.length)}`
     })
   )
