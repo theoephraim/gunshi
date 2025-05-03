@@ -31,6 +31,7 @@
     "node": ">= 20"
   },
   "type": "module",
+  "sideEffects": false,
   "files": [
     "lib"
   ],
