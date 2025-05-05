@@ -36,7 +36,7 @@ describe('execute command', () => {
     expect(mockFn).toBeCalled()
   })
 
-  test('entry command with options', async () => {
+  test('entry command with arguments', async () => {
     const mockFn = vi.fn()
     await cli(['--outDir', 'dist/', 'foo', 'bar'], {
       args: {
@@ -51,7 +51,7 @@ describe('execute command', () => {
     expect(mockFn.mock.calls[0][0].positionals).toEqual(['foo', 'bar'])
   })
 
-  test('entry command without options', async () => {
+  test('entry command without arguments', async () => {
     const mockFn = vi.fn()
     await cli(['dist/', 'test/'], {
       run: mockFn
@@ -652,7 +652,7 @@ test('negatable options', async () => {
   })
 })
 
-test('enum options', async () => {
+test('enum optional argument', async () => {
   const utils = await import('./utils.ts')
   const log = defineMockLog(utils)
 
