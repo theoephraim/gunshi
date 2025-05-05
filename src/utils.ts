@@ -12,7 +12,7 @@ import type {
   CommandBuiltinOptionsKeys,
   CommandBuiltinResourceKeys,
   GenerateNamespacedKey,
-  KeyOfArgOptions,
+  KeyOfArgs,
   RemovedIndex
 } from './types.ts'
 
@@ -68,7 +68,7 @@ export function resolveBuiltInKey<
 
 export function resolveOptionKey<
   A extends Args = {},
-  K extends string = KeyOfArgOptions<RemovedIndex<A>>
+  K extends string = KeyOfArgs<RemovedIndex<A>>
 >(key: K): GenerateNamespacedKey<K, typeof OPTION_PREFIX> {
   return `${OPTION_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }

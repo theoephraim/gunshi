@@ -20,7 +20,7 @@ export type RemovedIndex<T> = RemoveIndexSignature<{
   [K in keyof T]: T[K]
 }>
 
-export type KeyOfArgOptions<A extends Args> =
+export type KeyOfArgs<A extends Args> =
   | keyof A
   | {
       [K in keyof A]: A[K]['type'] extends 'boolean'
@@ -64,7 +64,7 @@ export type CommandBuiltinKeys =
  * The command i18n option keys are used to {@link CommandContext.translate | translate} function.
  */
 export type CommandOptionKeys<A extends Args> = GenerateNamespacedKey<
-  KeyOfArgOptions<RemovedIndex<A>>,
+  KeyOfArgs<RemovedIndex<A>>,
   typeof OPTION_PREFIX
 >
 
@@ -346,7 +346,7 @@ export type CommandResource<A extends Args = Args> = {
    */
   examples: string
 } & {
-  [Option in GenerateNamespacedKey<KeyOfArgOptions<RemovedIndex<A>>, typeof OPTION_PREFIX>]: string
+  [Option in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<A>>, typeof OPTION_PREFIX>]: string
 } & { [key: string]: string } // Infer the options usage, Define the user resources
 
 /**

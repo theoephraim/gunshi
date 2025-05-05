@@ -3,7 +3,7 @@ import { cli } from './cli.ts'
 import { define } from './definition.ts'
 
 import type { Args } from 'args-tokens'
-import type { KeyOfArgOptions } from './types.ts'
+import type { KeyOfArgs } from './types.ts'
 
 test('KeyOfArgOptions', () => {
   const _args = {
@@ -18,7 +18,7 @@ test('KeyOfArgOptions', () => {
       negatable: true
     }
   } satisfies Args
-  expectTypeOf<KeyOfArgOptions<typeof _args>>().toEqualTypeOf<'foo' | 'bar' | 'baz' | 'no-baz'>()
+  expectTypeOf<KeyOfArgs<typeof _args>>().toEqualTypeOf<'foo' | 'bar' | 'baz' | 'no-baz'>()
 })
 
 test('specified read only value as enum option default', async () => {
