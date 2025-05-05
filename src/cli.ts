@@ -4,7 +4,7 @@
  */
 
 import { parseArgs, resolveArgs } from 'args-tokens'
-import { COMMAND_OPTIONS_DEFAULT, COMMON_OPTIONS } from './constants.ts'
+import { COMMAND_OPTIONS_DEFAULT, COMMON_ARGS } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 import { create, resolveLazyCommand } from './utils.ts'
@@ -84,7 +84,7 @@ export async function cli<A extends Args = Args>(
 }
 
 function resolveArguments<A extends Args>(options?: A): A {
-  return Object.assign(create<A>(), options, COMMON_OPTIONS)
+  return Object.assign(create<A>(), options, COMMON_ARGS)
 }
 
 function resolveCommandOptions<A extends Args>(

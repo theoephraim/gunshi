@@ -9,7 +9,7 @@ import { DEFAULT_LOCALE } from './constants.ts'
 import { createCommandContext } from './context.ts'
 import DefaultLocale from './locales/en-US.json' with { type: 'json' }
 import jaLocale from './locales/ja-JP.json' with { type: 'json' }
-import { resolveBuiltInKey, resolveOptionKey } from './utils.ts'
+import { resolveArgKey, resolveBuiltInKey } from './utils.ts'
 
 import type { Args } from 'args-tokens'
 import type { Command, CommandResource, CommandResourceFetcher, LazyCommand } from './types.ts'
@@ -102,11 +102,11 @@ test('basic', async () => {
     renderValidationErrors: mockRenderValidationErrors
   })
 
-  expect(ctx.translate(resolveOptionKey<typeof args>('foo'))).toEqual('this is foo option')
-  expect(ctx.translate(resolveOptionKey<typeof args>('bar'))).toEqual('this is bar option')
-  expect(ctx.translate(resolveOptionKey<typeof args>('baz'))).toEqual('this is baz option')
-  expect(ctx.translate(resolveOptionKey<typeof args>('qux'))).toEqual('this is qux option')
-  expect(ctx.translate(resolveOptionKey<typeof args>('no-qux'))).toEqual('')
+  expect(ctx.translate(resolveArgKey<typeof args>('foo'))).toEqual('this is foo option')
+  expect(ctx.translate(resolveArgKey<typeof args>('bar'))).toEqual('this is bar option')
+  expect(ctx.translate(resolveArgKey<typeof args>('baz'))).toEqual('this is baz option')
+  expect(ctx.translate(resolveArgKey<typeof args>('qux'))).toEqual('this is qux option')
+  expect(ctx.translate(resolveArgKey<typeof args>('no-qux'))).toEqual('')
   expect(ctx.translate(resolveBuiltInKey('help'))).toEqual('Display this help message')
   expect(ctx.translate(resolveBuiltInKey('version'))).toEqual('Display this version')
   expect(ctx.translate('examples')).toEqual('examples')
@@ -264,9 +264,9 @@ describe('translation', () => {
     // description, options, and examples
     expect(ctx.translate(resolveBuiltInKey('help'))).toEqual(DefaultLocale.help)
     expect(ctx.translate(resolveBuiltInKey('version'))).toEqual(DefaultLocale.version)
-    expect(ctx.translate(resolveOptionKey<typeof args>('foo'))).toEqual('this is foo option')
-    expect(ctx.translate(resolveOptionKey<typeof args>('bar'))).toEqual('this is bar option')
-    expect(ctx.translate(resolveOptionKey<typeof args>('baz'))).toEqual('this is baz option')
+    expect(ctx.translate(resolveArgKey<typeof args>('foo'))).toEqual('this is foo option')
+    expect(ctx.translate(resolveArgKey<typeof args>('bar'))).toEqual('this is bar option')
+    expect(ctx.translate(resolveArgKey<typeof args>('baz'))).toEqual('this is baz option')
     expect(ctx.translate('description')).toEqual('this is cmd1')
     expect(ctx.translate('examples')).toEqual('this is an cmd1 example')
   })
@@ -347,13 +347,11 @@ describe('translation', () => {
 
     // description, options, and examples
     expect(ctx.translate('description')).toEqual(jaJPResource.description)
-    expect(ctx.translate(resolveOptionKey<typeof args>('foo'))).toEqual(jaJPResource['arg:foo'])
-    expect(ctx.translate(resolveOptionKey<typeof args>('bar'))).toEqual(jaJPResource['arg:bar'])
-    expect(ctx.translate(resolveOptionKey<typeof args>('baz'))).toEqual(jaJPResource['arg:baz'])
-    expect(ctx.translate(resolveOptionKey<typeof args>('qux'))).toEqual(jaJPResource['arg:qux'])
-    expect(ctx.translate(resolveOptionKey<typeof args>('no-qux'))).toEqual(
-      jaJPResource['arg:no-qux']
-    )
+    expect(ctx.translate(resolveArgKey<typeof args>('foo'))).toEqual(jaJPResource['arg:foo'])
+    expect(ctx.translate(resolveArgKey<typeof args>('bar'))).toEqual(jaJPResource['arg:bar'])
+    expect(ctx.translate(resolveArgKey<typeof args>('baz'))).toEqual(jaJPResource['arg:baz'])
+    expect(ctx.translate(resolveArgKey<typeof args>('qux'))).toEqual(jaJPResource['arg:qux'])
+    expect(ctx.translate(resolveArgKey<typeof args>('no-qux'))).toEqual(jaJPResource['arg:no-qux'])
     expect(ctx.translate('examples')).toEqual(jaJPResource.examples)
 
     // user defined resource

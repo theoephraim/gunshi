@@ -23,8 +23,8 @@ import {
   deepFreeze,
   log,
   mapResourceWithBuiltinKey,
-  resolveLazyCommand,
-  resolveOptionKey
+  resolveArgKey,
+  resolveLazyCommand
 } from './utils.ts'
 
 import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
@@ -226,7 +226,7 @@ export async function createCommandContext<
   })
 
   const defaultCommandResource = loadedOptionsResources.reduce((res, [key, value]) => {
-    res[resolveOptionKey(key)] = value
+    res[resolveArgKey(key)] = value
     return res
   }, create<Record<string, string>>())
   defaultCommandResource.description = command.description || ''

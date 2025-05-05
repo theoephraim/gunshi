@@ -5,7 +5,7 @@
 
 import type { Args, ArgToken, ArgValues } from 'args-tokens'
 
-import { BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX, OPTION_PREFIX } from './constants.ts'
+import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants.ts'
 
 type Awaitable<T> = T | Promise<T>
 
@@ -39,9 +39,9 @@ export type GenerateNamespacedKey<
 > = `${Prefixed}${typeof BUILT_IN_KEY_SEPARATOR}${Key}`
 
 /**
- * Command i18n built-in options keys.
+ * Command i18n built-in arguments keys.
  */
-export type CommandBuiltinOptionsKeys = keyof (typeof import('./constants.ts'))['COMMON_OPTIONS']
+export type CommandBuiltinArgsKeys = keyof (typeof import('./constants.ts'))['COMMON_ARGS']
 
 /**
  * Command i18n built-in resource keys.
@@ -54,7 +54,7 @@ export type CommandBuiltinResourceKeys =
  * The command i18n built-in keys are used to {@link CommandContext.translate | translate} function.
  */
 export type CommandBuiltinKeys =
-  | GenerateNamespacedKey<CommandBuiltinOptionsKeys>
+  | GenerateNamespacedKey<CommandBuiltinArgsKeys>
   | GenerateNamespacedKey<CommandBuiltinResourceKeys>
   | 'description'
   | 'examples'
@@ -63,9 +63,9 @@ export type CommandBuiltinKeys =
  * Command i18n option keys.
  * The command i18n option keys are used to {@link CommandContext.translate | translate} function.
  */
-export type CommandOptionKeys<A extends Args> = GenerateNamespacedKey<
+export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
   KeyOfArgs<RemovedIndex<A>>,
-  typeof OPTION_PREFIX
+  typeof ARG_PREFIX
 >
 
 /**
@@ -183,11 +183,11 @@ export interface CommandOptions<A extends Args = Args> {
    */
   middleMargin?: number
   /**
-   * Whether to display the usage option type.
+   * Whether to display the usage optional argument type.
    */
   usageOptionType?: boolean
   /**
-   * Whether to display the option value.
+   * Whether to display the optional argument value.
    */
   usageOptionValue?: boolean
   /**
@@ -291,7 +291,7 @@ export interface CommandContext<A extends Args = Args, V = ArgValues<A>> {
    */
   translate: <
     T extends string = CommandBuiltinKeys,
-    O = CommandOptionKeys<A>,
+    O = CommandArgKeys<A>,
     K = CommandBuiltinKeys | O | T
   >(
     key: K,
@@ -346,8 +346,8 @@ export type CommandResource<A extends Args = Args> = {
    */
   examples: string
 } & {
-  [Option in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<A>>, typeof OPTION_PREFIX>]: string
-} & { [key: string]: string } // Infer the options usage, Define the user resources
+  [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<A>>, typeof ARG_PREFIX>]: string
+} & { [key: string]: string } // Infer the arguments usage, Define the user resources
 
 /**
  * Command resource fetcher.

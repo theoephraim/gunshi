@@ -3,13 +3,13 @@
  * @license MIT
  */
 
-import { COMMON_OPTIONS } from '../constants.ts'
-import { create, resolveBuiltInKey, resolveOptionKey } from '../utils.ts'
+import { COMMON_ARGS } from '../constants.ts'
+import { create, resolveArgKey, resolveBuiltInKey } from '../utils.ts'
 
 import type { Args, ArgSchema } from 'args-tokens'
 import type { Command, CommandContext } from '../types.ts'
 
-const COMMON_OPTIONS_KEYS = Object.keys(COMMON_OPTIONS)
+const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
 
 /**
  * Render the usage.
@@ -37,9 +37,9 @@ export async function renderUsage<A extends Args = Args>(
     messages.push(...(await renderCommandsSection(ctx)), '')
   }
 
-  // render options section
+  // render optional arguments section
   if (hasOptions(ctx)) {
-    messages.push(...(await renderOptionsSection(ctx)), '')
+    messages.push(...(await renderOptionalArgsSection(ctx)), '')
   }
 
   // render examples section
@@ -52,16 +52,16 @@ export async function renderUsage<A extends Args = Args>(
 }
 
 /**
- * Render the options section
+ * Render the optional arguments section
  * @param ctx A {@link CommandContext | command context}
  * @returns A rendered options section
  */
-async function renderOptionsSection<A extends Args>(
+async function renderOptionalArgsSection<A extends Args>(
   ctx: Readonly<CommandContext<A>>
 ): Promise<string[]> {
   const messages: string[] = []
   messages.push(`${ctx.translate(resolveBuiltInKey('OPTIONS'))}:`)
-  messages.push(await generateOptionsUsage(ctx, getOptionsPairs(ctx)))
+  messages.push(await generateOptionalArgsUsage(ctx, getOptionalArgsPairs(ctx)))
   return messages
 }
 
@@ -227,18 +227,18 @@ function makeShortLongOptionPair(schema: ArgSchema, name: string): string {
 }
 
 /**
- * Get options pairs for usage
+ * Get optional arguments pairs for usage
  * @param ctx A {@link CommandContext | command context}
  * @returns Options pairs for usage
  */
-function getOptionsPairs<A extends Args>(ctx: CommandContext<A>): Record<string, string> {
+function getOptionalArgsPairs<A extends Args>(ctx: CommandContext<A>): Record<string, string> {
   return Object.entries(ctx.args).reduce((acc, [name, value]) => {
     let key = makeShortLongOptionPair(value, name)
     if (value.type !== 'boolean') {
       key = value.default ? `${key} [${name}]` : `${key} <${name}>`
     }
     acc[name] = key
-    if (value.type === 'boolean' && value.negatable && !COMMON_OPTIONS_KEYS.includes(name)) {
+    if (value.type === 'boolean' && value.negatable && !COMMON_ARGS_KEYS.includes(name)) {
       acc[`no-${name}`] = `--no-${name}`
     }
     return acc
@@ -262,7 +262,7 @@ function resolveDisplayValue<A extends Args>(
   ctx: Readonly<CommandContext<A>>,
   key: string
 ): string {
-  if (COMMON_OPTIONS_KEYS.includes(key)) {
+  if (COMMON_ARGS_KEYS.includes(key)) {
     return ''
   }
 
@@ -286,12 +286,12 @@ function resolveDisplayValue<A extends Args>(
 }
 
 /**
- * Generate options usage
+ * Generate optional arguments usage
  * @param ctx A {@link CommandContext | command context}
  * @param optionsPairs Options pairs for usage
  * @returns Generated options usage
  */
-async function generateOptionsUsage<A extends Args>(
+async function generateOptionalArgsUsage<A extends Args>(
   ctx: CommandContext<A>,
   optionsPairs: Record<string, string>
 ): Promise<string> {
@@ -307,7 +307,7 @@ async function generateOptionsUsage<A extends Args>(
 
   const usages = await Promise.all(
     Object.entries(optionsPairs).map(([key, value]) => {
-      let rawDesc = ctx.translate(resolveOptionKey(key))
+      let rawDesc = ctx.translate(resolveArgKey(key))
       if (!rawDesc && key.startsWith('no-')) {
         const name = resolveNegatableKey(key)
         const schema = ctx.args[name]

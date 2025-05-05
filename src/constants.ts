@@ -13,13 +13,13 @@ export const DEFAULT_LOCALE = 'en-US'
 
 export const BUILT_IN_PREFIX = '_'
 
-export const OPTION_PREFIX = 'arg'
+export const ARG_PREFIX = 'arg'
 
 export const BUILT_IN_KEY_SEPARATOR = ':'
 
 export const NOOP: () => void = () => {}
 
-type CommonOptionType = {
+type CommonArgType = {
   readonly help: {
     readonly type: 'boolean'
     readonly short: 'h'
@@ -32,7 +32,7 @@ type CommonOptionType = {
   }
 }
 
-export const COMMON_OPTIONS: CommonOptionType = {
+export const COMMON_ARGS: CommonArgType = {
   help: {
     type: 'boolean',
     short: 'h',
