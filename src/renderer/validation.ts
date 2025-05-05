@@ -13,7 +13,7 @@ import type { CommandContext } from '../types.ts'
  * @returns A rendered validation error.
  */
 export function renderValidationErrors<A extends Args = Args>(
-  ctx: CommandContext<A>, // eslint-disable-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+  _ctx: CommandContext<A>,
   error: AggregateError
 ): Promise<string> {
   const messages = [] as string[]
