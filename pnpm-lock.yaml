@@ -102,6 +102,9 @@ importers:
       messageformat:
         specifier: 4.0.0-10
         version: 4.0.0-10
+      mitata:
+        specifier: ^1.0.34
+        version: 1.0.34
       pkg-pr-new:
         specifier: ^0.0.43
         version: 0.0.43
@@ -3539,6 +3542,9 @@ packages:
 
   minisearch@7.1.2:
     resolution: {integrity: sha512-R1Pd9eF+MD5JYDDSPAp/q1ougKglm14uEkPMvQ/05RGmx6G9wvmLTrTI/Q5iPNJLYqNdsDQ7qTGIcNWR+FrHmA==}
+
+  mitata@1.0.34:
+    resolution: {integrity: sha512-Mc3zrtNBKIMeHSCQ0XqRLo1vbdIx1wvFV9c8NJAiyho6AjNfMY8bVhbS12bwciUdd1t4rj8099CH3N3NFahaUA==}
 
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
@@ -8106,6 +8112,8 @@ snapshots:
   minimist@1.2.8: {}
 
   minisearch@7.1.2: {}
+
+  mitata@1.0.34: {}
 
   mitt@3.0.1: {}
 

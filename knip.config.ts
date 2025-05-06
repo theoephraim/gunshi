@@ -14,5 +14,5 @@ export default {
     'docs/.vitepress/theme/index.ts'
   ],
   ignore: ['playground/deno/main.ts', 'src/constants.ts', 'src/**.test-d.ts', 'bench/**'],
-  ignoreDependencies: ['lint-staged', 'deno', 'gunshi019']
+  ignoreDependencies: ['lint-staged', 'deno', 'gunshi019', 'mitata']
 } satisfies KnipConfig
