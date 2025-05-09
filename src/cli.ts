@@ -15,19 +15,20 @@ import type {
   CommandCallMode,
   CommandContext,
   CommandOptions,
-  CommandRunner
+  CommandRunner,
+  LazyCommand
 } from './types.ts'
 
-/**
- * Run the command.
- * @param args Command line arguments
- * @param entry A {@link Command | entry command} or an {@link CommandRunner | inline command runner}
- * @param opts A {@link CommandOptions | command options}
- * @returns A rendered usage or undefined. if you will use {@link CommandOptions.usageSilent} option, it will return rendered usage string.
- */
+//
+// Run the command.
+// @param args Command line arguments
+// @param entry A {@link Command | entry command}, an {@link CommandRunner | inline command runner}, or a {@link LazyCommand | lazily-loaded command}
+// @param opts A {@link CommandOptions | command options}
+// @returns A rendered usage or undefined. if you will use {@link CommandOptions.usageSilent} option, it will return rendered usage string.
+//
 export async function cli<A extends Args = Args>(
   argv: string[],
-  entry: Command<A> | CommandRunner<A>,
+  entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
   opts: CommandOptions<A> = {}
 ): Promise<string | undefined> {
   const tokens = parseArgs(argv)
@@ -102,11 +103,16 @@ function resolveArguments<A extends Args>(options?: A): A {
 
 function resolveCommandOptions<A extends Args>(
   options: CommandOptions<A>,
-  entry: Command<A> | CommandRunner<A>
+  entry: Command<A> | CommandRunner<A> | LazyCommand<A>
 ): CommandOptions<A> {
   const subCommands = new Map(options.subCommands)
-  if (typeof entry === 'object' && entry.name && options.subCommands) {
-    subCommands.set(entry.name, entry)
+  if (options.subCommands) {
+    if (typeof entry === 'function' && 'commandName' in entry && entry.commandName) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      subCommands.set(entry.commandName!, entry as LazyCommand<any>)
+    } else if (typeof entry === 'object' && entry.name) {
+      subCommands.set(entry.name, entry)
+    }
   }
   const resolvedOptions = Object.assign(
     create<CommandOptions<A>>(),
@@ -168,38 +174,54 @@ async function showValidationErrors<A extends Args>(
   ctx.log(await render(ctx, error))
 }
 
+const CANNOT_RESOLVE_COMMAND = [undefined, undefined, 'unexpected'] as const satisfies [
+  undefined,
+  undefined,
+  CommandCallMode
+]
+
 async function resolveCommand<A extends Args>(
   sub: string,
-  entry: Command<A> | CommandRunner<A>,
+  entry: Command<A> | CommandRunner<A> | LazyCommand<A>,
   options: CommandOptions<A>,
   needRunResolving: boolean = false
 ): Promise<[string | undefined, Command<A> | undefined, CommandCallMode]> {
   const omitted = !sub
-  if (typeof entry === 'function') {
-    return [undefined, { run: entry }, 'entry']
-  } else {
-    if (omitted) {
-      return typeof entry === 'object'
-        ? [resolveEntryName(entry), await resolveLazyCommand(entry, '', needRunResolving), 'entry']
-        : [undefined, undefined, 'unexpected']
+
+  async function doResolveCommand(): Promise<
+    [string | undefined, Command<A> | undefined, CommandCallMode]
+  > {
+    if (typeof entry === 'function') {
+      // eslint-disable-next-line unicorn/prefer-ternary
+      if ('commandName' in entry && entry.commandName) {
+        // lazy command
+        return [entry.commandName, await resolveLazyCommand(entry, '', needRunResolving), 'entry']
+      } else {
+        // inline command (command runner)
+        return [undefined, { run: entry as CommandRunner<A> }, 'entry']
+      }
+    } else if (typeof entry === 'object') {
+      // command object
+      return [
+        resolveEntryName(entry),
+        await resolveLazyCommand(entry, '', needRunResolving),
+        'entry'
+      ]
     } else {
-      if (options.subCommands == null || options.subCommands.size === 0) {
-        return [
-          resolveEntryName(entry),
-          await resolveLazyCommand(entry, '', needRunResolving),
-          'entry'
-        ]
-      }
-
-      const cmd = options.subCommands?.get(sub)
-
-      if (cmd == null) {
-        return [sub, undefined, 'unexpected']
-      }
-
-      return [sub, await resolveLazyCommand(cmd, sub, needRunResolving), 'subCommand']
+      return CANNOT_RESOLVE_COMMAND
     }
   }
+
+  if (omitted || options.subCommands?.size === 0) {
+    return doResolveCommand()
+  }
+
+  const cmd = options.subCommands?.get(sub)
+  if (cmd == null) {
+    return [sub, undefined, 'unexpected']
+  }
+
+  return [sub, await resolveLazyCommand(cmd, sub, needRunResolving), 'subCommand']
 }
 
 function resolveEntryName<A extends Args>(entry: Command<A>): string {
