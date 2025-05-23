@@ -161,6 +161,7 @@ Each option can have the following properties:
 - `description`: A description of what the option does
 - `default`: Default value if the option is not provided
 - `required`: Set to `true` if the option is required (Note: Positional arguments defined with `type: 'positional'` are implicitly required by the parser).
+- `multiple`: Set to `true` if the multiple option values are be allowed
 
 #### Positional Arguments
 
