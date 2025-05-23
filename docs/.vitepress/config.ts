@@ -64,6 +64,10 @@ export default defineConfig({
         items: [
           { text: 'Custom Usage Generation', link: '/guide/advanced/custom-usage-generation' },
           { text: 'Documentation Generation', link: '/guide/advanced/documentation-generation' },
+          {
+            text: 'Advanced Lazy Loading and Sub-Commands',
+            link: '/guide/advanced/advanced-lazy-loading'
+          },
           { text: 'Translation Adapter', link: '/guide/advanced/translation-adapter' }
         ]
       },
