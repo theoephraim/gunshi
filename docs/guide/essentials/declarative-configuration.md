@@ -207,7 +207,13 @@ const command = {
 
 By default, argument names are displayed in the help text and used on the command line exactly as they are defined in the `args` object. However, it's common practice in CLI applications to use kebab-case for multi-word argument names (e.g., `--user-name` instead of `--userName`).
 
-Gunshi supports automatic conversion of camelCase argument names to kebab-case with the `toKebab` property. This can be set at two levels:
+Gunshi supports automatic conversion of camelCase argument names to kebab-case with the `toKebab` property. There are two different `toKebab` properties in Gunshi:
+
+1. **Command-level `toKebab`**: This is a property of the `Command` object itself. When set to `true`, it applies kebab-case conversion to all arguments in the command, unless overridden at the argument level.
+
+2. **Argument-level `toKebab`**: This is a property of the `ArgSchema` object (individual argument definition). It controls kebab-case conversion for a specific argument and takes precedence over the command-level setting.
+
+The `toKebab` property can be set at two levels:
 
 1. **Command level**: Apply to all arguments in the command
 
