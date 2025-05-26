@@ -131,3 +131,21 @@ node index.js --help
 # Help in Japanese
 MY_LOCALE=ja-JP node index.js --help
 ```
+
+### 12. Custom Type Arguments (`custom-type`)
+
+Demonstrates custom argument types with user-defined parsing logic.
+
+```sh
+cd custom-type
+node index.js --help
+
+# Parse comma-separated tags
+node index.js --tags javascript,typescript,node.js
+
+# Parse and validate JSON with Zod
+node index.js --config '{"debug":true,"port":8080,"host":"0.0.0.0"}'
+
+# Use both custom types with verbose output
+node index.js --tags javascript,typescript,node.js --config '{"debug":true,"port":8080}'
+```
