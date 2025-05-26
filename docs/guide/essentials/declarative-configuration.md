@@ -162,6 +162,7 @@ Each option can have the following properties:
 - `default`: Default value if the option is not provided
 - `required`: Set to `true` if the option is required (Note: Positional arguments defined with `type: 'positional'` are implicitly required by the parser).
 - `multiple`: Set to `true` if the multiple option values are be allowed
+- `toKebab`: Set to `true` to convert camelCase argument names to kebab-case in help text and command-line usage
 
 #### Positional Arguments
 
@@ -194,6 +195,67 @@ const command = {
 - **`ctx.positionals`**: This array still exists and contains the raw string values of positional arguments in the order they were parsed (e.g., `ctx.positionals[0]`, `ctx.positionals[1]`). While available, using `ctx.values.<key>` is generally preferred for clarity and consistency.
 - **Descriptions**: The `description` property is used for generating help/usage messages.
 - **Type Conversion**: `args-tokens` resolves positional arguments as strings. You typically need to perform type conversions or further validation on the values accessed via `ctx.values.<key>` within your `run` function based on your application's needs.
+
+#### Kebab-Case Argument Names
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!TIP]
+> This feature is particularly useful for users migrating from the [`cac` library](https://github.com/cacjs/cac), which automatically converts camelCase argument names to kebab-case. If you're transitioning from `cac` to Gunshi, enabling the `toKebab` option will help maintain the same command-line interface for your users.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+By default, argument names are displayed in the help text and used on the command line exactly as they are defined in the `args` object. However, it's common practice in CLI applications to use kebab-case for multi-word argument names (e.g., `--user-name` instead of `--userName`).
+
+Gunshi supports automatic conversion of camelCase argument names to kebab-case with the `toKebab` property. This can be set at two levels:
+
+1. **Command level**: Apply to all arguments in the command
+
+   ```js
+   const command = {
+     name: 'example',
+     description: 'Example command',
+     toKebab: true, // Apply to all arguments
+     args: {
+       userName: { type: 'string' }, // Will be displayed as --user-name
+       maxRetries: { type: 'number' } // Will be displayed as --max-retries
+     },
+     run: ctx => {
+       /* ... */
+     }
+   }
+   ```
+
+2. **Argument level**: Apply to specific arguments only
+   ```js
+   const command = {
+     name: 'example',
+     description: 'Example command',
+     args: {
+       userName: {
+         type: 'string',
+         toKebab: true // Will be displayed as --user-name
+       },
+       maxRetries: { type: 'number' } // Will remain as --maxRetries
+     },
+     run: ctx => {
+       /* ... */
+     }
+   }
+   ```
+
+When `toKebab` is enabled:
+
+- Argument names are converted from camelCase to kebab-case in help text and usage information
+- Parameter placeholders are also displayed in kebab-case (e.g., `--user-name <user-name>`)
+- Negatable boolean options use kebab-case (e.g., `--no-auto-save` for `autoSave: { type: 'boolean', negatable: true, toKebab: true }`)
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> The argument values are still accessed using the original camelCase keys in your code (e.g., `ctx.values.userName`), regardless of how they appear on the command line.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 #### Negatable Boolean Options
 
