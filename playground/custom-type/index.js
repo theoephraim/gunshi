@@ -48,9 +48,6 @@ const command = {
       console.log(`  debug: ${config.debug}`)
       console.log(`  port: ${config.port}`)
       console.log(`  host: ${config.host}`)
-      if (config.timeout !== undefined) {
-        console.log(`  timeout: ${config.timeout}`)
-      }
     }
   }
 }
