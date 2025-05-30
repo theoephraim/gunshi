@@ -30,7 +30,7 @@ for PKG in packages/* ; do
     echo "⚡ Publishing $PKG with tag $TAG"
     pnpm publish --access public --no-git-checks --tag $TAG
     echo "⚡ Publishing $PKG for jsr registry"
-    pnpx jsr publish -c jsr.json
+    pnpx jsr publish -c jsr.json --allow-dirty
     popd > /dev/null
   fi
 done
