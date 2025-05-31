@@ -126,6 +126,7 @@ You'll see a help message that includes:
 
 Now that you've created your first Gunshi CLI application, you can explore more advanced features:
 
+- [Declarative Configuration](./declarative-configuration.md) - Organize your commands with declarative structure
 - [Type Safety](./type-safe.md) - Learn how to use TypeScript for better type safety
 - [Lazy & Async Command Loading](./lazy-async.md) - Improve performance with lazy loading
 - [Internationalization](./internationalization.md) - Add multi-language support
