@@ -128,7 +128,7 @@ Now that you've created your first Gunshi CLI application, you can explore more 
 
 - [Declarative Configuration](./declarative-configuration.md) - Organize your commands with declarative structure
 - [Type Safety](./type-safe.md) - Learn how to use TypeScript for better type safety
+- [Composable Commands](./composable.md) - Build complex CLIs with sub-commands
+- [Auto Usage Generation](./auto-usage-generation.md) - Customize help messages
 - [Lazy & Async Command Loading](./lazy-async.md) - Improve performance with lazy loading
 - [Internationalization](./internationalization.md) - Add multi-language support
-- [Auto Usage Generation](./auto-usage-generation.md) - Customize help messages
-- [Composable Commands](./composable.md) - Build complex CLIs with sub-commands
