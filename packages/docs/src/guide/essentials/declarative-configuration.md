@@ -12,9 +12,9 @@ const command = {
   name: 'command-name',
   description: 'Command description',
 
-  // Command options
-  options: {
-    // Option definitions
+  // Command arguments
+  args: {
+    // Argument definitions
   },
 
   // Command examples

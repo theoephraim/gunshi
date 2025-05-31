@@ -121,3 +121,13 @@ You'll see a help message that includes:
 - Command description
 - Available options
 - Option descriptions
+
+## Next Steps
+
+Now that you've created your first Gunshi CLI application, you can explore more advanced features:
+
+- [Type Safety](./type-safe.md) - Learn how to use TypeScript for better type safety
+- [Lazy & Async Command Loading](./lazy-async.md) - Improve performance with lazy loading
+- [Internationalization](./internationalization.md) - Add multi-language support
+- [Auto Usage Generation](./auto-usage-generation.md) - Customize help messages
+- [Composable Commands](./composable.md) - Build complex CLIs with sub-commands
