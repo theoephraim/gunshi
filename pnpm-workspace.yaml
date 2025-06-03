@@ -3,4 +3,4 @@ packages:
   - playground/**
 catalog:
   typescript: ^5.8.3
-  zod: ^3.25.28
+  zod: ^3.25.49
