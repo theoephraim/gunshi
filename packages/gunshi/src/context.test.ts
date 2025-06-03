@@ -311,7 +311,7 @@ describe('translation', () => {
 
     const loadLocale = 'ja-JP'
 
-    const mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
+    using mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
       if (ctx.locale.toString() === loadLocale) {
         return Promise.resolve(jaJPResource)
       } else {
@@ -383,7 +383,7 @@ describe('translation adapter', () => {
 
     const loadLocale = 'ja-JP'
 
-    const mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
+    using mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
       if (ctx.locale.toString() === loadLocale) {
         return Promise.resolve(jaJPResource)
       } else {
@@ -440,7 +440,7 @@ describe('translation adapter', () => {
 
     const loadLocale = 'ja-JP'
 
-    const mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
+    using mockResource = vi.fn<CommandResourceFetcher<typeof args>>().mockImplementation(ctx => {
       if (ctx.locale.toString() === loadLocale) {
         return Promise.resolve(jaJPResource)
       } else {
