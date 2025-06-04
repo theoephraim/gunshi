@@ -82,7 +82,7 @@
     "build": "tsdown",
     "lint:jsr": "jsr publish --dry-run --allow-dirty",
     "prepack": "pnpm build",
-    "typecheck:deno": "deno check --all ./src"
+    "typecheck:deno": "deno check ./src"
   },
   "dependencies": {
     "args-tokens": "^0.20.1"
