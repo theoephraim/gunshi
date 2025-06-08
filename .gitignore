@@ -3,6 +3,7 @@ node_modules
 .idea
 .eslintcache
 .clinerules
+.claude
 lib
 dist
 packages/docs/src/.vitepress/dist
