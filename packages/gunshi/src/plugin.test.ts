@@ -90,7 +90,7 @@ describe('PluginContext#decorateValidationErrorsRenderer', () => {
   })
 })
 
-describe('commandDecorators', () => {
+describe('PluginContext#commandDecorators', () => {
   const identityDecorator: CommandDecorator = baseRunner => baseRunner
 
   test('should add command decorator', () => {

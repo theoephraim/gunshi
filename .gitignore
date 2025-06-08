@@ -4,6 +4,7 @@ node_modules
 .eslintcache
 .clinerules
 .claude
+design/.*
 lib
 dist
 packages/docs/src/.vitepress/dist
