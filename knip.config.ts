@@ -7,15 +7,7 @@ export default {
       project: '**/*.ts'
     },
     'packages/gunshi': {
-      entry: [
-        'src/index.ts',
-        'src/definition.ts',
-        'src/constants.ts',
-        'src/context.ts',
-        'src/renderer.ts',
-        'src/generator.ts',
-        'tsdown.config.ts'
-      ]
+      entry: ['src/constants.ts']
     },
     'packages/docs': {
       entry: ['src/.vitepress/config.ts', 'src/.vitepress/theme/index.ts']
