@@ -36,8 +36,8 @@ export async function cli<A extends Args = Args>(
 ): Promise<string | undefined> {
   const cliOptions = resolveCliOptions(options, entry)
 
-  const decorators = new Decorators()
-  const pluginContext = new PluginContext(decorators)
+  const decorators = new Decorators<A>()
+  const pluginContext = new PluginContext<A>(decorators)
   await applyPlugins(pluginContext)
 
   // Set default renderers if not provided via cli options
@@ -93,11 +93,17 @@ export async function cli<A extends Args = Args>(
   return await executeCommand(command, commandContext, name || '', decorators.commandDecorators)
 }
 
-async function applyPlugins(pluginContext: PluginContext): Promise<void> {
+async function applyPlugins<A extends Args>(pluginContext: PluginContext<A>): Promise<void> {
   try {
     // TODO(kazupon): add more user plugins loading logic
     for (const plugin of plugins) {
-      await plugin(pluginContext)
+      /**
+       * NOTE(kazupon):
+       * strictly `Args` are not required for plugin installation.
+       * because the strictly `Args` required by each plugin are unknown,
+       * and the plugin side can not know what the user will specify.
+       */
+      await plugin(pluginContext as unknown as PluginContext<Args>)
     }
   } catch (error: unknown) {
     console.error('Error loading plugin:', (error as Error).message)
@@ -114,7 +120,7 @@ function getCommandArgs<A extends Args>(cmd?: Command<A> | LazyCommand<A>): A {
   }
 }
 
-function resolveArguments<A extends Args>(pluginContext: PluginContext, args?: A): A {
+function resolveArguments<A extends Args>(pluginContext: PluginContext<A>, args?: A): A {
   return Object.assign(create<A>(), Object.fromEntries(pluginContext.globalOptions), args)
 }
 
@@ -151,7 +157,7 @@ function getSubCommand(tokens: ArgToken[]): string {
 async function showValidationErrors<A extends Args>(
   ctx: CommandContext<A>,
   error: AggregateError,
-  decorators: Decorators
+  decorators: Decorators<A>
 ): Promise<void> {
   // TODO(kazupon): deprecate cliOptions.renderValidationErrors
   if (ctx.env.renderValidationErrors === null) {
@@ -237,7 +243,7 @@ async function executeCommand<A extends Args = Args>(
   cmd: Command<A> | LazyCommand<A>,
   ctx: CommandContext<A>,
   name: string,
-  decorators: readonly CommandDecorator[]
+  decorators: readonly CommandDecorator<A>[]
 ): Promise<string | undefined> {
   const resolved = isLazyCommand<A>(cmd) ? await resolveLazyCommand<A>(cmd, name, true) : cmd
   const baseRunner = resolved.run || (() => {})
@@ -248,9 +254,9 @@ async function executeCommand<A extends Args = Args>(
     baseRunner
   )
 
-  // Execute and return result
+  // execute and return result
   const result = await decoratedRunner(ctx)
 
-  // Return string if one was returned
+  // return string if one was returned
   return typeof result === 'string' ? result : undefined
 }

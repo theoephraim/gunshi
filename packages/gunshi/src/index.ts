@@ -15,10 +15,12 @@
  */
 
 export { parseArgs, resolveArgs } from 'args-tokens'
-export type { Args, ArgSchema, ArgValues } from 'args-tokens'
 export * from './cli.ts'
 export { DEFAULT_LOCALE } from './constants.ts'
 export { define, lazy } from './definition.ts'
+export { plugin } from './plugin.ts'
 export { DefaultTranslation } from './translation.ts'
-export type { Plugin } from './plugin.ts'
+
+export type { Args, ArgSchema, ArgValues } from 'args-tokens'
+export type { Plugin, PluginOptions } from './plugin.ts'
 export type * from './types.ts'

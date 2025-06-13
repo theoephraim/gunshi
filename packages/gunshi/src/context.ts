@@ -42,8 +42,12 @@ import type {
   CommandBuiltinKeys,
   CommandCallMode,
   CommandContext,
+  CommandContextCore,
+  CommandContextExt,
+  CommandContextExtension,
   CommandEnvironment,
   CommandResource,
+  ExtendedCommand,
   LazyCommand
 } from './types.ts'
 
@@ -52,7 +56,11 @@ const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 /**
  * Parameters of {@link createCommandContext}
  */
-interface CommandContextParams<A extends Args, V> {
+interface CommandContextParams<
+  A extends Args,
+  V,
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A> // eslint-disable-line @typescript-eslint/no-explicit-any
+> {
   /**
    * An arguments of target command
    */
@@ -88,12 +96,21 @@ interface CommandContextParams<A extends Args, V> {
   /**
    * A target command
    */
-  command: Command<A> | LazyCommand<A>
+  command: C
   /**
    * A command options, which is spicialized from `cli` function
    */
   cliOptions: CliOptions<A>
 }
+
+type InferExtentableCommand<
+  A extends Args,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A>
+> =
+  C extends ExtendedCommand<A, infer E>
+    ? Readonly<CommandContext<A> & CommandContextExt<E>>
+    : Readonly<CommandContext<A>>
 
 /**
  * Create a {@link CommandContext | command context}
@@ -102,7 +119,8 @@ interface CommandContextParams<A extends Args, V> {
  */
 export async function createCommandContext<
   A extends Args = Args,
-  V extends ArgValues<A> = ArgValues<A>
+  V extends ArgValues<A> = ArgValues<A>,
+  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A> // eslint-disable-line @typescript-eslint/no-explicit-any
 >({
   args,
   values,
@@ -114,7 +132,7 @@ export async function createCommandContext<
   cliOptions,
   callMode = 'entry',
   omitted = false
-}: CommandContextParams<A, V>): Promise<Readonly<CommandContext<A, V>>> {
+}: CommandContextParams<A, V, C>): Promise<InferExtentableCommand<A, C>> {
   /**
    * normailize the options schema and values, to avoid prototype pollution
    */
@@ -131,7 +149,7 @@ export async function createCommandContext<
   const env = Object.assign(create<CommandEnvironment<A>>(), COMMAND_OPTIONS_DEFAULT, cliOptions)
 
   const locale = resolveLocale(cliOptions.locale)
-  const localeStr = locale.toString() // NOTE: `locale` is a `Intl.Locale` object, avoid overhead with `toString` calling for every time
+  const localeStr = locale.toString() // NOTE(kazupon): `locale` is a `Intl.Locale` object, avoid overhead with `toString` calling for every time
 
   const translationAdapterFactory = cliOptions.translationAdapterFactory || createTranslationAdapter
   const adapter = translationAdapterFactory({
@@ -171,13 +189,13 @@ export async function createCommandContext<
   ): string {
     const strKey = key as string
     if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
-      // NOTE:
+      // NOTE(kazupon):
       // if the key is one of the `COMMAND_BUILTIN_RESOURCE_KEYS` and the key is not found in the locale resources,
       // then return the key itself.
       const resource = localeResources.get(localeStr) || localeResources.get(DEFAULT_LOCALE)!
       return resource[strKey as CommandBuiltinKeys] || strKey
     } else {
-      // NOTE:
+      // NOTE(kazupon):
       // for otherwise, if the key is not found in the command resources, then return an empty string.
       // because should not render the key in usage.
       return adapter.translate(locale.toString(), strKey, values) || ''
@@ -201,36 +219,61 @@ export async function createCommandContext<
   }
 
   /**
-   * create the context
+   * create the command context
    */
 
-  const ctx = deepFreeze(
-    Object.assign(create<CommandContext<A, V>>(), {
-      name: getCommandName(command),
-      description: command.description,
-      omitted,
-      callMode,
-      locale,
-      env,
-      args: _args,
-      values,
-      positionals,
-      rest,
-      _: argv,
-      tokens,
-      toKebab: command.toKebab,
-      log: cliOptions.usageSilent ? NOOP : log,
-      loadCommands,
-      translate
+  const core = Object.assign(create<CommandContext<A>>(), {
+    name: getCommandName(command),
+    description: command.description,
+    omitted,
+    callMode,
+    locale,
+    env,
+    args: _args,
+    values,
+    positionals,
+    rest,
+    _: argv,
+    tokens,
+    toKebab: command.toKebab,
+    log: cliOptions.usageSilent ? NOOP : log,
+    loadCommands,
+    translate
+  })
+
+  /**
+   * extend the command context with extensions
+   */
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let ctx: any
+
+  // if command requires extensions
+  if ('_extensions' in command && command._extensions) {
+    const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    // apply each extension
+    for (const [key, extension] of Object.entries(command._extensions)) {
+      ext[key] = (extension as CommandContextExtension).factory(core as CommandContextCore<Args>)
+    }
+
+    // create extended context with extensions
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const extendedCtx = Object.assign(create<any>(), core, {
+      ext: Object.freeze(ext)
     })
-  )
+
+    ctx = deepFreeze(extendedCtx)
+  } else {
+    // without extensions (backward compatibility)
+    ctx = deepFreeze(core)
+  }
 
   /**
    * load the command resources
    */
 
-  // Extract option descriptions from command options
-  // const loadedOptionsResources = Object.entries(command.options || create<Options>()).map(
+  // extract option descriptions from command options
   const loadedOptionsResources = Object.entries(args).map(([key, arg]) => {
     // get description from option if available
     const description = arg.description || ''
@@ -245,7 +288,7 @@ export async function createCommandContext<
   defaultCommandResource.examples = await resolveExamples(ctx, command.examples)
   adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-  const originalResource = await loadCommandResource<A, V>(ctx, command)
+  const originalResource = await loadCommandResource<A>(ctx, command)
   if (originalResource) {
     const resource = Object.assign(
       create<Record<string, string>>(),
@@ -261,10 +304,13 @@ export async function createCommandContext<
     adapter.setResource(localeStr, resource)
   }
 
-  return ctx
+  return ctx as InferExtentableCommand<A, C>
 }
 
-function getCommandName<A extends Args>(cmd: Command<A> | LazyCommand<A>): string {
+function getCommandName<A extends Args>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cmd: Command<A> | LazyCommand<A> | ExtendedCommand<A, any>
+): string {
   if (isLazyCommand<A>(cmd)) {
     return cmd.commandName || cmd.name || ANONYMOUS_COMMAND_NAME
   } else if (typeof cmd === 'object') {
@@ -282,13 +328,14 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
       : new Intl.Locale(DEFAULT_LOCALE)
 }
 
-async function loadCommandResource<A extends Args, V extends ArgValues<A>>(
-  ctx: CommandContext<A, V>,
-  command: Command<A>
+async function loadCommandResource<A extends Args>(
+  ctx: CommandContext<A>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  command: Command<A> | ExtendedCommand<A, any> | LazyCommand<A>
 ): Promise<CommandResource<A> | undefined> {
   let resource: CommandResource<A> | undefined
   try {
-    // TODO: should check the resource which is a dictionary object
+    // TODO(kazupon): should check the resource which is a dictionary object
     resource = await command.resource?.(ctx)
   } catch {}
   return resource
