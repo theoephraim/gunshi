@@ -9,6 +9,39 @@ import { ARG_PREFIX, BUILT_IN_KEY_SEPARATOR, BUILT_IN_PREFIX } from './constants
 
 export type Awaitable<T> = T | Promise<T>
 
+/**
+ * Extend command context type. This type is used to extend the command context with additional properties at {@link CommandContext.extensions}.
+ */
+export type ExtendContext = Record<string, unknown>
+
+/**
+ * Gunshi unified parameter type.
+ * This type combines both argument definitions and command context extensions.
+ */
+export interface GunshiParams<
+  P extends {
+    args?: Args
+    extensions?: ExtendContext
+  } = {
+    args: Args
+    extensions: {}
+  }
+> {
+  /**
+   * Command argument definitions
+   */
+  args: P extends { args: infer A extends Args } ? A : Args
+  /**
+   * Command context extensions
+   */
+  extensions: P extends { extensions: infer E extends ExtendContext } ? E : {}
+}
+
+/**
+ * Default Gunshi parameters
+ */
+export type DefaultGunshiParams = GunshiParams
+
 type RemoveIndexSignature<T> = {
   [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K]
 }
@@ -78,7 +111,8 @@ export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
 /**
  * Command environment.
  */
-export interface CommandEnvironment<A extends Args = Args> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface CommandEnvironment<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Current working directory.
    * @see {@link CliOptions.cwd}
@@ -138,16 +172,16 @@ export interface CommandEnvironment<A extends Args = Args> {
   /**
    * Render function the command usage.
    */
-  renderUsage: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null | undefined
+  renderUsage: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null | undefined
   /**
    * Render function the header section in the command usage.
    */
-  renderHeader: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null | undefined
+  renderHeader: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null | undefined
   /**
    * Render function the validation errors.
    */
   renderValidationErrors:
-    | ((ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>)
+    | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
     | null
     | undefined
 }
@@ -155,7 +189,8 @@ export interface CommandEnvironment<A extends Args = Args> {
 /**
  * CLI options of `cli` function.
  */
-export interface CliOptions<A extends Args = Args> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface CliOptions<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Current working directory.
    */
@@ -204,16 +239,16 @@ export interface CliOptions<A extends Args = Args> {
   /**
    * Render function the command usage.
    */
-  renderUsage?: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null
+  renderUsage?: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null
   /**
    * Render function the header section in the command usage.
    */
-  renderHeader?: ((ctx: CommandContextWithPossibleExt<A>) => Promise<string>) | null
+  renderHeader?: ((ctx: Readonly<CommandContext<G>>) => Promise<string>) | null
   /**
    * Render function the validation errors.
    */
   renderValidationErrors?:
-    | ((ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>)
+    | ((ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>)
     | null
   /**
    * Translation adapter factory.
@@ -230,7 +265,8 @@ export type CommandCallMode = 'entry' | 'subCommand' | 'unexpected'
  * Command context.
  * Command context is the context of the command execution.
  */
-export interface CommandContext<A extends Args = Args> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface CommandContext<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Command name, that is the command that is executed.
    * The command name is same {@link CommandEnvironment.name}.
@@ -249,17 +285,17 @@ export interface CommandContext<A extends Args = Args> {
    * Command environment, that is the environment of the command that is executed.
    * The command environment is same {@link CommandEnvironment}.
    */
-  env: Readonly<CommandEnvironment<A>>
+  env: Readonly<CommandEnvironment<G>>
   /**
    * Command arguments, that is the arguments of the command that is executed.
    * The command arguments is same {@link Command.args}.
    */
-  args: A
+  args: G['args']
   /**
    * Command values, that is the values of the command that is executed.
    * Resolve values with `resolveArgs` from command arguments and {@link Command.args}.
    */
-  values: ArgValues<A>
+  values: ArgValues<G['args']>
   /**
    * Command positionals arguments, that is the positionals of the command that is executed.
    * Resolve positionals with `resolveArgs` from command arguments.
@@ -305,7 +341,7 @@ export interface CommandContext<A extends Args = Args> {
    * The loaded commands are cached and returned when called again.
    * @returns loaded commands.
    */
-  loadCommands: () => Promise<Command<A>[]>
+  loadCommands: () => Promise<Command<G>[]>
   /**
    * Translate function.
    * @param key the key to be translated
@@ -314,48 +350,41 @@ export interface CommandContext<A extends Args = Args> {
    */
   translate: <
     T extends string = CommandBuiltinKeys,
-    O = CommandArgKeys<A>,
+    O = CommandArgKeys<G['args']>,
     K = CommandBuiltinKeys | O | T
   >(
     key: K,
     values?: Record<string, unknown>
   ) => string
+  /**
+   *  Command context extensions.
+   */
+  extensions: keyof G['extensions'] extends never ? undefined : G['extensions']
 }
 
 /**
  * CommandContextCore type (base type without extensions)
  */
-export type CommandContextCore<A extends Args = Args> = Readonly<CommandContext<A>>
-
-/**
- * CommandContext with possible extensions
- * This type represents a command context that may have extensions
- */
-export type CommandContextWithPossibleExt<A extends Args = Args> = Readonly<CommandContext<A>> & {
-  ext?: Record<string, unknown>
-}
-
-/**
- * CommandContext with specific extensions
- */
-export type CommandContextWithExt<
-  A extends Args = Args,
-  E extends Record<string, unknown> = Record<string, never>
-> = Readonly<CommandContext<A>> & (keyof E extends never ? {} : { ext: E })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandContextCore<G extends GunshiParams<any> = DefaultGunshiParams> = Readonly<
+  CommandContext<G>
+>
 
 /**
  * Command context extension
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface CommandContextExtension<T = any> {
+export interface CommandContextExtension<
+  E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
+> {
   readonly key: symbol
-  readonly factory: (core: CommandContextCore) => T
+  readonly factory: (core: CommandContextCore) => E
 }
 
 /**
  * Command interface.
  */
-export interface Command<A extends Args = Args> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Command<G extends GunshiParams<any> = DefaultGunshiParams> {
   /**
    * Command name.
    * It's used to find command line arguments to execute from sub commands, and it's recommended to specify.
@@ -370,20 +399,20 @@ export interface Command<A extends Args = Args> {
    * Command arguments.
    * Each argument can include a description property to describe the argument in usage.
    */
-  args?: A
+  args?: G['args']
   /**
    * Command examples.
    * examples of how to use the command.
    */
-  examples?: string | CommandExamplesFetcher<A>
+  examples?: string | CommandExamplesFetcher<G>
   /**
    * Command runner. it's the command to be executed
    */
-  run?: CommandRunner<A>
+  run?: CommandRunner<G>
   /**
    * Command resource fetcher.
    */
-  resource?: CommandResourceFetcher<A>
+  resource?: CommandResourceFetcher<G>
   /**
    * Whether to convert the camel-case style argument name to kebab-case.
    * If you will set to `true`, All {@link Command.args} names will be converted to kebab-case.
@@ -392,50 +421,42 @@ export interface Command<A extends Args = Args> {
 }
 
 /**
- * Extended command type with extension support
- */
-export interface ExtendedCommand<
-  A extends Args = Args,
-  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
-> extends Omit<Command<A>, 'run'> {
-  // @internal
-  _extensions: E
-  run?: (ctx: Readonly<CommandContext<A> & CommandContextExt<E>>) => Awaitable<void | string>
-}
-
-/**
- * Command context extension type.
- * This type is used to extend the command context with additional properties.
+ * Extract command context extension
  * @internal
  */
-export type CommandContextExt<E extends Record<string, CommandContextExtension>> = {
-  ext: { [K in keyof E]: ReturnType<E[K]['factory']> }
+export type ExtractCommandContextExtension<E extends Record<string, CommandContextExtension>> = {
+  [K in keyof E]: ReturnType<E[K]['factory']>
 }
 
 /**
  * Lazy command interface.
  * Lazy command that's not loaded until it is executed.
  */
-export type LazyCommand<A extends Args = Args> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type LazyCommand<G extends GunshiParams<any> = DefaultGunshiParams> = {
   /**
    * Command load function
    */
-  (): Awaitable<Command<A> | CommandRunner<A>>
+  (): Awaitable<Command<G> | CommandRunner<G>>
   /**
    * Command name
    */
   commandName?: string
-} & Omit<Command<A>, 'run' | 'name'>
+} & Omit<Command<G>, 'run' | 'name'>
 
 /**
  * Define a command type.
  */
-export type Commandable<A extends Args> = Command<A> | LazyCommand<A>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Commandable<G extends GunshiParams<any> = DefaultGunshiParams> =
+  | Command<G>
+  | LazyCommand<G>
 
 /**
  * Command resource.
  */
-export type CommandResource<A extends Args = Args> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandResource<G extends GunshiParams<any> = DefaultGunshiParams> = {
   /**
    * Command description.
    */
@@ -443,9 +464,9 @@ export type CommandResource<A extends Args = Args> = {
   /**
    * Examples usage.
    */
-  examples: string | CommandExamplesFetcher<A>
+  examples: string | CommandExamplesFetcher<G>
 } & {
-  [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<A>>, typeof ARG_PREFIX>]: string
+  [Arg in GenerateNamespacedKey<KeyOfArgs<RemovedIndex<G['args']>>, typeof ARG_PREFIX>]: string
 } & { [key: string]: string } // Infer the arguments usage, Define the user resources
 
 /**
@@ -453,8 +474,9 @@ export type CommandResource<A extends Args = Args> = {
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched command examples.
  */
-export type CommandExamplesFetcher<A extends Args = Args> = (
-  ctx: Readonly<CommandContext<A>>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandExamplesFetcher<G extends GunshiParams<any> = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>
 ) => Awaitable<string>
 
 /**
@@ -462,9 +484,10 @@ export type CommandExamplesFetcher<A extends Args = Args> = (
  * @param ctx A {@link CommandContext | command context}
  * @returns A fetched {@link CommandResource | command resource}.
  */
-export type CommandResourceFetcher<A extends Args = Args> = (
-  ctx: Readonly<CommandContext<A>>
-) => Awaitable<CommandResource<A>>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandResourceFetcher<G extends GunshiParams<any> = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>
+) => Awaitable<CommandResource<G>>
 
 /**
  * Translation adapter factory.
@@ -527,9 +550,21 @@ export interface TranslationAdapter<MessageResource = string> {
  * @param ctx A {@link CommandContext | command context}
  * @returns void or string (for CLI output)
  */
-export type CommandRunner<A extends Args = Args> = (
-  ctx: Readonly<CommandContext<A>>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandRunner<G extends GunshiParams<any> = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>
 ) => Awaitable<void | string>
+
+/**
+ * Command loader.
+ * A function that returns a command or command runner.
+ * This is used to lazily load commands.
+ * @returns A command or command runner
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandLoader<G extends GunshiParams<any> = DefaultGunshiParams> = () => Awaitable<
+  Command<G> | CommandRunner<G>
+>
 
 /**
  * Command decorator.
@@ -537,11 +572,10 @@ export type CommandRunner<A extends Args = Args> = (
  * @param baseRunner The base command runner to decorate
  * @returns The decorated command runner
  */
-export type CommandDecorator<A extends Args = Args> = (
-  baseRunner: (ctx: CommandContextWithPossibleExt<A>) => Awaitable<void | string>
-) => (ctx: CommandContextWithPossibleExt<A>) => Awaitable<void | string>
-
-export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | CommandRunner<A>>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CommandDecorator<G extends GunshiParams<any> = DefaultGunshiParams> = (
+  baseRunner: (ctx: Readonly<CommandContext<G>>) => Awaitable<void | string>
+) => (ctx: Readonly<CommandContext<G>>) => Awaitable<void | string>
 
 /**
  * Renderer decorator type.
@@ -550,9 +584,10 @@ export type CommandLoader<A extends Args = Args> = () => Awaitable<Command<A> | 
  * @param ctx The command context
  * @returns The decorated result
  */
-export type RendererDecorator<T, A extends Args = Args> = (
-  baseRenderer: (ctx: CommandContextWithPossibleExt<A>) => Promise<T>,
-  ctx: CommandContextWithPossibleExt<A>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RendererDecorator<T, G extends GunshiParams<any> = DefaultGunshiParams> = (
+  baseRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>,
+  ctx: Readonly<CommandContext<G>>
 ) => Promise<T>
 
 /**
@@ -563,8 +598,9 @@ export type RendererDecorator<T, A extends Args = Args> = (
  * @param error The aggregate error containing validation errors
  * @returns The decorated result
  */
-export type ValidationErrorsDecorator<A extends Args = Args> = (
-  baseRenderer: (ctx: CommandContextWithPossibleExt<A>, error: AggregateError) => Promise<string>,
-  ctx: CommandContextWithPossibleExt<A>,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ValidationErrorsDecorator<G extends GunshiParams<any> = DefaultGunshiParams> = (
+  baseRenderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string>,
+  ctx: Readonly<CommandContext<G>>,
   error: AggregateError
 ) => Promise<string>

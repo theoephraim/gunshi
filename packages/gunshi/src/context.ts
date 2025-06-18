@@ -43,28 +43,37 @@ import type {
   CommandCallMode,
   CommandContext,
   CommandContextCore,
-  CommandContextExt,
   CommandContextExtension,
   CommandEnvironment,
   CommandResource,
-  ExtendedCommand,
+  DefaultGunshiParams,
+  GunshiParams,
   LazyCommand
 } from './types.ts'
 
 const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
 
 /**
+ * Extract extension return types from extensions record
+ * @internal
+ */
+export type ExtractExtensions<E extends Record<string, CommandContextExtension>> = {
+  [K in keyof E]: E[K] extends CommandContextExtension<infer T> ? T : never
+}
+
+/**
  * Parameters of {@link createCommandContext}
  */
 interface CommandContextParams<
-  A extends Args,
-  V,
-  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A> // eslint-disable-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams,
+  V extends ArgValues<G['args']>,
+  C extends Command<G> | LazyCommand<G> = Command<G>,
+  E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > {
   /**
    * An arguments of target command
    */
-  args: A
+  args: G['args']
   /**
    * A values of target command
    */
@@ -98,19 +107,14 @@ interface CommandContextParams<
    */
   command: C
   /**
+   * Plugin extensions to apply as the command context extension.
+   */
+  extensions?: E
+  /**
    * A command options, which is spicialized from `cli` function
    */
-  cliOptions: CliOptions<A>
+  cliOptions: CliOptions<G>
 }
-
-type InferExtentableCommand<
-  A extends Args,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A>
-> =
-  C extends ExtendedCommand<A, infer E>
-    ? Readonly<CommandContext<A> & CommandContextExt<E>>
-    : Readonly<CommandContext<A>>
 
 /**
  * Create a {@link CommandContext | command context}
@@ -118,9 +122,11 @@ type InferExtentableCommand<
  * @returns A {@link CommandContext | command context}, which is readonly
  */
 export async function createCommandContext<
-  A extends Args = Args,
-  V extends ArgValues<A> = ArgValues<A>,
-  C extends Command<A> | LazyCommand<A> | ExtendedCommand<A, any> = Command<A> // eslint-disable-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  G extends GunshiParams<any> = DefaultGunshiParams,
+  V extends ArgValues<G['args']> = ArgValues<G['args']>,
+  C extends Command<G> | LazyCommand<G> = Command<G>,
+  E extends Record<string, CommandContextExtension> = {}
 >({
   args,
   values,
@@ -129,10 +135,15 @@ export async function createCommandContext<
   argv,
   tokens,
   command,
+  extensions = {} as E,
   cliOptions,
   callMode = 'entry',
   omitted = false
-}: CommandContextParams<A, V, C>): Promise<InferExtentableCommand<A, C>> {
+}: CommandContextParams<G, V, C, E>): Promise<
+  {} extends ExtractExtensions<E>
+    ? Readonly<CommandContext<G>>
+    : Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: ExtractExtensions<E> }>>>
+> {
   /**
    * normailize the options schema and values, to avoid prototype pollution
    */
@@ -146,7 +157,7 @@ export async function createCommandContext<
    * setup the environment
    */
 
-  const env = Object.assign(create<CommandEnvironment<A>>(), COMMAND_OPTIONS_DEFAULT, cliOptions)
+  const env = Object.assign(create<CommandEnvironment<G>>(), COMMAND_OPTIONS_DEFAULT, cliOptions)
 
   const locale = resolveLocale(cliOptions.locale)
   const localeStr = locale.toString() // NOTE(kazupon): `locale` is a `Intl.Locale` object, avoid overhead with `toString` calling for every time
@@ -183,10 +194,10 @@ export async function createCommandContext<
    *
    */
 
-  function translate<T extends string = CommandBuiltinKeys, K = CommandBuiltinKeys | keyof A | T>(
-    key: K,
-    values: Record<string, unknown> = create<Record<string, unknown>>()
-  ): string {
+  function translate<
+    T extends string = CommandBuiltinKeys,
+    K = CommandBuiltinKeys | keyof G['args'] | T
+  >(key: K, values: Record<string, unknown> = create<Record<string, unknown>>()): string {
     const strKey = key as string
     if (strKey.codePointAt(0) === BUILT_IN_PREFIX_CODE) {
       // NOTE(kazupon):
@@ -206,13 +217,13 @@ export async function createCommandContext<
    * load the sub commands
    */
 
-  let cachedCommands: Command<A>[] | undefined
-  async function loadCommands(): Promise<Command<A>[]> {
+  let cachedCommands: Command<G>[] | undefined
+  async function loadCommands(): Promise<Command<G>[]> {
     if (cachedCommands) {
       return cachedCommands
     }
 
-    const subCommands = [...(cliOptions.subCommands || [])] as [string, Command<A>][]
+    const subCommands = [...(cliOptions.subCommands || [])] as [string, Command<G>][]
     return (cachedCommands = await Promise.all(
       subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
     ))
@@ -222,7 +233,7 @@ export async function createCommandContext<
    * create the command context
    */
 
-  const core = Object.assign(create<CommandContext<A>>(), {
+  const core = Object.assign(create<CommandContext<G>>(), {
     name: getCommandName(command),
     description: command.description,
     omitted,
@@ -248,21 +259,15 @@ export async function createCommandContext<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ctx: any
 
-  // if command requires extensions
-  if ('_extensions' in command && command._extensions) {
+  if (Object.keys(extensions).length > 0) {
     const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    // apply each extension
-    for (const [key, extension] of Object.entries(command._extensions)) {
-      ext[key] = (extension as CommandContextExtension).factory(core as CommandContextCore<Args>)
+    for (const [key, extension] of Object.entries(extensions)) {
+      ext[key] = extension.factory(core as unknown as CommandContextCore)
     }
 
     // create extended context with extensions
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const extendedCtx = Object.assign(create<any>(), core, {
-      ext: Object.freeze(ext)
-    })
-
+    const extendedCtx = Object.assign(create<any>(), core, { extensions: ext })
     ctx = deepFreeze(extendedCtx)
   } else {
     // without extensions (backward compatibility)
@@ -288,7 +293,7 @@ export async function createCommandContext<
   defaultCommandResource.examples = await resolveExamples(ctx, command.examples)
   adapter.setResource(DEFAULT_LOCALE, defaultCommandResource)
 
-  const originalResource = await loadCommandResource<A>(ctx, command)
+  const originalResource = await loadCommandResource<G>(ctx, command)
   if (originalResource) {
     const resource = Object.assign(
       create<Record<string, string>>(),
@@ -304,14 +309,13 @@ export async function createCommandContext<
     adapter.setResource(localeStr, resource)
   }
 
-  return ctx as InferExtentableCommand<A, C>
+  return ctx as {} extends ExtractExtensions<E>
+    ? Readonly<CommandContext<G>>
+    : Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: ExtractExtensions<E> }>>>
 }
 
-function getCommandName<A extends Args>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cmd: Command<A> | LazyCommand<A> | ExtendedCommand<A, any>
-): string {
-  if (isLazyCommand<A>(cmd)) {
+function getCommandName<G extends GunshiParams>(cmd: Command<G> | LazyCommand<G>): string {
+  if (isLazyCommand<G>(cmd)) {
     return cmd.commandName || cmd.name || ANONYMOUS_COMMAND_NAME
   } else if (typeof cmd === 'object') {
     return cmd.name || ANONYMOUS_COMMAND_NAME
@@ -328,12 +332,11 @@ function resolveLocale(locale: string | Intl.Locale | undefined): Intl.Locale {
       : new Intl.Locale(DEFAULT_LOCALE)
 }
 
-async function loadCommandResource<A extends Args>(
-  ctx: CommandContext<A>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  command: Command<A> | ExtendedCommand<A, any> | LazyCommand<A>
-): Promise<CommandResource<A> | undefined> {
-  let resource: CommandResource<A> | undefined
+async function loadCommandResource<G extends GunshiParams>(
+  ctx: CommandContext<G>,
+  command: Command<G> | LazyCommand<G>
+): Promise<CommandResource<G> | undefined> {
+  let resource: CommandResource<G> | undefined
   try {
     // TODO(kazupon): should check the resource which is a dictionary object
     resource = await command.resource?.(ctx)

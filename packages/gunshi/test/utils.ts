@@ -8,13 +8,20 @@ import {
 import { MessageFormat } from 'messageformat'
 import { vi } from 'vitest'
 import { DefaultTranslation } from '../src/translation.ts'
+import { create } from '../src/utils.ts'
 
 import type { CoreContext, LocaleMessage, LocaleMessageValue } from '@intlify/core'
+import type { Args } from 'args-tokens'
 import type {
   CommandContext,
+  CommandContextExtension,
+  ExtendContext,
+  GunshiParams,
   TranslationAdapter,
   TranslationAdapterFactoryOptions
 } from '../src/types.ts'
+
+type NoExt = Record<never, never>
 
 export function defineMockLog(utils: typeof import('../src/utils.ts')) {
   const logs: unknown[] = []
@@ -138,10 +145,13 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
   }
 }
 
-export function createMockCommandContext(): CommandContext {
-  return {
-    name: 'test-command',
-    description: 'Test command',
+export function createMockCommandContext<E extends ExtendContext = NoExt>(
+  extensions?: Record<string, CommandContextExtension>
+): CommandContext<GunshiParams<{ args: Args; extensions: E }>> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let ctx: any = {
+    name: 'mock-command',
+    description: 'Mock command',
     locale: new Intl.Locale('en-US'),
     env: {
       cwd: undefined,
@@ -171,4 +181,18 @@ export function createMockCommandContext(): CommandContext {
     // eslint-disable-next-line unicorn/prefer-native-coercion-functions, @typescript-eslint/no-explicit-any
     translate: ((key: any) => String(key)) as CommandContext['translate']
   }
+
+  if (extensions) {
+    const extensionsObj = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    for (const [key, extension] of Object.entries(extensions)) {
+      extensionsObj[key] = (extension as CommandContextExtension).factory(ctx)
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ctx = Object.assign(create<any>(), ctx, { extensions: extensionsObj })
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ctx = Object.assign(create<any>(), ctx, { extensions: {} })
+  }
+
+  return ctx as CommandContext<GunshiParams<{ args: Args; extensions: E }>>
 }

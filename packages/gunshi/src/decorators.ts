@@ -3,10 +3,11 @@
  * @license MIT
  */
 
-import type { Args } from 'args-tokens'
 import type {
-  CommandContextWithPossibleExt,
+  CommandContext,
   CommandDecorator,
+  DefaultGunshiParams,
+  GunshiParams,
   RendererDecorator,
   ValidationErrorsDecorator
 } from './types.ts'
@@ -17,64 +18,62 @@ const EMPTY_RENDERER = async () => ''
  * Internal class for managing renderer decorators.
  * This class is not exposed to plugin authors.
  */
-export class Decorators<A extends Args = Args> {
-  #headerDecorators: RendererDecorator<string, A>[] = []
-  #usageDecorators: RendererDecorator<string, A>[] = []
-  #validationDecorators: ValidationErrorsDecorator<A>[] = []
-  #commandDecorators: CommandDecorator<A>[] = []
+export class Decorators<G extends GunshiParams = DefaultGunshiParams> {
+  #headerDecorators: RendererDecorator<string, G>[] = []
+  #usageDecorators: RendererDecorator<string, G>[] = []
+  #validationDecorators: ValidationErrorsDecorator<G>[] = []
+  #commandDecorators: CommandDecorator<G>[] = []
 
-  addHeaderDecorator(decorator: RendererDecorator<string, A>): void {
+  addHeaderDecorator(decorator: RendererDecorator<string, G>): void {
     this.#headerDecorators.push(decorator)
   }
 
-  addUsageDecorator(decorator: RendererDecorator<string, A>): void {
+  addUsageDecorator(decorator: RendererDecorator<string, G>): void {
     this.#usageDecorators.push(decorator)
   }
 
-  addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<A>): void {
+  addValidationErrorsDecorator(decorator: ValidationErrorsDecorator<G>): void {
     this.#validationDecorators.push(decorator)
   }
 
-  addCommandDecorator(decorator: CommandDecorator<A>): void {
+  addCommandDecorator(decorator: CommandDecorator<G>): void {
     this.#commandDecorators.push(decorator)
   }
 
-  get commandDecorators(): readonly CommandDecorator<A>[] {
+  get commandDecorators(): readonly CommandDecorator<G>[] {
     return [...this.#commandDecorators]
   }
 
-  getHeaderRenderer(): (ctx: CommandContextWithPossibleExt<A>) => Promise<string> {
+  getHeaderRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string> {
     return this.#buildRenderer(this.#headerDecorators, EMPTY_RENDERER)
   }
 
-  getUsageRenderer(): (ctx: CommandContextWithPossibleExt<A>) => Promise<string> {
+  getUsageRenderer(): (ctx: Readonly<CommandContext<G>>) => Promise<string> {
     return this.#buildRenderer(this.#usageDecorators, EMPTY_RENDERER)
   }
 
   getValidationErrorsRenderer(): (
-    ctx: CommandContextWithPossibleExt<A>,
+    ctx: Readonly<CommandContext<G>>,
     error: AggregateError
   ) => Promise<string> {
     if (this.#validationDecorators.length === 0) {
       return EMPTY_RENDERER
     }
 
-    let renderer: (
-      ctx: CommandContextWithPossibleExt<A>,
-      error: AggregateError
-    ) => Promise<string> = EMPTY_RENDERER
+    let renderer: (ctx: Readonly<CommandContext<G>>, error: AggregateError) => Promise<string> =
+      EMPTY_RENDERER
     for (const decorator of this.#validationDecorators) {
       const previousRenderer = renderer
-      renderer = (ctx: CommandContextWithPossibleExt<A>, error: AggregateError) =>
+      renderer = (ctx: Readonly<CommandContext<G>>, error: AggregateError) =>
         decorator(previousRenderer, ctx, error)
     }
     return renderer
   }
 
-  #buildRenderer<T, A extends Args = Args>(
-    decorators: RendererDecorator<T, A>[],
-    defaultRenderer: (ctx: CommandContextWithPossibleExt<A>) => Promise<T>
-  ): (ctx: CommandContextWithPossibleExt<A>) => Promise<T> {
+  #buildRenderer<T, G extends GunshiParams = DefaultGunshiParams>(
+    decorators: RendererDecorator<T, G>[],
+    defaultRenderer: (ctx: Readonly<CommandContext<G>>) => Promise<T>
+  ): (ctx: Readonly<CommandContext<G>>) => Promise<T> {
     if (decorators.length === 0) {
       return defaultRenderer
     }
