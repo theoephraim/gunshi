@@ -8,7 +8,9 @@ import { plugin } from '../plugin.ts'
 /**
  * completion plugin for Gunshi.
  */
-export default plugin({
-  name: 'completion'
-  // TODO(kazupon): Implement completion plugin logic
-})
+export default function completion(_options = {}) {
+  return plugin({
+    name: 'completion'
+    // TODO(kazupon): Implement completion plugin logic
+  })
+}

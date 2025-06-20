@@ -11,4 +11,10 @@ import defaultRenderer from './renderer.ts'
 
 import type { Plugin } from '../plugin.ts'
 
-export const plugins: Plugin[] = [globals, loader, defaultRenderer, completion, dryRun] as Plugin[]
+export const plugins: Plugin[] = [
+  globals(),
+  loader(),
+  defaultRenderer(),
+  completion(),
+  dryRun()
+] as Plugin[]

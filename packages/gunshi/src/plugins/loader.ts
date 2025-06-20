@@ -45,7 +45,9 @@ const extension = (ctx: CommandContextCore<DefaultGunshiParams>) => {
 /**
  * command loader plugin for Gunshi.
  */
-export default plugin({
-  name: 'loader',
-  extension
-})
+export default function loader() {
+  return plugin({
+    name: 'loader',
+    extension
+  })
+}

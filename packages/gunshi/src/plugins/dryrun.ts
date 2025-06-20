@@ -8,7 +8,9 @@ import { plugin } from '../plugin.ts'
 /**
  * dry-run plugin for Gunshi.
  */
-export default plugin({
-  name: 'dry-run'
-  // TODO(kazupon): Implement dry-run plugin logic
-})
+export default function dryRun(_options = {}) {
+  return plugin({
+    name: 'dry-run'
+    // TODO(kazupon): Implement dry-run plugin logic
+  })
+}

@@ -82,50 +82,52 @@ const extension = (ctx: CommandContextCore<DefaultGunshiParams>) => ({
 /**
  * Built-in global options plugin for Gunshi.
  */
-export default plugin({
-  name: 'globals',
-  extension,
-  setup(ctx) {
-    for (const [name, schema] of Object.entries(COMMON_ARGS)) {
-      ctx.addGlobalOption(name, schema)
+export default function globals() {
+  return plugin({
+    name: 'globals',
+    extension,
+    setup(ctx) {
+      for (const [name, schema] of Object.entries(COMMON_ARGS)) {
+        ctx.addGlobalOption(name, schema)
+      }
+
+      // apply help and version decorators
+      ctx.decorateCommand(baseRunner => async ctx => {
+        const {
+          values,
+          validationError,
+          extensions: {
+            globals: { showVersion, showHeader, showUsage, showValidationErrors }
+          }
+        } = ctx
+
+        if (values.version) {
+          return showVersion()
+        }
+
+        const buf: string[] = []
+        const header = await showHeader()
+        if (header) {
+          buf.push(header)
+        }
+
+        if (values.help) {
+          const usage = await showUsage()
+          if (usage) {
+            buf.push(usage)
+            return buf.join('\n')
+          }
+          return
+        }
+
+        // check for validation errors before executing command
+        if (validationError) {
+          return await showValidationErrors(validationError)
+        }
+
+        // normal command execution
+        return baseRunner(ctx)
+      })
     }
-
-    // apply help and version decorators
-    ctx.decorateCommand(baseRunner => async ctx => {
-      const {
-        values,
-        validationError,
-        extensions: {
-          globals: { showVersion, showHeader, showUsage, showValidationErrors }
-        }
-      } = ctx
-
-      if (values.version) {
-        return showVersion()
-      }
-
-      const buf: string[] = []
-      const header = await showHeader()
-      if (header) {
-        buf.push(header)
-      }
-
-      if (values.help) {
-        const usage = await showUsage()
-        if (usage) {
-          buf.push(usage)
-          return buf.join('\n')
-        }
-        return
-      }
-
-      // check for validation errors before executing command
-      if (validationError) {
-        return await showValidationErrors(validationError)
-      }
-
-      // normal command execution
-      return baseRunner(ctx)
-    })
-  }
-})
+  })
+}

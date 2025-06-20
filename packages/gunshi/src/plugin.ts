@@ -215,7 +215,6 @@ export interface PluginWithoutExtension<
  * Create a plugin with extension capabilities
  * @param options - {@link PluginOptions | plugin options}
  */
-
 export function plugin<
   N extends string,
   F extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any

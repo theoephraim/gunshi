@@ -11,13 +11,15 @@ import { renderValidationErrors } from '../renderer/validation.ts'
 /**
  * Default renderer plugin for Gunshi.
  */
-export default plugin({
-  name: 'default-renderer',
-  setup: ctx => {
-    ctx.decorateHeaderRenderer(async (_baseRenderer, cmdCtx) => await renderHeader(cmdCtx))
-    ctx.decorateUsageRenderer(async (_baseRenderer, cmdCtx) => await renderUsage(cmdCtx))
-    ctx.decorateValidationErrorsRenderer(
-      async (_baseRenderer, cmdCtx, error) => await renderValidationErrors(cmdCtx, error)
-    )
-  }
-})
+export default function renderer() {
+  return plugin({
+    name: 'default-renderer',
+    setup: ctx => {
+      ctx.decorateHeaderRenderer(async (_baseRenderer, cmdCtx) => await renderHeader(cmdCtx))
+      ctx.decorateUsageRenderer(async (_baseRenderer, cmdCtx) => await renderUsage(cmdCtx))
+      ctx.decorateValidationErrorsRenderer(
+        async (_baseRenderer, cmdCtx, error) => await renderValidationErrors(cmdCtx, error)
+      )
+    }
+  })
+}

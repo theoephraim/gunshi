@@ -1,12 +1,13 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { createCommandContext } from './context.ts'
-import loaderPlugin from './plugins/loader.ts'
+import loader from './plugins/loader.ts'
 import { renderHeader, renderUsage, renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
 import type { Command, GunshiParams, LazyCommand } from './types.ts'
 
 const NOOP = async () => {}
+const loaderPlugin = loader()
 
 afterEach(() => {
   vi.resetAllMocks()
