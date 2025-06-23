@@ -77,9 +77,10 @@ export function resolveBuiltInKey<
   return `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
-export function resolveArgKey<A extends Args = {}, K extends string = KeyOfArgs<RemovedIndex<A>>>(
-  key: K
-): GenerateNamespacedKey<K, typeof ARG_PREFIX> {
+export function resolveArgKey<
+  A extends Args = DefaultGunshiParams['args'],
+  K extends string = KeyOfArgs<RemovedIndex<A>>
+>(key: K): GenerateNamespacedKey<K, typeof ARG_PREFIX> {
   return `${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 

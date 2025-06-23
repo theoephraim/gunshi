@@ -89,7 +89,7 @@ export type CommandBuiltinResourceKeys =
 
 /**
  * Command i18n built-in keys.
- * The command i18n built-in keys are used to {@link CommandContext.translate | translate} function.
+ * The command i18n built-in keys are used by the i18n plugin for translation.
  * @internal
  */
 export type CommandBuiltinKeys =
@@ -100,7 +100,7 @@ export type CommandBuiltinKeys =
 
 /**
  * Command i18n option keys.
- * The command i18n option keys are used to {@link CommandContext.translate | translate} function.
+ * The command i18n option keys are used by the i18n plugin for translation.
  * @internal
  */
 export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
@@ -278,10 +278,6 @@ export interface CommandContext<G extends GunshiParams<any> = DefaultGunshiParam
    */
   description: string | undefined
   /**
-   * Command locale, that is the locale of the command that is executed.
-   */
-  locale: Intl.Locale
-  /**
    * Command environment, that is the environment of the command that is executed.
    * The command environment is same {@link CommandEnvironment}.
    */
@@ -337,20 +333,6 @@ export interface CommandContext<G extends GunshiParams<any> = DefaultGunshiParam
    */
   log: (message?: any, ...optionalParams: any[]) => void // eslint-disable-line @typescript-eslint/no-explicit-any
   /**
-   * Translate function.
-   * @param key the key to be translated
-   * @param values the values to be formatted
-   * @returns A translated string.
-   */
-  translate: <
-    T extends string = CommandBuiltinKeys,
-    O = CommandArgKeys<G['args']>,
-    K = CommandBuiltinKeys | O | T
-  >(
-    key: K,
-    values?: Record<string, unknown>
-  ) => string
-  /**
    *  Command context extensions.
    */
   extensions: keyof G['extensions'] extends never ? undefined : G['extensions']
@@ -376,7 +358,8 @@ export interface CommandContextExtension<
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
 > {
   readonly key: symbol
-  readonly factory: (core: CommandContextCore) => E
+  readonly factory: (ctx: CommandContextCore, cmd: Command) => Awaitable<E>
+  readonly onFactory?: (ctx: Readonly<CommandContext>, cmd: Readonly<Command>) => Awaitable<void>
 }
 
 /**

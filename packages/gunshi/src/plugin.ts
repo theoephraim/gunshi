@@ -19,6 +19,7 @@ import { Decorators } from './decorators.ts'
 import type { Args, ArgSchema } from 'args-tokens'
 import type {
   Awaitable,
+  Command,
   CommandContext,
   CommandContextCore,
   CommandContextExtension,
@@ -179,7 +180,15 @@ export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
 export type PluginExtension<
   T = Record<string, unknown>,
   G extends GunshiParams = DefaultGunshiParams
-> = (core: CommandContextCore<G>) => T
+> = (ctx: CommandContextCore<G>, cmd: Command<G>) => T
+
+/**
+ * Plugin extension callback type
+ */
+export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (
+  ctx: Readonly<CommandContext<G>>,
+  cmd: Readonly<Command<G>>
+) => void
 
 /**
  * Plugin definition options
@@ -204,6 +213,10 @@ export interface PluginOptions<
    * Plugin extension
    */
   extension?: PluginExtension<T, G>
+  /**
+   * Callback for when the plugin is extended with `extension` option.
+   */
+  onExtension?: OnPluginExtension<G>
 }
 
 /**
@@ -247,15 +260,16 @@ export interface PluginWithoutExtension<
  */
 export function plugin<
   N extends string,
-  F extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
+  P extends PluginExtension<any, DefaultGunshiParams> // eslint-disable-line @typescript-eslint/no-explicit-any
 >(options: {
   name: N
   dependencies?: (PluginDependency | string)[]
   setup?: (
-    ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]: ReturnType<F> } }>>
+    ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]: ReturnType<P> } }>>
   ) => Awaitable<void>
-  extension: F
-}): PluginWithExtension<ReturnType<F>>
+  extension: P
+  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in N]: ReturnType<P> } }>
+}): PluginWithExtension<ReturnType<P>>
 
 export function plugin(options: {
   name: string
@@ -266,18 +280,16 @@ export function plugin(options: {
 export function plugin<
   N extends string,
   E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']
->(
-  options: {
-    name: N
-    dependencies?: (PluginDependency | string)[]
-    setup?: (
-      ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>
-    ) => Awaitable<void>
-    extension?: PluginExtension<E, DefaultGunshiParams>
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any {
-  const { name, setup, extension, dependencies } = options
+>(options: {
+  name: N
+  dependencies?: (PluginDependency | string)[]
+  setup?: (
+    ctx: PluginContext<GunshiParams<{ args: Args; extensions: { [K in N]?: E } }>>
+  ) => Awaitable<void>
+  extension?: PluginExtension<E, DefaultGunshiParams>
+  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in N]?: E } }>
+}): PluginWithExtension<E> | PluginWithoutExtension<DefaultGunshiParams['extensions']> {
+  const { name, setup, extension, onExtension, dependencies } = options
 
   // create a wrapper function with properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -307,7 +319,8 @@ export function plugin<
       extension: {
         value: {
           key: Symbol(name),
-          factory: extension
+          factory: extension,
+          onFactory: onExtension
         },
         writable: false,
         enumerable: true,
