@@ -42,7 +42,6 @@ pnpm release
 This is a monorepo managed with pnpm workspaces. The main library code is in `packages/gunshi/`:
 
 - **packages/gunshi/src/**: Core library source code (TypeScript)
-
   - `index.ts`: Main entry point exporting all public APIs
   - `runner.ts`: Command execution logic
   - `parser.ts`: Command-line argument parsing

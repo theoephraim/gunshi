@@ -17,13 +17,11 @@ While Gunshi's basic lazy loading (covered in [Lazy & Async](../essentials/lazy-
 The [pnpmc](https://github.com/kazupon/pnpmc) project (PNPM Catalogs Tooling) demonstrates an effective pattern for organizing a CLI with lazy-loaded sub-commands:
 
 1. **Bundled Metadata, Lazy-Loaded Implementations**:
-
    - Command metadata (name, description, arguments) is imported directly and bundled with the main CLI package
    - Only the command runners (implementations) are lazy-loaded when executed
    - This allows displaying help information for all commands without loading implementations
 
 2. **Modular Package Structure**:
-
    - Command metadata is exposed from separate packages via `meta.js` files and imported directly
    - Command implementations are in separate packages and loaded on-demand
    - This separation enables showing usage via `--help` without loading all command code
