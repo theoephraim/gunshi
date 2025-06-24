@@ -592,14 +592,14 @@ describe('resolveDependencies', () => {
     const pluginB = plugin({ name: 'b', dependencies: ['a'] })
 
     expect(() => resolveDependencies([pluginA, pluginB])).toThrow(
-      'Circular dependency detected: `a`'
+      'Circular dependency detected: `a -> b -> a`'
     )
   })
 
   test('throw error for self-dependency', () => {
     const pluginA = plugin({ name: 'a', dependencies: ['a'] })
 
-    expect(() => resolveDependencies([pluginA])).toThrow('Circular dependency detected: `a`')
+    expect(() => resolveDependencies([pluginA])).toThrow('Circular dependency detected: `a -> a`')
   })
 
   test('handle plugins without names', () => {
@@ -645,7 +645,7 @@ describe('resolveDependencies', () => {
     const pluginC = plugin({ name: 'c', dependencies: ['b'] })
 
     expect(() => resolveDependencies([pluginA, pluginB, pluginC])).toThrow(
-      'Circular dependency detected'
+      'Circular dependency detected: `a -> c -> b -> a'
     )
   })
 })

@@ -362,7 +362,9 @@ export function resolveDependencies<E extends GunshiParams['extensions']>(
       return
     }
     if (visiting.has(plugin.name)) {
-      throw new Error(`Circular dependency detected: \`${plugin.name}\``)
+      throw new Error(
+        `Circular dependency detected: \`${[...visiting].join(` -> `) + ' -> ' + plugin.name}\``
+      )
     }
 
     visiting.add(plugin.name)
