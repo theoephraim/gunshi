@@ -3,6 +3,7 @@ import { z } from 'zod/v4-mini'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
+import { plugin } from './plugin.ts'
 import { renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
@@ -1150,6 +1151,45 @@ describe('command decorators', () => {
     expect(mockFn).not.toHaveBeenCalled()
     expect(log()).toMatchSnapshot()
   })
+})
+
+test('plugins option', async () => {
+  const msgs: string[] = []
+  vi.spyOn(console, 'log').mockImplementation(msg => msgs.push(msg))
+
+  function logger() {
+    return plugin({
+      name: 'logger',
+      setup: ctx => {
+        ctx.decorateCommand(baseRunner => ctx => {
+          console.log(`before command: ${ctx.name}`)
+          const ret = baseRunner(ctx)
+          if (typeof ret === 'string') {
+            console.log(`command output: ${ret}`)
+          }
+          console.log(`after command: ${ctx.name}`)
+          return ret
+        })
+      }
+    })
+  }
+
+  const command = {
+    name: 'test',
+    run: ctx => {
+      return `executed ${ctx.name}`
+    }
+  } satisfies Command<GunshiParams>
+
+  await cli([], command, {
+    plugins: [logger()]
+  })
+
+  expect(msgs).toEqual([
+    'before command: test',
+    'command output: executed test',
+    'after command: test'
+  ])
 })
 
 describe('edge cases', () => {
