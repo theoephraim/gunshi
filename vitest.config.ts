@@ -6,6 +6,9 @@ export default defineConfig({
     include: ['./packages/gunshi/src/**/*.test.ts'],
     typecheck: {
       tsconfig: './tsconfig.ci.json'
+    },
+    coverage: {
+      include: ['packages/gunshi/src/**/*.ts']
     }
   }
 })

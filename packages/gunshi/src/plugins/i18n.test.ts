@@ -127,7 +127,7 @@ test('handle missing translations gracefully', async () => {
   const ctx = await createMockCommandContext()
   const extension = await plugin.extension.factory(ctx, {} as Command)
 
-  // Test non-existent key
+  // test non-existent key
   expect(extension.translate('non-existent-key')).toBe('')
 })
 

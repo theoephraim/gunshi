@@ -7,6 +7,7 @@ node_modules
 design/.*
 lib
 dist
+coverage
 packages/docs/src/.vitepress/dist
 packages/docs/src/.vitepress/cache
 packages/docs/src/api

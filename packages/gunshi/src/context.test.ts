@@ -77,7 +77,6 @@ test('basic', async () => {
       renderHeader: null,
       renderUsage: mockRenderUsage,
       renderValidationErrors: mockRenderValidationErrors,
-      // @ts-ignore -- TODO(kazupon): resolve type
       subCommands
     }
   })
@@ -114,11 +113,9 @@ test('basic', async () => {
 
   expect(hasPrototype(ctx)).toEqual(false)
   expect(hasPrototype(ctx.env)).toEqual(false)
-  // expect(hasPrototype(ctx.options)).toEqual(false)
   for (const value of Object.values(ctx.args)) {
     expect(hasPrototype(value)).toEqual(false)
   }
-  // expect(hasPrototype(ctx.values)).toEqual(false)
 
   /**
    * check frozen
@@ -297,10 +294,13 @@ describe('plugin extensions', () => {
       cliOptions: {}
     })
 
-    expect(ctx.extensions).toBeDefined()
-    expect(ctx.extensions.ext1.value1).toBe('test1')
-    expect(ctx.extensions.ext2.value2).toBe('test2')
-    expect(ctx.extensions.ext3.value3).toBe('test3')
+    expect(ctx.extensions).toEqual(
+      expect.objectContaining({
+        ext1: expect.objectContaining({ value1: 'test1' }),
+        ext2: expect.objectContaining({ value2: 'test2' }),
+        ext3: expect.objectContaining({ value3: 'test3' })
+      })
+    )
   })
 
   test('extension factory execution order', async () => {
@@ -383,9 +383,11 @@ describe('plugin extensions', () => {
     expect(ctx.extensions).toBeUndefined()
 
     // all standard properties should work
-    expect(ctx.name).toBe('simple')
-    expect(ctx.values.name).toBe('World')
-    expect(ctx.args).toEqual(args)
+    expect(ctx).toMatchObject({
+      name: 'simple',
+      values: { name: 'World' },
+      args
+    })
   })
 
   test('extension can access all context properties', async () => {
@@ -476,9 +478,11 @@ describe('CommandContextCore type', () => {
 
     const core: CommandContextCore<GunshiParams<{ args: typeof args }>> = ctx
 
-    expect(core.name).toBe('readonly-test')
-    expect(core.values.flag).toBe(true)
-    expect(core.args).toEqual(args)
+    expect(core).toMatchObject({
+      name: 'readonly-test',
+      values: { flag: true },
+      args
+    })
     expect(typeof core.log).toBe('function')
   })
 })

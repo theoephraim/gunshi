@@ -185,7 +185,7 @@ export async function createMockCommandContext<E extends ExtendContext = NoExt>(
       usageOptionType: options.usageOptionType || false,
       usageOptionValue: options.usageOptionValue || true,
       usageSilent: options.usageSilent ?? false,
-      subCommands: undefined,
+      subCommands: options.subCommands ?? undefined,
       renderUsage: options.renderUsage || undefined,
       renderHeader: options.renderHeader || undefined,
       renderValidationErrors: options.renderValidationErrors || undefined
