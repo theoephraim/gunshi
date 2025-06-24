@@ -30,8 +30,6 @@ import type {
   ValidationErrorsDecorator
 } from './types.ts'
 
-export type { GlobalsCommandContext } from './plugins/globals.ts'
-
 /**
  * Plugin dependency definition
  */
