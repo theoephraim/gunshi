@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`renderUsage > basic 1`] = `
+exports[`basic 1`] = `
 "A test command
 
 USAGE:
@@ -20,7 +20,7 @@ EXAMPLES:
 "
 `;
 
-exports[`renderUsage > enable usageOptionType 1`] = `
+exports[`enable usageOptionType 1`] = `
 "A test command
 
 USAGE:
@@ -40,7 +40,7 @@ EXAMPLES:
 "
 `;
 
-exports[`renderUsage > kebab-case arguments with Command.toKebab option 1`] = `
+exports[`kebab-case arguments with Command.toKebab option 1`] = `
 "A test command with kebab-case arguments
 
 USAGE:
@@ -60,7 +60,7 @@ EXAMPLES:
 "
 `;
 
-exports[`renderUsage > kebab-case arguments with toKebab option 1`] = `
+exports[`kebab-case arguments with toKebab option 1`] = `
 "A test command with kebab-case arguments
 
 USAGE:
@@ -81,7 +81,7 @@ EXAMPLES:
 "
 `;
 
-exports[`renderUsage > mixed positionals and optionals 1`] = `
+exports[`mixed positionals and optionals 1`] = `
 "A test command
 
 USAGE:
@@ -97,7 +97,7 @@ OPTIONS:
 "
 `;
 
-exports[`renderUsage > no arguments 1`] = `
+exports[`no arguments 1`] = `
 "A test command
 
 USAGE:
@@ -111,7 +111,7 @@ EXAMPLES:
 "
 `;
 
-exports[`renderUsage > no examples 1`] = `
+exports[`no examples 1`] = `
 "A test command
 
 USAGE:
@@ -125,7 +125,7 @@ OPTIONS:
 "
 `;
 
-exports[`renderUsage > no required on optional arguments 1`] = `
+exports[`no required on optional arguments 1`] = `
 "A test command
 
 USAGE:
@@ -138,7 +138,7 @@ OPTIONS:
 "
 `;
 
-exports[`renderUsage > not install i18n plugin 1`] = `
+exports[`not install i18n plugin 1`] = `
 "USAGE:
   cmd1 [show] <OPTIONS> <positional1>
   cmd1 <COMMANDS>
@@ -169,7 +169,7 @@ EXAMPLES:
 "
 `;
 
-exports[`renderUsage > positional arguments 1`] = `
+exports[`positional arguments 1`] = `
 "A test command
 
 USAGE:
@@ -181,7 +181,7 @@ ARGUMENTS:
 "
 `;
 
-exports[`renderUsage > sub commands 1`] = `
+exports[`sub commands 1`] = `
 "USAGE:
   cmd1 [show] <OPTIONS> <positional1>
   cmd1 <COMMANDS>
@@ -213,9 +213,4 @@ EXAMPLES:
   # Example 2
   $ test -f bar -b 42 -q quux
 "
-`;
-
-exports[`renderValidationErrors 1`] = `
-"Optional argument '--dependency' or '-d' is required
-Optional argument '--alias' or '-a' is required"
 `;

@@ -4,18 +4,18 @@
  */
 
 import { kebabnize } from 'args-tokens/utils'
-import { ARG_NEGATABLE_PREFIX, COMMON_ARGS } from '../constants.ts'
+import { ARG_NEGATABLE_PREFIX, COMMON_ARGS } from '../../constants.ts'
 import {
   resolveExamples as _resolvedExamples,
   create,
   resolveArgKey,
   resolveBuiltInKey
-} from '../utils.ts'
+} from '../../utils.ts'
 
 import type { ArgSchema, Args } from 'args-tokens'
-import type { LoaderCommandContext } from '../plugins/loader.ts'
-import type { DefaultRendererCommandContext } from '../plugins/renderer.ts'
-import type { Command, CommandContext, DefaultGunshiParams, GunshiParams } from '../types.ts'
+import type { Command, CommandContext, DefaultGunshiParams, GunshiParams } from '../../types.ts'
+import type { LoaderCommandContext } from '../loader.ts'
+import type { DefaultRendererCommandContext } from '../renderer.ts'
 
 const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
 

@@ -9,6 +9,8 @@
     "include": [
       "src/**/*.ts",
       "src/locales/*.json",
+      "src/plugins/*.ts",
+      "src/plugins/**/*.ts",
       "assets/*.png",
       "package.json",
       "jsr.json",

@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import type { CommandContext, DefaultGunshiParams, GunshiParams } from '../types.ts'
+import type { CommandContext, DefaultGunshiParams, GunshiParams } from '../../types.ts'
 
 /**
  * Render the header.

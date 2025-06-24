@@ -14,6 +14,6 @@
  * @license MIT
  */
 
-export { renderHeader } from './renderer/header.ts'
-export { renderUsage } from './renderer/usage.ts'
-export { renderValidationErrors } from './renderer/validation.ts'
+export { renderHeader } from './plugins/renderer/header.ts'
+export { renderUsage } from './plugins/renderer/usage.ts'
+export { renderValidationErrors } from './plugins/renderer/validation.ts'
