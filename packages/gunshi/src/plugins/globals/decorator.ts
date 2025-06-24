@@ -9,7 +9,7 @@ import type { GlobalsCommandContext } from './extension.ts'
 /**
  * Decorator function to extend the command with global options.
  */
-const decorate: CommandDecorator<{
+const decorator: CommandDecorator<{
   args: DefaultGunshiParams['args']
   extensions: {
     globals: GlobalsCommandContext
@@ -51,4 +51,4 @@ const decorate: CommandDecorator<{
   return baseRunner(ctx)
 }
 
-export default decorate
+export default decorator
