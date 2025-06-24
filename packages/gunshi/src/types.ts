@@ -403,14 +403,6 @@ export interface Command<G extends GunshiParams<any> = DefaultGunshiParams> {
 }
 
 /**
- * Extract command context extension
- * @internal
- */
-export type ExtractCommandContextExtension<E extends Record<string, CommandContextExtension>> = {
-  [K in keyof E]: ReturnType<E[K]['factory']>
-}
-
-/**
  * Lazy command interface.
  * Lazy command that's not loaded until it is executed.
  */

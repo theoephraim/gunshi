@@ -1,13 +1,7 @@
 import { expectTypeOf, test } from 'vitest'
 
 import type { Args } from 'args-tokens'
-import type {
-  CommandContext,
-  CommandRunner,
-  ExtractCommandContextExtension,
-  GunshiParams,
-  KeyOfArgs
-} from './types.ts'
+import type { CommandContext, CommandRunner, GunshiParams, KeyOfArgs } from './types.ts'
 
 test('KeyOfArgOptions', () => {
   const _args = {
@@ -56,28 +50,4 @@ test('CommandRunner', () => {
   // Args and Extend type argument
   type C2 = Parameters<CommandRunner<GunshiParams<{ args: A; extensions: E }>>>[0]
   expectTypeOf<C2['extensions']>().toEqualTypeOf<E>()
-})
-
-test('ExtractCommandContextExtension', () => {
-  const _extensions = {
-    ext1: {
-      key: Symbol('ext1'),
-      factory: () => ({ value1: 'test1' })
-    },
-    ext2: {
-      key: Symbol('ext2'),
-      factory: () => ({ value2: 'test2' })
-    },
-    ext3: {
-      key: Symbol('ext3'),
-      factory: () => ({ value3: 'test3' })
-    }
-  }
-
-  type T1 = ExtractCommandContextExtension<typeof _extensions>
-  expectTypeOf<T1>().toEqualTypeOf<{
-    ext1: { value1: string }
-    ext2: { value2: string }
-    ext3: { value3: string }
-  }>()
 })
