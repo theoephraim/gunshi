@@ -16,6 +16,7 @@ import type {
   Command,
   CommandContext,
   CommandContextExtension,
+  CommandEnvironment,
   DefaultGunshiParams,
   ExtendContext,
   GunshiParams,
@@ -157,43 +158,47 @@ class IntlifyMessageFormatTranslation implements TranslationAdapter {
   }
 }
 
-type CreateMockCommandContext<G extends GunshiParams = DefaultGunshiParams> = {
-  extensions?: Record<string, CommandContextExtension<G['extensions']>>
-  command?: Command<G>
-}
+type CreateMockCommandContext<G extends GunshiParams = DefaultGunshiParams> = Partial<
+  Omit<CommandContext, 'extensions'> &
+    Omit<CommandEnvironment, 'name' | 'description' | 'version'> & {
+      extensions?: Record<string, CommandContextExtension<G['extensions']>>
+      command?: Command<G>
+      version?: string | null
+    }
+>
 
 export async function createMockCommandContext<E extends ExtendContext = NoExt>(
-  options: CreateMockCommandContext<DefaultGunshiParams> = {}
+  options: CreateMockCommandContext = {}
 ): Promise<CommandContext<GunshiParams<{ args: Args; extensions: E }>>> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let ctx: any = {
-    name: 'mock-command',
-    description: 'Mock command',
+    name: options.name || 'mock-command',
+    description: options.description || 'Mock command',
     locale: new Intl.Locale('en-US'),
     env: {
-      cwd: undefined,
+      cwd: options.cwd,
       name: 'test-app',
       description: 'Test application',
-      version: '1.0.0',
-      leftMargin: 2,
-      middleMargin: 10,
-      usageOptionType: false,
-      usageOptionValue: true,
-      usageSilent: false,
+      version: options.version == null ? undefined : options.version || '1.0.0',
+      leftMargin: options.leftMargin || 2,
+      middleMargin: options.middleMargin || 10,
+      usageOptionType: options.usageOptionType || false,
+      usageOptionValue: options.usageOptionValue || true,
+      usageSilent: options.usageSilent ?? false,
       subCommands: undefined,
-      renderUsage: undefined,
-      renderHeader: undefined,
-      renderValidationErrors: undefined
+      renderUsage: options.renderUsage || undefined,
+      renderHeader: options.renderHeader || undefined,
+      renderValidationErrors: options.renderValidationErrors || undefined
     },
-    args: {},
-    values: {},
-    positionals: [],
-    rest: [],
-    _: [],
-    tokens: [],
-    omitted: false,
-    callMode: 'entry',
-    log: vi.fn()
+    args: options.args || {},
+    values: options.values || {},
+    positionals: options.positionals || [],
+    rest: options.rest || [],
+    _: options._ || [],
+    tokens: options.tokens || [],
+    omitted: options.omitted || false,
+    callMode: options.callMode || 'entry',
+    log: options.log || vi.fn()
   }
 
   if (options.extensions) {
