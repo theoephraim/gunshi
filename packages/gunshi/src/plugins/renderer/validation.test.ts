@@ -19,12 +19,12 @@ test('basic', async () => {
       name: 'cmd1'
     }
   })
-
   // eslint-disable-next-line unicorn/error-message
   const error = new AggregateError([
     new Error(`Optional argument '--dependency' or '-d' is required`),
     new Error(`Optional argument '--alias' or '-a' is required`)
   ])
+
   await expect(renderValidationErrors(ctx, error)).resolves.toEqual(
     [
       `Optional argument '--dependency' or '-d' is required`,

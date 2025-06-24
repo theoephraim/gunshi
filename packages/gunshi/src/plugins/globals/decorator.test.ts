@@ -21,6 +21,7 @@ test('enable version option', async () => {
   })
   const baseRunner = vi.fn(() => 'command executed')
   const result = await decorator(baseRunner)(ctx)
+
   expect(result).toBe(version)
   expect(baseRunner).not.toHaveBeenCalled()
 })
@@ -41,6 +42,7 @@ test('enable help option', async () => {
   })
   const baseRunner = vi.fn(() => 'command executed')
   const result = await decorator(baseRunner)(ctx)
+
   expect(result).toBe(usage)
   expect(baseRunner).not.toHaveBeenCalled()
 })
@@ -63,6 +65,7 @@ test('header rendering', async () => {
   })
   const baseRunner = vi.fn(() => 'command executed')
   const result = await decorator(baseRunner)(ctx)
+
   expect(result).toBe([header, usage].join('\n'))
   expect(baseRunner).not.toHaveBeenCalled()
 })
@@ -81,5 +84,6 @@ test('base runner execution', async () => {
   })
   const baseRunner = vi.fn(() => 'command executed')
   const result = await decorator(baseRunner)(ctx)
+
   expect(result).toBe('command executed')
 })

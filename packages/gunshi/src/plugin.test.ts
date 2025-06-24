@@ -14,6 +14,7 @@ describe('PluginContext#addGlobalOpttion', () => {
     const decorators = new Decorators()
     const ctx = new PluginContext(decorators)
     ctx.addGlobalOption('foo', { type: 'string', description: 'foo option' })
+
     expect(ctx.globalOptions.size).toBe(1)
     expect(ctx.globalOptions.get('foo')).toEqual({
       type: 'string',
@@ -24,6 +25,7 @@ describe('PluginContext#addGlobalOpttion', () => {
   test('name empty', () => {
     const decorators = new Decorators()
     const ctx = new PluginContext(decorators)
+
     expect(() => ctx.addGlobalOption('', { type: 'string' })).toThrow(
       'Option name must be a non-empty string'
     )
@@ -33,6 +35,7 @@ describe('PluginContext#addGlobalOpttion', () => {
     const decorators = new Decorators()
     const ctx = new PluginContext(decorators)
     ctx.addGlobalOption('foo', { type: 'string', description: 'foo option' })
+
     expect(() => ctx.addGlobalOption('foo', { type: 'string' })).toThrow(
       `Global option 'foo' is already registered`
     )
@@ -48,6 +51,7 @@ test('PluginContext#decorateHeaderRenderer', async () => {
 
   ctx.decorateHeaderRenderer<Logger>(async (baseRenderer, cmdCtx) => {
     const result = await baseRenderer(cmdCtx)
+
     expectTypeOf(cmdCtx.extensions).toEqualTypeOf<Auth & Logger>()
     return `[DECORATED] ${result}`
   })
@@ -66,7 +70,9 @@ test('PluginContext#decorateUsageRenderer', async () => {
 
   ctx.decorateUsageRenderer<Logger>(async (baseRenderer, cmdCtx) => {
     const result = await baseRenderer(cmdCtx)
+
     expectTypeOf(cmdCtx.extensions).toEqualTypeOf<Auth & Logger>()
+
     return `[USAGE] ${result}`
   })
 
@@ -83,7 +89,9 @@ test('PluginContext#decorateValidationErrorsRenderer', async () => {
 
   ctx.decorateValidationErrorsRenderer<Logger>(async (baseRenderer, cmdCtx, error) => {
     const result = await baseRenderer(cmdCtx, error)
+
     expectTypeOf(cmdCtx.extensions).toEqualTypeOf<Auth & Logger>()
+
     return `[ERROR] ${result}`
   })
 
@@ -102,7 +110,9 @@ test('PluginContext#decorateCommand', async () => {
 
   ctx.decorateCommand<Logger>(baseRunner => async ctx => {
     const result = await baseRunner(ctx)
+
     expectTypeOf(ctx.extensions).toEqualTypeOf<Auth & Logger>()
+
     return `[USAGE] ${result}`
   })
 
@@ -183,9 +193,11 @@ describe('plugin function', () => {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateHeaderRenderer(async (baseRenderer, cmdCtx) => {
           const user = cmdCtx.extensions.auth.user
+
           expectTypeOf(cmdCtx.extensions).toEqualTypeOf<{
             auth: ReturnType<typeof extensionFactory>
           }>()
+
           console.log(`User: ${user.name} (${user.id})`)
           return await baseRenderer(cmdCtx)
         })
@@ -193,6 +205,7 @@ describe('plugin function', () => {
           expectTypeOf(ctx.extensions).toEqualTypeOf<{
             auth: ReturnType<typeof extensionFactory>
           }>()
+
           const result = await baseRunner(ctx)
           return `[AUTH] ${result}`
         })
@@ -216,10 +229,12 @@ describe('plugin function', () => {
         ctx.addGlobalOption('token', { type: 'string' })
         ctx.decorateUsageRenderer(async (baseRenderer, cmdCtx) => {
           expectTypeOf(cmdCtx.extensions).toEqualTypeOf<undefined>()
+
           return await baseRenderer(cmdCtx)
         })
         ctx.decorateValidationErrorsRenderer(async (baseRenderer, cmdCtx, error) => {
           expectTypeOf(cmdCtx.extensions).toEqualTypeOf<undefined>()
+
           return await baseRenderer(cmdCtx, error)
         })
       }
@@ -247,7 +262,6 @@ describe('Plugin type with optional properties', () => {
     const pluginFn = async (ctx: PluginContext) => {
       ctx.addGlobalOption('extended', { type: 'string' })
     }
-
     // use Object.defineProperty to add properties
     Object.defineProperty(pluginFn, 'name', {
       value: 'extended-plugin',
@@ -255,7 +269,6 @@ describe('Plugin type with optional properties', () => {
       enumerable: true,
       configurable: true
     })
-
     Object.defineProperty(pluginFn, 'extension', {
       value: {
         key: Symbol('extended-plugin'),
@@ -454,6 +467,7 @@ describe('Plugin Extensions Integration', () => {
       setup: () => {},
       extension(core: CommandContextCore) {
         expect(core.extensions).toBeDefined()
+
         capturedContext({
           name: core.name,
           hasValues: !!core.values
@@ -490,7 +504,6 @@ describe('Plugin Extensions Integration', () => {
       callMode: 'entry',
       cliOptions: {}
     })
-
     await contextCommand.run!(ctx)
 
     expect(capturedContext).toHaveBeenCalledWith({
@@ -506,7 +519,6 @@ describe('resolveDependencies', () => {
     const pluginA = plugin({ name: 'a' })
     const pluginB = plugin({ name: 'b' })
     const pluginC = plugin({ name: 'c' })
-
     const result = resolveDependencies([pluginA, pluginB, pluginC])
 
     expect(result).toEqual([pluginA, pluginB, pluginC])
@@ -516,7 +528,6 @@ describe('resolveDependencies', () => {
     const pluginA = plugin({ name: 'a' })
     const pluginB = plugin({ name: 'b', dependencies: ['a'] })
     const pluginC = plugin({ name: 'c', dependencies: ['b'] })
-
     const result = resolveDependencies([pluginC, pluginB, pluginA])
 
     expect(result.map(p => p.name)).toEqual(['a', 'b', 'c'])
@@ -527,10 +538,9 @@ describe('resolveDependencies', () => {
     const pluginB = plugin({ name: 'b', dependencies: ['a'] })
     const pluginC = plugin({ name: 'c', dependencies: ['a'] })
     const pluginD = plugin({ name: 'd', dependencies: ['b', 'c'] })
-
     const result = resolveDependencies([pluginD, pluginC, pluginB, pluginA])
-
     const names = result.map(p => p.name)
+
     expect(names[0]).toBe('a')
     expect(names.indexOf('b')).toBeGreaterThan(names.indexOf('a'))
     expect(names.indexOf('c')).toBeGreaterThan(names.indexOf('a'))
@@ -544,7 +554,6 @@ describe('resolveDependencies', () => {
       name: 'b',
       dependencies: [{ name: 'a', optional: false }]
     })
-
     const result = resolveDependencies([pluginB, pluginA])
 
     expect(result.map(p => p.name)).toEqual(['a', 'b'])
@@ -556,7 +565,6 @@ describe('resolveDependencies', () => {
       name: 'b',
       dependencies: [{ name: 'missing', optional: true }]
     })
-
     const result = resolveDependencies([pluginB, pluginA])
 
     expect(result.map(p => p.name)).toEqual(['b', 'a'])
@@ -568,7 +576,6 @@ describe('resolveDependencies', () => {
       name: 'b',
       dependencies: [{ name: 'a', optional: true }]
     })
-
     const result = resolveDependencies([pluginB, pluginA])
 
     expect(result.map(p => p.name)).toEqual(['a', 'b'])
@@ -599,7 +606,6 @@ describe('resolveDependencies', () => {
     const pluginA = plugin({ name: 'a' })
     const pluginB = {} as Plugin
     const pluginC = plugin({ name: 'c', dependencies: ['a'] })
-
     const result = resolveDependencies([pluginB, pluginC, pluginA])
 
     expect(result.filter(p => p.name).map(p => p.name)).toEqual(['a', 'c'])
@@ -612,7 +618,6 @@ describe('resolveDependencies', () => {
       name: 'c',
       dependencies: ['a', { name: 'b', optional: false }, { name: 'missing', optional: true }]
     })
-
     const result = resolveDependencies([pluginC, pluginB, pluginA])
 
     expect(result.map(p => p.name)).toEqual(['a', 'b', 'c'])
@@ -622,7 +627,6 @@ describe('resolveDependencies', () => {
     const mockWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const pluginA = plugin({ name: 'a' })
     const pluginB = plugin({ name: 'b', dependencies: ['a'] })
-
     const result = resolveDependencies([pluginA, pluginB, pluginA])
 
     expect(result.map(p => p.name)).toEqual(['a', 'b'])

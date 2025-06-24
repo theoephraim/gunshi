@@ -17,8 +17,8 @@ describe('execute command', () => {
   test('entry iniline function', async () => {
     const mockFn = vi.fn()
     await cli([], mockFn)
-    expect(mockFn).toBeCalled()
-    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+
+    expect(mockFn).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
   })
 
   test('entry command', async () => {
@@ -26,8 +26,8 @@ describe('execute command', () => {
     await cli([], {
       run: mockFn
     })
-    expect(mockFn).toBeCalled()
-    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+
+    expect(mockFn).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
   })
 
   test('entry command with name', async () => {
@@ -36,8 +36,8 @@ describe('execute command', () => {
       name: 'publish',
       run: mockFn
     })
-    expect(mockFn).toBeCalled()
-    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+
+    expect(mockFn).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
   })
 
   test('entry command with arguments', async () => {
@@ -51,9 +51,14 @@ describe('execute command', () => {
       },
       run: mockFn
     })
-    expect(mockFn.mock.calls[0][0].values).toEqual({ outDir: 'dist/' })
-    expect(mockFn.mock.calls[0][0].positionals).toEqual(['foo', 'bar'])
-    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+
+    expect(mockFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        callMode: 'entry',
+        values: { outDir: 'dist/' },
+        positionals: ['foo', 'bar']
+      })
+    )
   })
 
   test('entry command without arguments', async () => {
@@ -61,9 +66,14 @@ describe('execute command', () => {
     await cli(['dist/', 'test/'], {
       run: mockFn
     })
-    expect(mockFn.mock.calls[0][0].values).toEqual({})
-    expect(mockFn.mock.calls[0][0].positionals).toEqual(['dist/', 'test/'])
-    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+
+    expect(mockFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        callMode: 'entry',
+        values: {},
+        positionals: ['dist/', 'test/']
+      })
+    )
   })
 
   test('entry lazy command name omitted', async () => {
@@ -72,8 +82,8 @@ describe('execute command', () => {
       [''],
       lazy(() => mockFn, { name: 'lazy' })
     )
-    expect(mockFn).toBeCalled()
-    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+
+    expect(mockFn).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
   })
 
   test('entry lazy command name as sub-command', async () => {
@@ -82,8 +92,8 @@ describe('execute command', () => {
       ['laz'],
       lazy(() => mockFn, { name: 'lazy' })
     )
-    expect(mockFn).toBeCalled()
-    expect(mockFn.mock.calls[0][0].callMode).toEqual('entry')
+
+    expect(mockFn).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
   })
 
   test('entry lazy command on sub-command', async () => {
@@ -98,13 +108,11 @@ describe('execute command', () => {
 
     // check entry command
     await cli(['lazy'], lazyCommand, { subCommands })
-    expect(mockFn).toBeCalled()
-    expect(mockFn.mock.calls[0][0].callMode).toEqual('subCommand')
+    expect(mockFn).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'subCommand' }))
 
     // check registered sub-command
     await cli(['command1'], lazyCommand, { subCommands })
-    expect(mockCommand1).toBeCalled()
-    expect(mockCommand1.mock.calls[0][0].callMode).toEqual('subCommand')
+    expect(mockCommand1).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'subCommand' }))
 
     // check unknown command
     await expect(async () => {
@@ -151,15 +159,23 @@ describe('execute command', () => {
     await cli(['command2', '--bar=1', 'position2'], show, options)
 
     expect(mockShow).toBeCalledTimes(2)
-    expect(mockShow.mock.calls[0][0].callMode).toEqual('entry')
+    expect(mockShow).toHaveBeenCalledWith(expect.objectContaining({ callMode: 'entry' }))
     expect(mockCommand1).toBeCalledTimes(1)
-    expect(mockCommand1.mock.calls[0][0].values).toEqual({ foo: 'foo' })
-    expect(mockCommand1.mock.calls[0][0].positionals).toEqual(['command1', 'position1'])
-    expect(mockCommand1.mock.calls[0][0].callMode).toEqual('subCommand')
+    expect(mockCommand1).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { foo: 'foo' },
+        positionals: ['command1', 'position1'],
+        callMode: 'subCommand'
+      })
+    )
     expect(mockCommand2).toBeCalledTimes(1)
-    expect(mockCommand2.mock.calls[0][0].values).toEqual({ bar: 1 })
-    expect(mockCommand2.mock.calls[0][0].positionals).toEqual(['command2', 'position2'])
-    expect(mockCommand2.mock.calls[0][0].callMode).toEqual('subCommand')
+    expect(mockCommand2).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { bar: 1 },
+        positionals: ['command2', 'position2'],
+        callMode: 'subCommand'
+      })
+    )
   })
 
   test('entry loose command + sub commands', async () => {
@@ -624,28 +640,34 @@ test('_ (rawArgs)', async () => {
   const args = ['--foo', 'bar', '--baz', 'qux']
   const fn = vi.fn()
   await cli(args, fn)
-  expect(fn.mock.calls[0][0]._).toEqual(args)
+
+  expect(fn).toHaveBeenCalledWith(expect.objectContaining({ _: args }))
 })
 
 test('tokens', async () => {
   const args = ['--foo', 'bar']
   const fn = vi.fn()
   await cli(args, fn)
-  expect(fn.mock.calls[0][0].tokens).toEqual([
-    {
-      index: 0,
-      kind: 'option',
-      name: 'foo',
-      rawName: '--foo',
-      value: undefined,
-      inlineValue: undefined
-    },
-    {
-      index: 1,
-      kind: 'positional',
-      value: 'bar'
-    }
-  ])
+
+  expect(fn).toHaveBeenCalledWith(
+    expect.objectContaining({
+      tokens: [
+        {
+          index: 0,
+          kind: 'option',
+          name: 'foo',
+          rawName: '--foo',
+          value: undefined,
+          inlineValue: undefined
+        },
+        {
+          index: 1,
+          kind: 'positional',
+          value: 'bar'
+        }
+      ]
+    })
+  )
 })
 
 test('option grouping', async () => {
@@ -665,7 +687,14 @@ test('option grouping', async () => {
     run: mockFn
   })
 
-  expect(mockFn.mock.calls[0][0].values).toEqual({ silent: true, verbose: true })
+  expect(mockFn).toHaveBeenCalledWith(
+    expect.objectContaining({
+      values: {
+        silent: true,
+        verbose: true
+      }
+    })
+  )
 })
 
 test('rest arguments', async () => {
@@ -681,7 +710,11 @@ test('rest arguments', async () => {
     run: mockFn
   })
 
-  expect(mockFn.mock.calls[0][0].rest).toEqual(['--baz', 'qux'])
+  expect(mockFn).toHaveBeenCalledWith(
+    expect.objectContaining({
+      rest: ['--baz', 'qux']
+    })
+  )
 })
 
 test('negatable options', async () => {
@@ -723,7 +756,11 @@ test('enum optional argument', async () => {
     args,
     run: mockFn1
   })
-  expect(mockFn1.mock.calls[0][0].values).toEqual({ foo: 'a' })
+  expect(mockFn1).toHaveBeenCalledWith(
+    expect.objectContaining({
+      values: { foo: 'a' }
+    })
+  )
 
   // failure case
   await cli(['--foo', 'z'], {
@@ -755,7 +792,11 @@ describe('positional arguments', async () => {
       args,
       run: mockFn1
     })
-    expect(mockFn1.mock.calls[0][0].values).toEqual({ foo: 'value1', bar: 'value2' })
+    expect(mockFn1).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { foo: 'value1', bar: 'value2' }
+      })
+    )
 
     // failure case
     await cli(['value1'], {
@@ -812,7 +853,11 @@ describe('positional arguments', async () => {
         subCommands
       }
     )
-    expect(mockFn1.mock.calls[0][0].values).toEqual({ foo: 'value1', option1: 'option1' })
+    expect(mockFn1).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { foo: 'value1', option1: 'option1' }
+      })
+    )
 
     // failure case
     await cli(
@@ -843,7 +888,12 @@ test('multiple option values', async () => {
     args,
     run: mockFn1
   })
-  expect(mockFn1.mock.calls[0][0].values).toEqual({ fruits: ['banana', 'orange', 'apple'] })
+
+  expect(mockFn1).toHaveBeenCalledWith(
+    expect.objectContaining({
+      values: { fruits: ['banana', 'orange', 'apple'] }
+    })
+  )
 })
 
 describe('argument name kebabnize', () => {
@@ -863,7 +913,12 @@ describe('argument name kebabnize', () => {
       args,
       run: mockFn1
     })
-    expect(mockFn1.mock.calls[0][0].values).toEqual({ fooBar: 'value1', bazQux: 'value2' })
+
+    expect(mockFn1).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { fooBar: 'value1', bazQux: 'value2' }
+      })
+    )
   })
 
   test('globally', async () => {
@@ -882,7 +937,12 @@ describe('argument name kebabnize', () => {
       toKebab: true,
       run: mockFn1
     })
-    expect(mockFn1.mock.calls[0][0].values).toEqual({ fooBar: 'value1' })
+
+    expect(mockFn1).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { fooBar: 'value1' }
+      })
+    )
   })
 })
 
@@ -902,9 +962,12 @@ describe('custom type arguments', () => {
       args,
       run: mockFn
     })
-    expect(mockFn.mock.calls[0][0].values).toEqual({
-      tags: ['javascript', 'typescript', 'node.js']
-    })
+
+    expect(mockFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { tags: ['javascript', 'typescript', 'node.js'] }
+      })
+    )
   })
 
   test('json parser', async () => {
@@ -928,7 +991,12 @@ describe('custom type arguments', () => {
       args,
       run: mockFn
     })
-    expect(mockFn.mock.calls[0][0].values).toEqual({ config: { debug: true, port: 3000 } })
+
+    expect(mockFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { config: { debug: true, port: 3000 } }
+      })
+    )
   })
 
   test('custom type with default value', async () => {
@@ -952,7 +1020,12 @@ describe('custom type arguments', () => {
       args,
       run: mockFn
     })
-    expect(mockFn.mock.calls[0][0].values).toEqual({ format: 'json' })
+
+    expect(mockFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: { format: 'json' }
+      })
+    )
   })
 
   test('custom type with validation error', async () => {
@@ -1006,13 +1079,17 @@ describe('custom type arguments', () => {
       args,
       run: mockFn
     })
-    expect(mockFn.mock.calls[0][0].values).toEqual({
-      points: [
-        { x: 1, y: 2 },
-        { x: 3, y: 4 },
-        { x: 5, y: 6 }
-      ]
-    })
+    expect(mockFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: {
+          points: [
+            { x: 1, y: 2 },
+            { x: 3, y: 4 },
+            { x: 5, y: 6 }
+          ]
+        }
+      })
+    )
   })
 })
 

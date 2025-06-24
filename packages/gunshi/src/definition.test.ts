@@ -39,7 +39,6 @@ test('lazy', async () => {
       }
     }
   })
-
   const mock = vi.fn()
   const testLazy = lazy(() => {
     return Promise.resolve(mock)
@@ -74,7 +73,6 @@ describe('define with type parameters', () => {
         query: (sql: string) => Promise<{ rows: string[] }>
       }
     }
-
     const command = define<
       GunshiParams<{
         args: { env: { type: 'string'; required: true } }
@@ -124,7 +122,6 @@ describe('define with type parameters', () => {
         logout: () => Promise<void>
       }
     }
-
     const command = define<GunshiParams<{ args: Args; extensions: AuthExt }>>({
       name: 'profile',
       run: async ctx => {
@@ -183,7 +180,6 @@ describe('lazy with type parameters', () => {
       }
       return runner
     })
-
     const lazyCmd = lazy<GunshiParams<{ args: Args; extensions: AuthExt }>>(loader, {
       name: 'lazy-deploy',
       description: 'Lazy deploy command'
@@ -198,7 +194,6 @@ describe('lazy with type parameters', () => {
     const loader = vi.fn(async () => {
       return async () => 'done'
     })
-
     const lazyCmd = lazy(loader, {
       name: 'lazy-test',
       description: 'Test lazy command',
@@ -232,7 +227,6 @@ describe('lazy with type parameters', () => {
       }
       return runner
     })
-
     const lazyCmd = lazy(loader, {
       name: 'test'
     })
@@ -246,7 +240,6 @@ describe('lazy with type parameters', () => {
       name: 'simple',
       run: async () => 'done'
     }))
-
     const lazyCmd = lazy(loader, {
       name: 'simple',
       description: 'Simple lazy command'
@@ -261,7 +254,6 @@ describe('lazy with type parameters', () => {
       name: 'minimal',
       run: async () => 'done'
     }))
-
     const lazyCmd = lazy(loader)
 
     expect(typeof lazyCmd).toBe('function')

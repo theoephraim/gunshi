@@ -6,7 +6,6 @@ test('DefaultTranslation', () => {
     locale: 'ja-JP',
     fallbackLocale: 'en-US'
   })
-
   translation.setResource('ja-JP', {
     hello: 'こんにちは、{$name}さん！'
   })

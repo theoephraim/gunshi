@@ -106,7 +106,6 @@ test('basic', async () => {
     renderUsage: mockRenderUsage,
     renderValidationErrors: mockRenderValidationErrors
   })
-
   expect(ctx.env.subCommands).toEqual(subCommands)
 
   /**
@@ -244,7 +243,6 @@ describe('plugin extensions', () => {
     expect(ctx.extensions.auth.user).toEqual({ id: 1, name: 'Test User' })
     expect(ctx.extensions.auth.isAuthenticated).toBe(true)
     expect(ctx.extensions.auth.getCommandName()).toBe('test-cmd')
-
     expect(ctx.extensions.db).toBeDefined()
     expect(ctx.extensions.db.connected).toBe(true)
     expect(typeof ctx.extensions.db.query).toBe('function')
@@ -281,12 +279,10 @@ describe('plugin extensions', () => {
         factory: () => ({ value3: 'test3' })
       }
     }
-
     const command: Command<DefaultGunshiParams> = {
       name: 'multi-ext',
       run: async _ctx => 'done'
     }
-
     const ctx = await createCommandContext({
       args: {},
       values: {},

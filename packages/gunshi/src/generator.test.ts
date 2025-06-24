@@ -11,6 +11,7 @@ const meta = {
 
 test('single', async () => {
   const result = await generate(null, show, { ...meta })
+
   expect(result).toMatchSnapshot()
 })
 

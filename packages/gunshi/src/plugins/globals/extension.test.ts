@@ -22,6 +22,7 @@ describe('showVersion', () => {
       }
     })
     const rendered = globals.showVersion()
+
     expect(rendered).toEqual(version)
     expect(log).toHaveBeenCalledWith(version)
   })
@@ -42,6 +43,7 @@ describe('showVersion', () => {
       }
     })
     const rendered = await globals.showVersion()
+
     expect(rendered).toBe('unknown')
     expect(log).toHaveBeenCalledWith('unknown')
   })
@@ -64,6 +66,7 @@ describe('showVersion', () => {
       }
     })
     const rendered = await globals.showVersion()
+
     expect(rendered).toEqual(version)
     expect(log).not.toHaveBeenCalled()
   })
@@ -87,6 +90,7 @@ describe('showHeader', () => {
       }
     })
     const rendered = await globals.showHeader()
+
     expect(rendered).toEqual(header)
     expect(log).toHaveBeenCalledWith(header)
     expect(log).toHaveBeenCalledWith()
@@ -107,6 +111,7 @@ describe('showHeader', () => {
       }
     })
     const rendered = await globals.showHeader()
+
     expect(rendered).toBeUndefined()
   })
 })
@@ -129,6 +134,7 @@ describe('showUsage', () => {
       }
     })
     const rendered = await globals.showUsage()
+
     expect(rendered).toEqual(usage)
     expect(log).toHaveBeenCalledWith(usage)
   })
@@ -148,6 +154,7 @@ describe('showUsage', () => {
       }
     })
     const rendered = await globals.showUsage()
+
     expect(rendered).toBeUndefined()
   })
 })

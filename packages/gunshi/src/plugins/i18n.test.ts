@@ -97,9 +97,9 @@ describe('translate non-built-in keys', () => {
     const plugin = i18n({ translationAdapterFactory: () => translation })
     const ctx = await createMockCommandContext()
     const extension = await plugin.extension.factory(ctx, {} as Command)
-
     extension.translate(resolveBuiltInKey('ARGUMENTS'))
     extension.translate('description')
+
     expect(translation.translate).toHaveBeenCalledTimes(1)
     expect(translation.translate).toHaveBeenCalledWith('en-US', 'description', {})
   })
@@ -114,9 +114,9 @@ describe('translate non-built-in keys', () => {
     const plugin = i18n({ translationAdapterFactory: () => translation, locale: 'ja-JP' })
     const ctx = await createMockCommandContext()
     const extension = await plugin.extension.factory(ctx, {} as Command)
-
     extension.translate(resolveBuiltInKey('ARGUMENTS'))
     extension.translate('examples', { foo: 'bar' })
+
     expect(translation.translate).toHaveBeenCalledTimes(1)
     expect(translation.translate).toHaveBeenCalledWith('ja-JP', 'examples', { foo: 'bar' })
   })
