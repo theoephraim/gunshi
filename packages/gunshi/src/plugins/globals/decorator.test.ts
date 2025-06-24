@@ -1,19 +1,16 @@
-import { afterEach, expect, test, vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import { createMockCommandContext } from '../../../test/utils.ts'
 import decorator from './decorator.ts'
 import extension from './extension.ts'
 
 import type { GlobalsCommandContext } from './extension.ts'
 
-afterEach(() => {
-  vi.resetAllMocks()
-})
-
 test('enable version option', async () => {
+  const version = '1.0.0'
   const ctx = await createMockCommandContext<{
     globals: GlobalsCommandContext
   }>({
-    version: '1.0.0',
+    version,
     values: { version: true },
     extensions: {
       globals: {
@@ -24,7 +21,7 @@ test('enable version option', async () => {
   })
   const baseRunner = vi.fn(() => 'command executed')
   const result = await decorator(baseRunner)(ctx)
-  expect(result).toBe('1.0.0')
+  expect(result).toBe(version)
   expect(baseRunner).not.toHaveBeenCalled()
 })
 

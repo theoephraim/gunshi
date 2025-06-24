@@ -1,12 +1,8 @@
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { createMockCommandContext } from '../../../test/utils.ts'
 import extension from './extension.ts'
 
 import type { GlobalsCommandContext } from './extension.ts'
-
-afterEach(() => {
-  vi.resetAllMocks()
-})
 
 describe('showVersion', () => {
   test('basic', async () => {
@@ -25,7 +21,7 @@ describe('showVersion', () => {
         }
       }
     })
-    const rendered = await globals.showVersion()
+    const rendered = globals.showVersion()
     expect(rendered).toEqual(version)
     expect(log).toHaveBeenCalledWith(version)
   })
