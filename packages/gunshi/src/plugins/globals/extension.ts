@@ -15,16 +15,19 @@ export interface GlobalsCommandContext {
    * @returns The version of the application, or `unknown` if the version is not specified.
    */
   showVersion: () => string
+
   /**
    * Show the header of the application.
    * @returns The header of the application, or `undefined` if the `renderHeader` is not specified.
    */
   showHeader: () => Awaitable<string | undefined>
+
   /**
    * Show the usage of the application. if `--help` option is specified, it will print the usage to the console.
    * @returns The usage of the application, or `undefined` if the `renderUsage` is not specified.
    */
   showUsage: () => Awaitable<string | undefined>
+
   /**
    * Show validation errors. This is called when argument validation fails.
    * @param error The aggregate error containing validation failures
@@ -44,6 +47,7 @@ export default function extension(
       }
       return version
     },
+
     showHeader: async () => {
       let header: string | undefined
       if (ctx.env.renderHeader != null) {
@@ -55,6 +59,7 @@ export default function extension(
       }
       return header
     },
+
     showUsage: async () => {
       if (ctx.env.renderUsage != null) {
         const usage = await ctx.env.renderUsage(ctx)
@@ -64,6 +69,7 @@ export default function extension(
         }
       }
     },
+
     showValidationErrors: async (error: AggregateError) => {
       if (ctx.env.renderValidationErrors === null) {
         return
