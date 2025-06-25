@@ -1,7 +1,6 @@
 import { afterEach, expect, test, vi } from 'vitest'
 import { createCommandContext } from '../../context.ts'
 import i18n from '../i18n.ts'
-import loader from '../loader.ts'
 import renderer from '../renderer.ts'
 import { renderUsage } from './usage.ts'
 
@@ -9,7 +8,6 @@ import type { Args } from 'args-tokens'
 import type { Command, GunshiParams, LazyCommand } from '../../types.ts'
 
 const NOOP = async () => {}
-const loaderPlugin = loader()
 const i18nPlugin = i18n()
 const rendererPlugin = renderer()
 
@@ -131,7 +129,6 @@ test('basic', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -165,7 +162,6 @@ test('no arguments', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -213,7 +209,6 @@ test('no required on optional arguments', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -255,7 +250,6 @@ test('positional arguments', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -307,7 +301,6 @@ test('mixed positionals and optionals', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -361,7 +354,6 @@ test('no examples', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -416,7 +408,6 @@ test('enable usageOptionType', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -445,7 +436,6 @@ test('sub commands', async () => {
     command: SHOW,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -506,7 +496,6 @@ test('kebab-case arguments with toKebab option', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -563,7 +552,6 @@ test('kebab-case arguments with Command.toKebab option', async () => {
     command,
     extensions: {
       i18n: i18nPlugin.extension,
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {
@@ -588,7 +576,6 @@ test('not install i18n plugin', async () => {
     tokens: [], // dummy, due to test
     command: SHOW,
     extensions: {
-      loader: loaderPlugin.extension,
       renderer: rendererPlugin.extension
     },
     cliOptions: {

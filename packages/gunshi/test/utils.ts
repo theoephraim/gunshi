@@ -202,15 +202,21 @@ export async function createMockCommandContext<E extends ExtendContext = NoExt>(
   }
 
   if (options.extensions) {
-    const extensionsObj = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    const ext = create(null) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    Object.defineProperty(ctx, 'extensions', {
+      value: ext,
+      writable: false,
+      enumerable: true,
+      configurable: true
+    })
     for (const [key, extension] of Object.entries(options.extensions)) {
-      extensionsObj[key] = await (extension as CommandContextExtension).factory(
+      ext[key] = await (extension as CommandContextExtension).factory(
         ctx,
         options.command as Command
       )
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ctx = Object.assign(create<any>(), ctx, { extensions: extensionsObj })
+    ctx = Object.assign(create<any>(), ctx, { extensions: ext })
   } else {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ctx = Object.assign(create<any>(), ctx, { extensions: {} })

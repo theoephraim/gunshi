@@ -10,13 +10,14 @@ import {
 } from '../constants.ts'
 import DefaultResource from '../locales/en-US.json' with { type: 'json' }
 import { plugin } from '../plugin.ts'
-import { create } from '../utils.ts'
+import { create, resolveLazyCommand } from '../utils.ts'
 import { renderHeader } from './renderer/header.ts'
 import { renderUsage } from './renderer/usage.ts'
 import { renderValidationErrors } from './renderer/validation.ts'
 
 import type { Args } from 'args-tokens'
 import type {
+  Command,
   CommandArgKeys,
   CommandBuiltinKeys,
   CommandContext,
@@ -35,6 +36,11 @@ export interface DefaultRendererCommandContext<G extends GunshiParams<any> = Def
    * Render the text message
    */
   text: I18nCommandContext<G>['translate']
+  /**
+   * Load commands
+   * @returns A list of commands loaded from the command loader plugin.
+   */
+  loadCommands: <G extends GunshiParams = DefaultGunshiParams>() => Promise<Command<G>[]>
 }
 
 /**
@@ -44,7 +50,7 @@ export default function renderer() {
   return plugin({
     name: 'renderer',
 
-    dependencies: ['loader', { name: 'i18n', optional: true }],
+    dependencies: [{ name: 'i18n', optional: true }],
 
     extension: (ctx: CommandContextCore): DefaultRendererCommandContext => {
       // TODO(kazupon): This is a workaround for the type system.
@@ -56,6 +62,23 @@ export default function renderer() {
           i18n?: I18nCommandContext
         }
       }>
+
+      let cachedCommands: Command[] | undefined
+
+      async function loadCommands<G extends GunshiParams = DefaultGunshiParams>(): Promise<
+        Command<G>[]
+      > {
+        if (cachedCommands) {
+          return cachedCommands as Command<G>[]
+        }
+
+        const subCommands = [...(ctx.env.subCommands || [])] as [string, Command<G>][]
+        cachedCommands = (await Promise.all(
+          subCommands.map(async ([name, cmd]) => await resolveLazyCommand(cmd, name))
+        )) as Command<DefaultGunshiParams>[]
+
+        return cachedCommands as Command<G>[]
+      }
 
       function text<
         T extends string = CommandBuiltinKeys,
@@ -86,7 +109,8 @@ export default function renderer() {
       }
 
       return {
-        text
+        text,
+        loadCommands
       }
     },
 

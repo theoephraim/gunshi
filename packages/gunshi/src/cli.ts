@@ -12,7 +12,6 @@ import completion from './plugins/completion.ts'
 import dryRun from './plugins/dryrun.ts'
 import globals from './plugins/globals.ts'
 import i18n from './plugins/i18n.ts'
-import loader from './plugins/loader.ts'
 import renderer from './plugins/renderer.ts'
 import { create, isLazyCommand, resolveLazyCommand } from './utils.ts'
 
@@ -47,7 +46,6 @@ export async function cli<G extends GunshiParams = DefaultGunshiParams>(
   const pluginContext = new PluginContext<G>(decorators)
 
   const builtInPlugins: Plugin[] = [
-    loader(),
     globals(),
     i18n({ locale: options.locale, translationAdapterFactory: options.translationAdapterFactory }),
     renderer(),

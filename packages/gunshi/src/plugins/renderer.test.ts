@@ -1,9 +1,10 @@
 import { expect, test } from 'vitest'
 import { createMockCommandContext } from '../../test/utils.ts'
 import { define, lazy } from '../definition.ts'
-import loaderPlugin from './loader.ts'
+import i18nPlugin from './i18n.ts'
+import rendererPlugin from './renderer.ts'
 
-import type { LoaderCommandContext } from './loader.ts'
+import type { DefaultRendererCommandContext } from './renderer.ts'
 
 test('loadCommand', async () => {
   const command1 = define({
@@ -18,19 +19,22 @@ test('loadCommand', async () => {
   subCommands.set(command1.name, command1)
   subCommands.set(lazyCommand2.commandName, lazyCommand2)
 
-  const plugged = loaderPlugin()
+  const pluggedI18n = i18nPlugin()
+  const pluggedRenderer = rendererPlugin()
+
   const {
-    extensions: { loader }
+    extensions: { renderer }
   } = await createMockCommandContext<{
-    loader: LoaderCommandContext
+    renderer: DefaultRendererCommandContext
   }>({
     subCommands,
     extensions: {
-      loader: plugged.extension
+      i18n: pluggedI18n.extension,
+      renderer: pluggedRenderer.extension
     }
   })
 
-  const loadedCommaneds = await loader.loadCommands()
+  const loadedCommaneds = await renderer.loadCommands()
   expect(loadedCommaneds).toHaveLength(2)
   expect(loadedCommaneds.map(cmd => cmd.name)).toEqual(['command1', 'lazyCommand2'])
 })

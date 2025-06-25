@@ -14,7 +14,6 @@ import {
 
 import type { ArgSchema, Args } from 'args-tokens'
 import type { Command, CommandContext, DefaultGunshiParams, GunshiParams } from '../../types.ts'
-import type { LoaderCommandContext } from '../loader.ts'
 import type { DefaultRendererCommandContext } from '../renderer.ts'
 
 const COMMON_ARGS_KEYS = Object.keys(COMMON_ARGS)
@@ -145,13 +144,12 @@ async function renderCommandsSection<
   G extends GunshiParams<{
     args: Args
     extensions: {
-      loader: LoaderCommandContext
       renderer: DefaultRendererCommandContext
     }
   }>
 >(ctx: Readonly<CommandContext<G>>): Promise<string[]> {
   const messages: string[] = [`${ctx.extensions!.renderer.text(resolveBuiltInKey('COMMANDS'))}:`]
-  const loadedCommands = (await ctx.extensions?.loader.loadCommands<G>()) || []
+  const loadedCommands = (await ctx.extensions?.renderer.loadCommands<G>()) || []
   const commandMaxLength = Math.max(...loadedCommands.map(cmd => (cmd.name || '').length))
   const commandsStr = await Promise.all(
     loadedCommands.map(cmd => {
@@ -234,11 +232,10 @@ async function hasCommands<
     args: Args
     extensions: {
       renderer: DefaultRendererCommandContext
-      loader: LoaderCommandContext
     }
   }>
 >(ctx: CommandContext<G>): Promise<boolean> {
-  const loadedCommands = (await ctx.extensions?.loader.loadCommands<G>()) || []
+  const loadedCommands = (await ctx.extensions?.renderer.loadCommands<G>()) || []
   return loadedCommands.length > 1
 }
 

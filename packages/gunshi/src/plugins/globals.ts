@@ -8,8 +8,6 @@ import { plugin } from '../plugin.ts'
 import decorator from './globals/decorator.ts'
 import extension from './globals/extension.ts'
 
-export type { GlobalsCommandContext } from './globals/extension.ts'
-
 /**
  * Built-in global options plugin
  */
