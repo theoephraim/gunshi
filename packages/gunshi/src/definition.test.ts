@@ -2,8 +2,7 @@ import { describe, expect, expectTypeOf, test, vi } from 'vitest'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
 
-import type { Args } from 'args-tokens'
-import type { CommandRunner, GunshiParams } from './types.ts'
+import type { Args, CommandRunner, GunshiParams } from './types.ts'
 
 test('define', async () => {
   const command = define({
@@ -122,7 +121,7 @@ describe('define with type parameters', () => {
         logout: () => Promise<void>
       }
     }
-    const command = define<GunshiParams<{ args: Args; extensions: AuthExt }>>({
+    const command = define<AuthExt>({
       name: 'profile',
       run: async ctx => {
         const userName: string = ctx.extensions.auth.user.name
@@ -143,14 +142,6 @@ describe('define with type parameters', () => {
         value: { type: 'number' }
       },
       examples: 'complex --flag\ncomplex --value 42',
-      resource: async () => {
-        return {
-          description: 'Complex command resource',
-          examples: 'complex --flag\ncomplex --value 42',
-          'arg:flag': 'A boolean flag for the complex command',
-          'arg:value': 'A numeric value for the complex command'
-        }
-      },
       toKebab: false,
       run: async _ctx => 'done'
     })
@@ -159,7 +150,6 @@ describe('define with type parameters', () => {
     expect(command.description).toBe('Complex command')
     expect(command.args).toBeDefined()
     expect(command.examples).toEqual('complex --flag\ncomplex --value 42')
-    expect(command.resource).toBeDefined()
     expect(command.toKebab).toBe(false)
   })
 })
@@ -172,15 +162,13 @@ describe('lazy with type parameters', () => {
       }
     }
     const loader = vi.fn(async () => {
-      const runner: CommandRunner<
-        GunshiParams<{ args: Args; extensions: AuthExt }>
-      > = async ctx => {
+      const runner: CommandRunner<{ args: Args; extensions: AuthExt }> = async ctx => {
         expectTypeOf(ctx.extensions.auth.authenticated).toEqualTypeOf<boolean>()
         return 'deployed'
       }
       return runner
     })
-    const lazyCmd = lazy<GunshiParams<{ args: Args; extensions: AuthExt }>>(loader, {
+    const lazyCmd = lazy<AuthExt>(loader, {
       name: 'lazy-deploy',
       description: 'Lazy deploy command'
     })
@@ -199,13 +187,6 @@ describe('lazy with type parameters', () => {
       description: 'Test lazy command',
       args: { opt: { type: 'string' as const } },
       examples: 'lazy-test --opt value',
-      resource: () => {
-        return {
-          description: 'This is a lazy command',
-          examples: 'lazy-test',
-          'arg:opt': 'An optional string argument for the lazy command'
-        }
-      },
       toKebab: true
     })
 
@@ -213,16 +194,16 @@ describe('lazy with type parameters', () => {
     expect(lazyCmd.description).toBe('Test lazy command')
     expect(lazyCmd.args).toEqual({ opt: { type: 'string' } })
     expect(lazyCmd.examples).toEqual('lazy-test --opt value')
-    expect(lazyCmd.resource).toBeDefined()
     expect(lazyCmd.toKebab).toBe(true)
   })
 
   test('handles type parameters from loaded command', () => {
     const loader = vi.fn(async () => {
-      type TestExt = {
-        existing: { existing: boolean }
+      interface TestExt {
+        existing: { test: boolean }
       }
-      const runner: CommandRunner<GunshiParams<{ args: Args; extensions: TestExt }>> = async () => {
+      const runner: CommandRunner<{ extensions: { test: TestExt } }> = async ctx => {
+        expectTypeOf(ctx.extensions.test.existing.test).toEqualTypeOf<boolean>()
         return 'done'
       }
       return runner

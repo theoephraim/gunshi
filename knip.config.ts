@@ -2,11 +2,10 @@ import type { KnipConfig } from 'knip'
 
 export default {
   workspaces: {
-    // NOTE(kazupon): currently, root does not have lintable files.
-    // '.': {
-    //   entry: ['scripts/*.ts'],
-    //   project: '**/*.ts'
-    // }
+    '.': {
+      entry: ['scripts/*.ts'],
+      project: '**/*.ts'
+    },
     'packages/gunshi': {
       entry: ['src/constants.ts']
     },
@@ -15,5 +14,5 @@ export default {
     }
   },
   ignore: ['playground/deno/main.ts', '**/src/**.test-d.ts', 'bench/**'],
-  ignoreDependencies: ['lint-staged', 'deno', 'gunshi019', 'mitata', '@typescript/native-preview']
+  ignoreDependencies: ['lint-staged', 'deno', 'mitata']
 } satisfies KnipConfig

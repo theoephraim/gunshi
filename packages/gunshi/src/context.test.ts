@@ -3,8 +3,8 @@ import { createMockCommandContext, hasPrototype } from '../test/utils.ts'
 import { ANONYMOUS_COMMAND_NAME } from './constants.ts'
 import { createCommandContext } from './context.ts'
 
-import type { Args } from 'args-tokens'
 import type {
+  Args,
   Command,
   CommandContextCore,
   CommandContextExtension,
@@ -204,9 +204,10 @@ describe('plugin extensions', () => {
     }
 
     const args = { token: { type: 'string' as const } }
-    const command: Command<
-      GunshiParams<{ args: typeof args; extensions: { auth: AuthExtension; db: DbExtension } }>
-    > = {
+    const command: Command<{
+      args: typeof args
+      extensions: { auth: AuthExtension; db: DbExtension }
+    }> = {
       name: 'test-cmd',
       args,
       run: async ctx => {
@@ -215,9 +216,10 @@ describe('plugin extensions', () => {
       }
     }
 
-    const ctx = await createCommandContext<
-      GunshiParams<{ args: typeof args; extensions: { auth: AuthExtension; db: DbExtension } }>
-    >({
+    const ctx = await createCommandContext<{
+      args: typeof args
+      extensions: { auth: AuthExtension; db: DbExtension }
+    }>({
       args,
       values: { token: 'test-token' },
       positionals: [],
@@ -424,9 +426,7 @@ describe('plugin extensions', () => {
       run: async _ctx => 'done'
     }
 
-    await createCommandContext<
-      GunshiParams<{ args: typeof args; extensions: { test: TestExtension } }>
-    >({
+    await createCommandContext<{ args: typeof args; extensions: { test: TestExtension } }>({
       args,
       values: { opt: 'value' },
       positionals: ['pos1', 'pos2'],

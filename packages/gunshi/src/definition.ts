@@ -1,9 +1,28 @@
 /**
- * The entry for command definition.
+ * The entry for gunshi command definition.
+ *
+ * This entry point exports the following APIs and types:
+ * - `define`: A function to define a command.
+ * - `lazy`: A function to lazily load a command.
+ * - Some basic type definitions, such as `Command`, `LazyCommand`, etc.
  *
  * @example
  * ```js
  * import { define } from 'gunshi/definition'
+ *
+ * export default define({
+ *   name: 'say',
+ *   args: {
+ *     say: {
+ *       type: 'string',
+ *       description: 'say something',
+ *       default: 'hello!'
+ *     }
+ *   },
+ *   run: ctx => {
+ *     return `You said: ${ctx.values.say}`
+ *   }
+ * })
  * ```
  *
  * @module
@@ -14,38 +33,58 @@
  * @license MIT
  */
 
-import type { Args } from 'args-tokens'
 import type {
+  Args,
   Command,
   CommandLoader,
+  DefaultGunshiParams,
+  ExtendContext,
+  GunshiParamsConstraint,
+  LazyCommand
+} from './types.ts'
+
+export type {
+  Args,
+  ArgSchema,
+  ArgValues,
+  Command,
+  CommandLoader,
+  CommandRunner,
   DefaultGunshiParams,
   ExtendContext,
   GunshiParams,
   LazyCommand
 } from './types.ts'
 
-export type { Args, ArgSchema, ArgValues } from 'args-tokens'
+/**
+ * Define a {@link Command | command}
+ * @param definition A {@link Command | command} definition
+ */
+export function define<A extends Args>(
+  definition: Command<{ args: A; extensions: {} }>
+): Command<{ args: A; extensions: {} }>
 
 /**
  * Define a {@link Command | command}
  * @param definition A {@link Command | command} definition
  */
-// Overload for args with explicit type (improved type inference for ArgValues)
-export function define<A extends Args>(
-  definition: Command<GunshiParams<{ args: A; extensions: {} }>> & { args: A }
-): Command<GunshiParams<{ args: A; extensions: {} }>>
-
-// Overload for extensions only
 export function define<E extends ExtendContext>(
-  definition: Command<GunshiParams<{ args: Args; extensions: E }>>
-): Command<GunshiParams<{ args: Args; extensions: E }>>
+  definition: Command<{ args: Args; extensions: E }>
+): Command<{ args: Args; extensions: E }>
 
-// Generic overload (default)
-export function define<G extends GunshiParams = DefaultGunshiParams>(
+/**
+ * Define a {@link Command | command}
+ * @param definition A {@link Command | command} definition
+ */
+export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   definition: Command<G>
 ): Command<G>
 
-export function define<G extends GunshiParams = DefaultGunshiParams>(
+/**
+ * Define a {@link Command | command}
+ * @param definition A {@link Command | command} definition
+ */
+export function define<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   definition: Command<G>
 ): Command<G> {
   return definition
@@ -56,7 +95,47 @@ export function define<G extends GunshiParams = DefaultGunshiParams>(
  * @param loader A {@link CommandLoader | command loader}
  * @returns A {@link LazyCommand | lazy command} loader
  */
-export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+export function lazy<A extends Args>(
+  loader: CommandLoader<{ args: A; extensions: {} }>
+): LazyCommand<{ args: A; extensions: {} }>
+
+/**
+ * Define a {@link LazyCommand | lazy command} with definition.
+ * @param loader A {@link CommandLoader | command loader} function that returns a command definition
+ * @param definition An optional {@link Command | command} definition
+ * @returns A {@link LazyCommand | lazy command} that can be executed later
+ */
+export function lazy<A extends Args>(
+  loader: CommandLoader<{ args: A; extensions: {} }>,
+  definition: Command<{ args: A; extensions: {} }>
+): LazyCommand<{ args: A; extensions: {} }>
+
+/**
+ * Define a {@link LazyCommand | lazy command}
+ * @param loader A {@link CommandLoader | command loader}
+ * @returns A {@link LazyCommand | lazy command} loader
+ */
+export function lazy<E extends ExtendContext>(
+  loader: CommandLoader<{ args: Args; extensions: E }>
+): LazyCommand<{ args: Args; extensions: E }>
+
+/**
+ * Define a {@link LazyCommand | lazy command} with definition.
+ * @param loader A {@link CommandLoader | command loader} function that returns a command definition
+ * @param definition An optional {@link Command | command} definition
+ * @returns A {@link LazyCommand | lazy command} that can be executed later
+ */
+export function lazy<E extends ExtendContext>(
+  loader: CommandLoader<{ args: Args; extensions: E }>,
+  definition: Command<{ args: Args; extensions: E }>
+): LazyCommand<{ args: Args; extensions: E }>
+
+/**
+ * Define a {@link LazyCommand | lazy command}
+ * @param loader A {@link CommandLoader | command loader}
+ * @returns A {@link LazyCommand | lazy command} loader
+ */
+export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>
 ): LazyCommand<G>
 
@@ -66,7 +145,7 @@ export function lazy<G extends GunshiParams = DefaultGunshiParams>(
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>,
   definition: Command<G>
 ): LazyCommand<G>
@@ -77,7 +156,7 @@ export function lazy<G extends GunshiParams = DefaultGunshiParams>(
  * @param definition An optional {@link Command | command} definition
  * @returns A {@link LazyCommand | lazy command} that can be executed later
  */
-export function lazy<G extends GunshiParams = DefaultGunshiParams>(
+export function lazy<G extends GunshiParamsConstraint = DefaultGunshiParams>(
   loader: CommandLoader<G>,
   definition?: Command<G>
 ): LazyCommand<G> {
@@ -89,7 +168,11 @@ export function lazy<G extends GunshiParams = DefaultGunshiParams>(
     lazyCommand.description = definition.description
     lazyCommand.args = definition.args
     lazyCommand.examples = definition.examples
-    lazyCommand.resource = definition.resource
+    // @ts-ignore - resource property is now provided by plugin-i18n
+    if ('resource' in definition) {
+      // @ts-ignore
+      lazyCommand.resource = definition.resource
+    }
     lazyCommand.toKebab = definition.toKebab
   }
 

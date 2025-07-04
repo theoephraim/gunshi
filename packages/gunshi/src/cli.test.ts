@@ -1,9 +1,11 @@
+import jsJPResource from '@gunshi/resources/ja-JP' with { type: 'json' }
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { z } from 'zod/v4-mini'
+import i18n from '../../plugin-i18n/src/index.ts'
 import { defineMockLog } from '../test/utils.ts'
 import { cli } from './cli.ts'
 import { define, lazy } from './definition.ts'
-import { plugin } from './plugin.ts'
+import { plugin } from './plugin/core.ts'
 import { renderValidationErrors } from './renderer.ts'
 
 import type { Args } from 'args-tokens'
@@ -467,8 +469,13 @@ describe('auto generate usage', () => {
       description: 'Modern CLI tool',
       version: '0.0.0',
       leftMargin: 4,
-      locale: 'ja-JP',
-      middleMargin: 15
+      middleMargin: 15,
+      plugins: [
+        i18n({
+          locale: 'ja-JP',
+          resources: { 'ja-JP': jsJPResource }
+        })
+      ]
     })
     expect(mainUsageRendered).toMatchSnapshot('main')
 
@@ -479,38 +486,6 @@ describe('auto generate usage', () => {
       version: '0.0.0'
     })
     expect(command2UsageRendered).toMatchSnapshot('command2')
-
-    const message = log()
-    expect(message).toMatchSnapshot()
-  })
-
-  test('locale resource not found', async () => {
-    const utils = await import('./utils.ts')
-    const log = defineMockLog(utils)
-    const mockResource = vi.fn().mockRejectedValue(new Error('Resource not found'))
-    await cli(
-      ['-h'],
-      {
-        args: {
-          foo: {
-            type: 'string',
-            short: 'f',
-            description: 'The foo option'
-          }
-        },
-        name: 'command1',
-        examples: '# Example 1\n$ gunshi --foo bar\n# Example 2\n$ gunshi -f bar',
-        resource: mockResource,
-        run: vi.fn()
-      },
-      {
-        name: 'gunshi',
-        description: 'Modern CLI tool',
-        version: '0.0.0',
-        locale: 'fr-FR',
-        usageOptionType: true
-      }
-    )
 
     const message = log()
     expect(message).toMatchSnapshot()
@@ -1159,6 +1134,7 @@ test('plugins option', async () => {
 
   function logger() {
     return plugin({
+      id: 'logger',
       name: 'logger',
       setup: ctx => {
         ctx.decorateCommand(baseRunner => ctx => {

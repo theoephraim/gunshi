@@ -29,6 +29,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   comments({
     kazupon: {
       ignores: [
+        './scripts/**',
         './bench/**',
         './playground/**',
         './packages/docs/**',
@@ -84,7 +85,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   }),
   markdown({
     rules: {
-      'import/extensions': 'off'
+      'import/extensions': 'off',
+      'unused-imports/no-unused-imports': 'off'
     }
   }),
   vitest(),
@@ -93,6 +95,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
   globalIgnores([
     '.vscode',
     'tsconfig.json',
+    './packages/**/docs/**',
     'pnpm-lock.yaml',
     'playground/**',
     'design/**'

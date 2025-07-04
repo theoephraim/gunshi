@@ -18,8 +18,11 @@
 import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from './constants.ts'
 import { create, deepFreeze, isLazyCommand, log } from './utils.ts'
 
-import type { Args, ArgSchema, ArgToken, ArgValues } from 'args-tokens'
 import type {
+  Args,
+  ArgSchema,
+  ArgToken,
+  ArgValues,
   CliOptions,
   Command,
   CommandCallMode,
@@ -28,7 +31,10 @@ import type {
   CommandContextExtension,
   CommandEnvironment,
   DefaultGunshiParams,
+  ExtendContext,
+  ExtractArgs,
   GunshiParams,
+  GunshiParamsConstraint,
   LazyCommand
 } from './types.ts'
 
@@ -44,15 +50,15 @@ export type ExtractExtensions<E extends Record<string, CommandContextExtension>>
  * Parameters of {@link createCommandContext}
  */
 interface CommandContextParams<
-  G extends GunshiParams,
-  V extends ArgValues<G['args']>,
+  G extends GunshiParams | { extensions: ExtendContext },
+  V extends ArgValues<ExtractArgs<G>>,
   C extends Command<G> | LazyCommand<G> = Command<G>,
   E extends Record<string, CommandContextExtension> = Record<string, CommandContextExtension>
 > {
   /**
    * An arguments of target command
    */
-  args: G['args']
+  args: ExtractArgs<G>
   /**
    * A values of target command
    */
@@ -105,9 +111,8 @@ interface CommandContextParams<
  * @returns A {@link CommandContext | command context}, which is readonly
  */
 export async function createCommandContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  G extends GunshiParams<any> = DefaultGunshiParams,
-  V extends ArgValues<G['args']> = ArgValues<G['args']>,
+  G extends GunshiParamsConstraint = DefaultGunshiParams,
+  V extends ArgValues<ExtractArgs<G>> = ArgValues<ExtractArgs<G>>,
   C extends Command<G> | LazyCommand<G> = Command<G>,
   E extends Record<string, CommandContextExtension> = {}
 >({
@@ -126,7 +131,9 @@ export async function createCommandContext<
 }: CommandContextParams<G, V, C, E>): Promise<
   {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<G>>
-    : Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: ExtractExtensions<E> }>>>
+    : Readonly<
+        CommandContext<GunshiParams<{ args: ExtractArgs<G>; extensions: ExtractExtensions<E> }>>
+      >
 > {
   /**
    * normailize the options schema and values, to avoid prototype pollution
@@ -148,7 +155,7 @@ export async function createCommandContext<
    */
 
   const core = Object.assign(create<CommandContext<G>>(), {
-    name: getCommandName(command),
+    name: getCommandName(command as Command),
     description: command.description,
     omitted,
     callMode,
@@ -183,11 +190,13 @@ export async function createCommandContext<
       }
     }
   }
-  const ctx = deepFreeze(core)
+  const ctx = deepFreeze(core, ['extensions'])
 
   return ctx as {} extends ExtractExtensions<E>
     ? Readonly<CommandContext<G>>
-    : Readonly<CommandContext<GunshiParams<{ args: G['args']; extensions: ExtractExtensions<E> }>>>
+    : Readonly<
+        CommandContext<GunshiParams<{ args: ExtractArgs<G>; extensions: ExtractExtensions<E> }>>
+      >
 }
 
 function getCommandName<G extends GunshiParams>(cmd: Command<G> | LazyCommand<G>): string {
