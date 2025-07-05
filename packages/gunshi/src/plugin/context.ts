@@ -28,7 +28,7 @@ type ExtractedParams<G extends GunshiParamsConstraint, L extends Record<string, 
 
 /**
  * Gunshi plugin context interface.
- * @since v0.24.0
+ * @since v0.27.0
  */
 export interface PluginContext<G extends GunshiParamsConstraint = DefaultGunshiParams> {
   /**

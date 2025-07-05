@@ -98,6 +98,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
     './packages/**/docs/**',
     'pnpm-lock.yaml',
     'playground/**',
+    'CHANGELOG.md',
     'design/**'
   ]) as Linter.Config
 )

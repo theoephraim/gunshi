@@ -17,7 +17,7 @@ import type { PluginContext } from './context.ts'
 
 /**
  * Plugin dependency definition
- * @since v0.24.0
+ * @since v0.27.0
  */
 export interface PluginDependency {
   /**
@@ -33,7 +33,7 @@ export interface PluginDependency {
 
 /**
  * Plugin function type
- * @since v0.24.0
+ * @since v0.27.0
  */
 export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
   ctx: Readonly<PluginContext<G>>
@@ -41,7 +41,7 @@ export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
 
 /**
  * Plugin extension for CommandContext
- * @since v0.24.0
+ * @since v0.27.0
  */
 export type PluginExtension<
   T = Record<string, unknown>,
@@ -50,7 +50,7 @@ export type PluginExtension<
 
 /**
  * Plugin extension callback type
- * @since v0.24.0
+ * @since v0.27.0
  */
 export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (
   ctx: Readonly<CommandContext<G>>,
@@ -59,7 +59,7 @@ export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (
 
 /**
  * Plugin definition options
- * @since v0.24.0
+ * @since v0.27.0
  */
 export interface PluginOptions<
   T extends Record<string, unknown> = Record<never, never>,
@@ -95,7 +95,7 @@ export interface PluginOptions<
  * Gunshi plugin, which is a function that receives a PluginContext.
  * @param ctx - A {@link PluginContext}.
  * @returns An {@link Awaitable} that resolves when the plugin is loaded.
- * @since v0.24.0
+ * @since v0.27.0
  */
 export type Plugin<E extends GunshiParams['extensions'] = DefaultGunshiParams['extensions']> =
   PluginFunction & {
@@ -134,7 +134,7 @@ export interface PluginWithoutExtension<
  * Define a plugin with extension capabilities
  * @param options - {@link PluginOptions | plugin options}
  * @return A defined plugin with extension capabilities.
- * @since v0.24.0
+ * @since v0.27.0
  */
 export function plugin<
   I extends string,
@@ -156,7 +156,7 @@ export function plugin<
  * Define a plugin without extension capabilities
  * @param options - {@link PluginOptions | plugin options} without extension
  * @returns A defined plugin without extension capabilities.
- * @since v0.24.0
+ * @since v0.27.0
  */
 export function plugin(options: {
   id: string
@@ -169,7 +169,7 @@ export function plugin(options: {
  * Define a plugin
  * @param options - {@link PluginOptions | plugin options}
  * @returns A defined plugin.
- * @since v0.24.0
+ * @since v0.27.0
  */
 export function plugin<
   I extends string,

@@ -86,7 +86,7 @@ await cli(process.argv.slice(2), greetCommand, {
 - Default: `{}`
 - Description:
   - Built-in resource translations for different locales. Used for translating gunshi built-in level messages like "USAGE", "OPTIONS", "COMMANDS", etc.
-  - for details, see [Resource Key Naming Conventions](#resource-key-naming-conventions)
+  - for details, see [Resource Key Naming Conventions](#-resource-key-naming-conventions)
 
 ### `translationAdapterFactory`
 

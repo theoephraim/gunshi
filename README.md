@@ -1,5 +1,5 @@
 <p align="center">
-	<img width="196" src="./assets/logo.png">
+	<img alt="logo" width="196" src="./assets/logo.png">
 </p>
 <h1 align="center">🏯 Gunshi</h1>
 
@@ -124,7 +124,7 @@ The development of Gunshi is supported by my OSS sponsors!
 
 <p align="center">
   <a href="https://cdn.jsdelivr.net/gh/kazupon/sponsors/sponsors.svg">
-    <img src='https://cdn.jsdelivr.net/gh/kazupon/sponsors/sponsors.svg'/>
+    <img alt="sponsor" src='https://cdn.jsdelivr.net/gh/kazupon/sponsors/sponsors.svg'/>
   </a>
 </p>
 
