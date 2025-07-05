@@ -3,12 +3,12 @@ packages:
   - playground/**
 catalog:
   typescript: ^5.8.3
-  zod: ^3.25.51
-  deno: ^2.3.3
-  jsr: ^0.13.4
+  zod: ^3.25.74
+  deno: ^2.4.0
+  jsr: ^0.13.5
   jsr-exports-lint: ^0.4.1
   publint: ^0.3.12
-  tsdown: ^0.12.3
-  '@types/node': ^22.15.29
-  typedoc: ^0.28.4
-  typedoc-plugin-markdown: ^4.6.3
+  tsdown: ^0.12.9
+  '@types/node': ^22.16.0
+  typedoc: ^0.28.7
+  typedoc-plugin-markdown: ^4.7.0
