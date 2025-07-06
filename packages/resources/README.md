@@ -3,7 +3,6 @@
 > built-in localization resources for gunshi
 
 This package provides multilingual resources for gunshi.
-っｋｗ
 
 ## 💿 Installation
 
