@@ -40,6 +40,7 @@ for PKG in packages/* ; do
     if [[ $PKG == packages/docs ]]; then
       continue
     fi
+    pushd $PKG
     pnpx tsx ../../scripts/jsr.ts --package $PKG --tag $TAG
     pnpm install --no-frozen-lockfile
     echo "⚡ Publishing $PKG for jsr registry"
