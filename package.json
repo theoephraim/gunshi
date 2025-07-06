@@ -2,7 +2,7 @@
   "name": "gunshi-monorepo",
   "description": "Monorepo for gunshi - Modern javascript command-line library",
   "private": true,
-  "version": "0.27.0-alpha.3",
+  "version": "0.27.0-alpha.2",
   "author": {
     "name": "kazuya kawaguchi",
     "email": "kawakazu80@gmail.com"
@@ -52,7 +52,7 @@
     "lint:prettier": "prettier . --check --experimental-cli",
     "prepare": "git config --local core.hooksPath .githooks && pnpm run gen:importmap",
     "preview:docs": "pnpm -F @gunshi/docs preview",
-    "release": "bumpp --commit \"release: v\" --all --push --tag",
+    "release": "bumpp package.json packages/**/package.json packages/**/jsr.json --commit \"release: v\" --all --push --tag",
     "test": "vitest --typecheck run",
     "typecheck": "pnpm run --stream --color \"/^typecheck:/\"",
     "typecheck:deno": "pnpm -r --if-present typecheck:deno",
