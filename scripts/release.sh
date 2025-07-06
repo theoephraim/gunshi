@@ -13,7 +13,9 @@ if [[ ! -z ${NPM_TOKEN} ]] ; then
   npm whoami
 fi
 
-# Release packages
+TAG="alpha"
+
+# Release packages for npm registry
 for PKG in packages/* ; do
   if [[ -d $PKG ]]; then
     if [[ $PKG == packages/docs ]]; then
@@ -26,9 +28,18 @@ for PKG in packages/* ; do
       cp ../../CHANGELOG.md ./CHANGELOG.md
       cp ../../LICENSE ./LICENSE
     fi
-    TAG="alpha"
     echo "⚡ Publishing $PKG with tag $TAG"
     pnpm publish --access public --no-git-checks --tag $TAG
+    popd > /dev/null
+  fi
+done
+
+# Release packages for jsr registry
+for PKG in packages/* ; do
+  if [[ -d $PKG ]]; then
+    if [[ $PKG == packages/docs ]]; then
+      continue
+    fi
     pnpx tsx ../../scripts/jsr.ts --package $PKG --tag $TAG
     pnpm install --no-frozen-lockfile
     echo "⚡ Publishing $PKG for jsr registry"
