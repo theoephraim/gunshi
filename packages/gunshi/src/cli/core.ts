@@ -131,16 +131,20 @@ function resolveArguments<G extends GunshiParamsConstraint>(
 
 function createInitialSubCommands<G extends GunshiParamsConstraint>(
   options: CliOptions<G>,
-  entry: Command<G> | CommandRunner<G> | LazyCommand<G>
+  entryCmd: Command<G> | CommandRunner<G> | LazyCommand<G>
 ): Map<string, Command<G> | LazyCommand<G>> {
   const subCommands = new Map(options.subCommands)
 
   // add entry command to sub commands if there are sub commands
   if (options.subCommands || subCommands.size > 0) {
-    if (isLazyCommand(entry)) {
-      if (entry.commandName) subCommands.set(entry.commandName, entry as LazyCommand<G>)
-    } else if (typeof entry === 'object' && entry.name) {
-      subCommands.set(entry.name, entry as Command<G>)
+    if (isLazyCommand(entryCmd)) {
+      if (entryCmd.commandName) {
+        entryCmd.entry = true
+        subCommands.set(entryCmd.commandName, entryCmd as LazyCommand<G>)
+      }
+    } else if (typeof entryCmd === 'object' && entryCmd.name) {
+      entryCmd.entry = true
+      subCommands.set(entryCmd.name, entryCmd as Command<G>)
     }
   }
 
@@ -209,7 +213,7 @@ async function resolveCommand<G extends GunshiParamsConstraint>(
       } else {
         // inline command (command runner)
         return {
-          command: { run: entry as CommandRunner<G> } as Command<G>,
+          command: { run: entry as CommandRunner<G>, entry: true } as Command<G>,
           callMode: 'entry'
         }
       }
