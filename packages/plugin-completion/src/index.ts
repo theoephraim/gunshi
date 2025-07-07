@@ -16,7 +16,7 @@ import type {
   PluginContext,
   PluginWithoutExtension
 } from '@gunshi/plugin'
-import type { CompletionCommandContext, CompletionConfig } from './types.ts'
+import type { CompletionCommandContext, CompletionOptions } from './types.ts'
 
 export * from './types.ts'
 
@@ -28,8 +28,9 @@ const NOOP_HANDLER: Handler = () => {
  * completion plugin for gunshi
  */
 export default function completion(
-  options: CompletionConfig = {}
+  options: CompletionOptions = {}
 ): PluginWithoutExtension<CompletionCommandContext> {
+  const config = options.config || {}
   const completion = new Completion()
 
   return plugin({
@@ -110,7 +111,7 @@ export default function completion(
         )
       }
 
-      handleSubCommands(completion, ctx.subCommands, options.subCommands)
+      handleSubCommands(completion, ctx.subCommands, config.subCommands)
     },
 
     extension: async (_ctx, _cmd) => {}
@@ -160,6 +161,8 @@ function quoteExec(): string {
     }
   }
 }
+
+type CompletionConfig = NonNullable<CompletionOptions['config']>
 
 async function handleSubCommands(
   completion: Completion,

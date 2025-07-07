@@ -26,15 +26,17 @@ export type PluginId = typeof pluginId
 export interface CompletionCommandContext {}
 
 /**
- * Configuration for the completion plugin.
+ * Completion plugin options.
  */
-export interface CompletionConfig {
-  /**
-   * The entry point handler.
-   */
-  entry?: Handler
-  /**
-   * The handlers for subcommands.
-   */
-  subCommands?: Record<string, Handler>
+export interface CompletionOptions {
+  config?: {
+    /**
+     * The entry point handler.
+     */
+    entry?: Handler
+    /**
+     * The handlers for subcommands.
+     */
+    subCommands?: Record<string, Handler>
+  }
 }
