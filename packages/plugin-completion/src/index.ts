@@ -20,6 +20,8 @@ import type { CompletionCommandContext, CompletionOptions } from './types.ts'
 
 export * from './types.ts'
 
+const TERMINATOR = '--'
+
 const NOOP_HANDLER: Handler = () => {
   return []
 }
@@ -47,32 +49,40 @@ export default function completion(
         name: completeName,
         // TODO(kazupon): support description localization
         description: 'Generate shell completion script',
-        args: {
-          shell: {
-            type: 'positional',
-            // TODO(kazupon): support description localization
-            description:
-              'Shell type to generate completion script (zsh, bash, fish, powershell, fig)'
-          }
-        },
+        // args: {
+        //   shell: {
+        //     type: 'string',
+        //     // @ts-ignore -- TOOD: `args-tokens` will be updated to support `shell` type
+        //     required: false,
+        //     // TODO(kazupon): support description localization
+        //     description:
+        //       'shell type to generate completion script (zsh, bash, fish, fig, powershell)',
+        //   }
+        // },
         run: async cmdCtx => {
           if (!cmdCtx.env.name) {
             throw new Error('cli name is not defined.')
           }
 
-          let shell: string | undefined = cmdCtx._[0]
-          if (shell === '--') {
+          let shell: string | undefined = cmdCtx._[1]
+          if (shell === TERMINATOR) {
             shell = undefined
           }
 
           if (shell === undefined) {
-            const extra = cmdCtx._.slice(cmdCtx._.indexOf('--') + 1)
+            const extra = cmdCtx._.slice(cmdCtx._.indexOf(TERMINATOR) + 1)
             completion.parse(extra)
           } else {
             script(shell as Parameters<typeof script>[0], cmdCtx.env.name, quoteExec())
           }
         }
       })
+
+      /**
+       * disable header renderer
+       */
+
+      ctx.decorateHeaderRenderer(async (_baseRenderer, _cmdCtx) => '')
 
       /**
        * setup bombshell completion
@@ -86,7 +96,7 @@ export default function completion(
       }
 
       // setup root level completion
-      const isPositional = hasPositional(await resolveLazyCommand(entry))
+      const isPositional = hasPositional(await resolveLazyCommand(entry as Command))
       const root = ''
       // TODO(kazupon): more tweaking for root completion
       completion.addCommand(
@@ -119,6 +129,7 @@ export default function completion(
 }
 
 function detectRuntime(): 'bun' | 'deno' | 'node' | 'unknown' {
+  // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
   if (globalThis.process !== undefined && globalThis.process.release?.name === 'node') {
     return 'node'
   }
@@ -141,13 +152,16 @@ function quoteExec(): string {
   const runtime = detectRuntime()
   switch (runtime) {
     case 'node': {
-      const execPath = process.execPath
-      const processArgs = process.argv.slice(1)
+      // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
+      const execPath = globalThis.process.execPath
+      // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
+      const processArgs = globalThis.process.argv.slice(1)
       const quotedExecPath = quoteIfNeeded(execPath)
       // eslint-disable-next-line unicorn/no-array-callback-reference
       const quotedProcessArgs = processArgs.map(quoteIfNeeded)
+      // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
       // eslint-disable-next-line unicorn/no-array-callback-reference
-      const quotedProcessExecArgs = process.execArgv.map(quoteIfNeeded)
+      const quotedProcessExecArgs = globalThis.process.execArgv.map(quoteIfNeeded)
       return `${quotedExecPath} ${quotedProcessExecArgs.join(' ')} ${quotedProcessArgs[0]}`
     }
     case 'deno': {
@@ -170,8 +184,8 @@ async function handleSubCommands(
   configs: CompletionConfig['subCommands'] = {}
 ) {
   for (const [name, cmd] of subCommands) {
-    if (cmd.internal || cmd.entry) {
-      continue // skip entry or internal command
+    if (cmd.internal || cmd.entry || name === 'complete') {
+      continue // skip entry / internal command / completion command itself
     }
     const resolvedCmd = await resolveLazyCommand(cmd)
     if (!resolvedCmd.description) {
