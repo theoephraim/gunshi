@@ -142,9 +142,10 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
         entryCmd.entry = true
         subCommands.set(entryCmd.commandName, entryCmd as LazyCommand<G>)
       }
-    } else if (typeof entryCmd === 'object' && entryCmd.name) {
+      // } else if (typeof entryCmd === 'object' && entryCmd.name) {
+    } else if (typeof entryCmd === 'object') {
       entryCmd.entry = true
-      subCommands.set(entryCmd.name, entryCmd as Command<G>)
+      subCommands.set(entryCmd.name || '', entryCmd as Command<G>)
     }
   }
 

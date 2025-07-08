@@ -1,230 +1,95 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`shell option 1`] = `
-"#compdef vite
-compdef _vite vite
-
-# zsh completion for vite -*- shell-script -*-
-
-__vite_debug() {
-    local file="$BASH_COMP_DEBUG_FILE"
-    if [[ -n \${file} ]]; then
-        echo "$*" >> "\${file}"
-    fi
-}
-
-_vite() {
-    local shellCompDirectiveError=1
-    local shellCompDirectiveNoSpace=2
-    local shellCompDirectiveNoFileComp=4
-    local shellCompDirectiveFilterFileExt=8
-    local shellCompDirectiveFilterDirs=16
-    local shellCompDirectiveKeepOrder=32
-
-    local lastParam lastChar flagPrefix requestComp out directive comp lastComp noSpace keepOrder
-    local -a completions
-
-    __vite_debug "\\n========= starting completion logic =========="
-    __vite_debug "CURRENT: \${CURRENT}, words[*]: \${words[*]}"
-
-    # The user could have moved the cursor backwards on the command-line.
-    # We need to trigger completion from the $CURRENT location, so we need
-    # to truncate the command-line ($words) up to the $CURRENT location.
-    # (We cannot use $CURSOR as its value does not work when a command is an alias.)
-    words=( "\${=words[1,CURRENT]}" )
-    __vite_debug "Truncated words[*]: \${words[*]},"
-
-    lastParam=\${words[-1]}
-    lastChar=\${lastParam[-1]}
-    __vite_debug "lastParam: \${lastParam}, lastChar: \${lastChar}"
-
-    # For zsh, when completing a flag with an = (e.g., vite -n=<TAB>)
-    # completions must be prefixed with the flag
-    setopt local_options BASH_REMATCH
-    if [[ "\${lastParam}" =~ '-.*=' ]]; then
-        # We are dealing with a flag with an =
-        flagPrefix="-P \${BASH_REMATCH}"
-    fi
-
-    # Prepare the command to obtain completions, ensuring arguments are quoted for eval
-    local -a args_to_quote=("\${(@)words[2,-1]}")
-    if [ "\${lastChar}" = "" ]; then
-        # If the last parameter is complete (there is a space following it)
-        # We add an extra empty parameter so we can indicate this to the go completion code.
-        __vite_debug "Adding extra empty parameter"
-        args_to_quote+=("")
-    fi
-
-    # Use Zsh's (q) flag to quote each argument safely for eval
-    local quoted_args=("\${(@q)args_to_quote}")
-
-    # Join the main command and the quoted arguments into a single string for eval
-    requestComp="/Users/kazuya.kawaguchi/.nvm/versions/node/v24.1.0/bin/node --require /Users/kazuya.kawaguchi/Library/Caches/pnpm/dlx/63065c1d2ea4575c940b7fbae672cb49cb081ceb23893d56e604d77d95c0d918/197e8eb9974-3a3f/node_modules/.pnpm/tsx@4.20.3/node_modules/tsx/dist/preflight.cjs --import file:///Users/kazuya.kawaguchi/Library/Caches/pnpm/dlx/63065c1d2ea4575c940b7fbae672cb49cb081ceb23893d56e604d77d95c0d918/197e8eb9974-3a3f/node_modules/.pnpm/tsx@4.20.3/node_modules/tsx/dist/loader.mjs /Users/kazuya.kawaguchi/Projects/my/gunshi/packages/plugin-completion/examples/demo.node.ts complete -- \${quoted_args[*]}"
-
-    __vite_debug "About to call: eval \${requestComp}"
-
-    # Use eval to handle any environment variables and such
-    out=$(eval \${requestComp} 2>/dev/null)
-    __vite_debug "completion output: \${out}"
-
-    # Extract the directive integer following a : from the last line
-    local lastLine
-    while IFS='
-' read -r line; do
-        lastLine=\${line}
-    done < <(printf "%s
-" "\${out[@]}")
-    __vite_debug "last line: \${lastLine}"
-
-    if [ "\${lastLine[1]}" = : ]; then
-        directive=\${lastLine[2,-1]}
-        # Remove the directive including the : and the newline
-        local suffix
-        (( suffix=\${#lastLine}+2))
-        out=\${out[1,-$suffix]}
-    else
-        # There is no directive specified.  Leave $out as is.
-        __vite_debug "No directive found.  Setting to default"
-        directive=0
-    fi
-
-    __vite_debug "directive: \${directive}"
-    __vite_debug "completions: \${out}"
-    __vite_debug "flagPrefix: \${flagPrefix}"
-
-    if [ $((directive & shellCompDirectiveError)) -ne 0 ]; then
-        __vite_debug "Completion received error. Ignoring completions."
-        return
-    fi
-
-    local activeHelpMarker="%"
-    local endIndex=\${#activeHelpMarker}
-    local startIndex=$((\${#activeHelpMarker}+1))
-    local hasActiveHelp=0
-    while IFS='
-' read -r comp; do
-        # Check if this is an activeHelp statement (i.e., prefixed with $activeHelpMarker)
-        if [ "\${comp[1,$endIndex]}" = "$activeHelpMarker" ];then
-            __vite_debug "ActiveHelp found: $comp"
-            comp="\${comp[$startIndex,-1]}"
-            if [ -n "$comp" ]; then
-                compadd -x "\${comp}"
-                __vite_debug "ActiveHelp will need delimiter"
-                hasActiveHelp=1
-            fi
-            continue
-        fi
-
-        if [ -n "$comp" ]; then
-            # If requested, completions are returned with a description.
-            # The description is preceded by a TAB character.
-            # For zsh's _describe, we need to use a : instead of a TAB.
-            # We first need to escape any : as part of the completion itself.
-            comp=\${comp//:/\\:}
-
-            local tab="$(printf '\\t')"
-            comp=\${comp//$tab/:}
-
-            __vite_debug "Adding completion: \${comp}"
-            completions+=\${comp}
-            lastComp=$comp
-        fi
-    done < <(printf "%s
-" "\${out[@]}")
-
-    # Add a delimiter after the activeHelp statements, but only if:
-    # - there are completions following the activeHelp statements, or
-    # - file completion will be performed (so there will be choices after the activeHelp)
-    if [ $hasActiveHelp -eq 1 ]; then
-        if [ \${#completions} -ne 0 ] || [ $((directive & shellCompDirectiveNoFileComp)) -eq 0 ]; then
-            __vite_debug "Adding activeHelp delimiter"
-            compadd -x "--"
-            hasActiveHelp=0
-        fi
-    fi
-
-    if [ $((directive & shellCompDirectiveNoSpace)) -ne 0 ]; then
-        __vite_debug "Activating nospace."
-        noSpace="-S ''"
-    fi
-
-    if [ $((directive & shellCompDirectiveKeepOrder)) -ne 0 ]; then
-        __vite_debug "Activating keep order."
-        keepOrder="-V"
-    fi
-
-    if [ $((directive & shellCompDirectiveFilterFileExt)) -ne 0 ]; then
-        # File extension filtering
-        local filteringCmd
-        filteringCmd='_files'
-        for filter in \${completions[@]}; do
-            if [ \${filter[1]} != '*' ]; then
-                # zsh requires a glob pattern to do file filtering
-                filter="\\*.$filter"
-            fi
-            filteringCmd+=" -g $filter"
-        done
-        filteringCmd+=" \${flagPrefix}"
-
-        __vite_debug "File filtering command: $filteringCmd"
-        _arguments '*:filename:'"$filteringCmd"
-    elif [ $((directive & shellCompDirectiveFilterDirs)) -ne 0 ]; then
-        # File completion for directories only
-        local subdir
-        subdir="\${completions[1]}"
-        if [ -n "$subdir" ]; then
-            __vite_debug "Listing directories in $subdir"
-            pushd "\${subdir}" >/dev/null 2>&1
-        else
-            __vite_debug "Listing directories in ."
-        fi
-
-        local result
-        _arguments '*:dirname:_files -/'" \${flagPrefix}"
-        result=$?
-        if [ -n "$subdir" ]; then
-            popd >/dev/null 2>&1
-        fi
-        return $result
-    else
-        __vite_debug "Calling _describe"
-        if eval _describe $keepOrder "completions" completions -Q \${flagPrefix} \${noSpace}; then
-            __vite_debug "_describe found some completions"
-
-            # Return the success of having called _describe
-            return 0
-        else
-            __vite_debug "_describe did not find completions."
-            __vite_debug "Checking if we should do file completion."
-            if [ $((directive & shellCompDirectiveNoFileComp)) -ne 0 ]; then
-                __vite_debug "deactivating file completion"
-
-                # We must return an error code here to let zsh know that there were no
-                # completions found by _describe; this is what will trigger other
-                # matching algorithms to attempt to find completions.
-                # For example zsh can match letters in the middle of words.
-                return 1
-            else
-                # Perform file completion
-                __vite_debug "Activating file completion"
-
-                # We must return the result of this command, so it must be the
-                # last command, or else we must store its result to return it.
-                _arguments '*:filename:_files'" \${flagPrefix}"
-            fi
-        fi
-    fi
-}
-
-# don't run the completion function when being sourced or eval-ed
-if [ "\${funcstack[1]}" = "_vite" ]; then
-    _vite
-fi
-
+exports[`subcommand only 1`] = `
+"dev	Start dev server
+:4
 "
 `;
 
-exports[`termination only 1`] = `
+exports[`subcommand with long option 1`] = `
+"--port	Specify port
+:4
+"
+`;
+
+exports[`subcommand with long option and value 1`] = `
+"completion command context [Object: null prototype] {
+  name: 'complete',
+  description: 'Generate shell completion script',
+  omitted: false,
+  callMode: 'subCommand',
+  env: [Object: null prototype] {
+    name: 'vite',
+    description: 'Vite CLI',
+    version: '0.0.0',
+    cwd: undefined,
+    usageSilent: false,
+    subCommands: Map(5) {
+      'dev' => [Object],
+      'build' => [Object],
+      'lint' => [Object],
+      '' => [Object],
+      'complete' => [Object]
+    },
+    leftMargin: 2,
+    middleMargin: 10,
+    usageOptionType: false,
+    usageOptionValue: true,
+    renderHeader: [Function: renderer],
+    renderUsage: [Function: renderer],
+    renderValidationErrors: [Function: renderer],
+    plugins: [ [AsyncFunction] ]
+  },
+  args: [Object: null prototype] {
+    help: [Object: null prototype] {
+      type: 'boolean',
+      short: 'h',
+      description: 'Display this help message'
+    },
+    version: [Object: null prototype] {
+      type: 'boolean',
+      short: 'v',
+      description: 'Display this version'
+    }
+  },
+  values: [Object: null prototype] {},
+  positionals: [ 'complete' ],
+  rest: [ 'dev', '--port=3' ],
+  _: [ 'complete', '--', 'dev', '--port=3' ],
+  tokens: [
+    { kind: 'positional', index: 0, value: 'complete' },
+    { kind: 'option-terminator', index: 1 },
+    { kind: 'positional', index: 2, value: 'dev' },
+    { kind: 'positional', index: 3, value: '--port=3' }
+  ],
+  toKebab: undefined,
+  log: [Function: log],
+  validationError: undefined,
+  extensions: [Object: null prototype] {
+    'g:global': {
+      showVersion: [Function: showVersion],
+      showHeader: [AsyncFunction: showHeader],
+      showUsage: [AsyncFunction: showUsage],
+      showValidationErrors: [AsyncFunction: showValidationErrors]
+    },
+    'g:renderer': {
+      text: [AsyncFunction: text],
+      loadCommands: [AsyncFunction: loadCommands]
+    },
+    'g:completion': undefined
+  }
+}
+:4
+"
+`;
+
+exports[`subcommand with short option 1`] = `
+"-H	Specify hostname
+:4
+"
+`;
+
+exports[`termination 1`] = `
 "dev	Start dev server
 build	Build project
 lint	Lint project

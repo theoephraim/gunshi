@@ -13,16 +13,34 @@ function runCommand(command: string): Promise<string> {
   })
 }
 
-test('shell option', async () => {
-  const output = await runCommand(
-    `pnpx tsx packages/plugin-completion/examples/demo.node.ts complete zsh`
-  )
+const SCRIPT = `pnpx tsx packages/plugin-completion/examples/demo.node.ts complete`
+
+test('termination', async () => {
+  const output = await runCommand(`${SCRIPT} --`)
   expect(output).toMatchSnapshot()
 })
 
-test('termination only', async () => {
-  const output = await runCommand(
-    `pnpx tsx packages/plugin-completion/examples/demo.node.ts complete --`
-  )
+test.todo('default command option', async () => {
+  const output = await runCommand(`${SCRIPT} --config --`)
+  expect(output).toMatchSnapshot()
+})
+
+test('subcommand only', async () => {
+  const output = await runCommand(`${SCRIPT} -- dev`)
+  expect(output).toMatchSnapshot()
+})
+
+test('subcommand with long option', async () => {
+  const output = await runCommand(`${SCRIPT} -- dev --port`)
+  expect(output).toMatchSnapshot()
+})
+
+test('subcommand with short option', async () => {
+  const output = await runCommand(`${SCRIPT} -- dev -H`)
+  expect(output).toMatchSnapshot()
+})
+
+test.todo('subcommand with long option and value', async () => {
+  const output = await runCommand(`${SCRIPT} -- dev --port=3`)
   expect(output).toMatchSnapshot()
 })
