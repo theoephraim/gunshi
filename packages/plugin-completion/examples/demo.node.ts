@@ -33,7 +33,7 @@ const dev = define({
       short: 'H'
     },
     port: {
-      type: 'string',
+      type: 'number',
       description: 'Specify port',
       short: 'p'
     }

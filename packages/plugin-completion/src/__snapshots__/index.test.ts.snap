@@ -1,98 +1,58 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`default command inputing 1`] = `
+"--config	Use specified config file
+--mode	Set env mode
+--logLevel	info | warn | error | silent
+:4
+"
+`;
+
+exports[`default command long option 1`] = `
+"--config	Use specified config file
+:4
+"
+`;
+
+exports[`global option 1`] = `
+":4
+"
+`;
+
+exports[`no input 1`] = `
+"dev	Start dev server
+build	Build project
+lint	Lint project
+:4
+"
+`;
+
+exports[`subcommand long option 1`] = `
+"--port	Specify port
+:4
+"
+`;
+
 exports[`subcommand only 1`] = `
 "dev	Start dev server
 :4
 "
 `;
 
-exports[`subcommand with long option 1`] = `
-"--port	Specify port
+exports[`subcommand option inputing 1`] = `
+"--host	Specify hostname
+--port	Specify port
 :4
 "
 `;
 
-exports[`subcommand with long option and value 1`] = `
-"completion command context [Object: null prototype] {
-  name: 'complete',
-  description: 'Generate shell completion script',
-  omitted: false,
-  callMode: 'subCommand',
-  env: [Object: null prototype] {
-    name: 'vite',
-    description: 'Vite CLI',
-    version: '0.0.0',
-    cwd: undefined,
-    usageSilent: false,
-    subCommands: Map(5) {
-      'dev' => [Object],
-      'build' => [Object],
-      'lint' => [Object],
-      '' => [Object],
-      'complete' => [Object]
-    },
-    leftMargin: 2,
-    middleMargin: 10,
-    usageOptionType: false,
-    usageOptionValue: true,
-    renderHeader: [Function: renderer],
-    renderUsage: [Function: renderer],
-    renderValidationErrors: [Function: renderer],
-    plugins: [ [AsyncFunction] ]
-  },
-  args: [Object: null prototype] {
-    help: [Object: null prototype] {
-      type: 'boolean',
-      short: 'h',
-      description: 'Display this help message'
-    },
-    version: [Object: null prototype] {
-      type: 'boolean',
-      short: 'v',
-      description: 'Display this version'
-    }
-  },
-  values: [Object: null prototype] {},
-  positionals: [ 'complete' ],
-  rest: [ 'dev', '--port=3' ],
-  _: [ 'complete', '--', 'dev', '--port=3' ],
-  tokens: [
-    { kind: 'positional', index: 0, value: 'complete' },
-    { kind: 'option-terminator', index: 1 },
-    { kind: 'positional', index: 2, value: 'dev' },
-    { kind: 'positional', index: 3, value: '--port=3' }
-  ],
-  toKebab: undefined,
-  log: [Function: log],
-  validationError: undefined,
-  extensions: [Object: null prototype] {
-    'g:global': {
-      showVersion: [Function: showVersion],
-      showHeader: [AsyncFunction: showHeader],
-      showUsage: [AsyncFunction: showUsage],
-      showValidationErrors: [AsyncFunction: showValidationErrors]
-    },
-    'g:renderer': {
-      text: [AsyncFunction: text],
-      loadCommands: [AsyncFunction: loadCommands]
-    },
-    'g:completion': undefined
-  }
-}
-:4
-"
-`;
-
-exports[`subcommand with short option 1`] = `
+exports[`subcommand short option 1`] = `
 "-H	Specify hostname
 :4
 "
 `;
 
-exports[`termination 1`] = `
-"dev	Start dev server
-build	Build project
-lint	Lint project
-:4
+exports[`subcommand unknown option 1`] = `
+":4
 "
 `;

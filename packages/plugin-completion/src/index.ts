@@ -81,7 +81,7 @@ export default function completion(
       /**
        * disable header renderer
        */
-
+      // TODO(kazupon): we might be change this to a more flexible way
       ctx.decorateHeaderRenderer(async (_baseRenderer, _cmdCtx) => '')
 
       /**

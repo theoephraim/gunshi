@@ -13,34 +13,49 @@ function runCommand(command: string): Promise<string> {
   })
 }
 
-const SCRIPT = `pnpx tsx packages/plugin-completion/examples/demo.node.ts complete`
+const SCRIPT = `pnpx tsx packages/plugin-completion/examples/demo.node.ts complete --`
 
-test('termination', async () => {
+test('no input', async () => {
+  const output = await runCommand(`${SCRIPT}`)
+  expect(output).toMatchSnapshot()
+})
+
+test('default command inputing', async () => {
   const output = await runCommand(`${SCRIPT} --`)
   expect(output).toMatchSnapshot()
 })
 
-test.todo('default command option', async () => {
-  const output = await runCommand(`${SCRIPT} --config --`)
+test('default command long option', async () => {
+  const output = await runCommand(`${SCRIPT} --config`)
   expect(output).toMatchSnapshot()
 })
 
 test('subcommand only', async () => {
-  const output = await runCommand(`${SCRIPT} -- dev`)
+  const output = await runCommand(`${SCRIPT} dev`)
   expect(output).toMatchSnapshot()
 })
 
-test('subcommand with long option', async () => {
-  const output = await runCommand(`${SCRIPT} -- dev --port`)
+test('subcommand option inputing', async () => {
+  const output = await runCommand(`${SCRIPT} dev --`)
   expect(output).toMatchSnapshot()
 })
 
-test('subcommand with short option', async () => {
-  const output = await runCommand(`${SCRIPT} -- dev -H`)
+test('subcommand long option', async () => {
+  const output = await runCommand(`${SCRIPT} dev --port`)
   expect(output).toMatchSnapshot()
 })
 
-test.todo('subcommand with long option and value', async () => {
-  const output = await runCommand(`${SCRIPT} -- dev --port=3`)
+test('subcommand short option', async () => {
+  const output = await runCommand(`${SCRIPT} dev -H`)
+  expect(output).toMatchSnapshot()
+})
+
+test('subcommand unknown option', async () => {
+  const output = await runCommand(`${SCRIPT} dev --unknown`)
+  expect(output).toMatchSnapshot()
+})
+
+test.todo('subcommand long option and value', async () => {
+  const output = await runCommand(`${SCRIPT} dev --port=3`)
   expect(output).toMatchSnapshot()
 })
