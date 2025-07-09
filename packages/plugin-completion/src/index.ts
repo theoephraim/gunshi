@@ -16,7 +16,7 @@ import type {
   PluginContext,
   PluginWithoutExtension
 } from '@gunshi/plugin'
-import type { CompletionCommandContext, CompletionOptions } from './types.ts'
+import type { CompletionCommandContext, CompletionConfig, CompletionOptions } from './types.ts'
 
 export * from './types.ts'
 
@@ -101,7 +101,7 @@ export default function completion(
       // TODO(kazupon): more tweaking for root completion
       completion.addCommand(
         root,
-        entry.description || '',
+        entry.description ?? '',
         isPositional ? [false] : [],
         NOOP_HANDLER
       )
@@ -115,8 +115,8 @@ export default function completion(
         completion.addOption(
           root,
           `--${name}`,
-          schema.description || '',
-          NOOP_HANDLER,
+          schema.description ?? '',
+          config.entry?.args?.[name]?.handler ?? NOOP_HANDLER,
           schema.short
         )
       }
@@ -176,12 +176,10 @@ function quoteExec(): string {
   }
 }
 
-type CompletionConfig = NonNullable<CompletionOptions['config']>
-
 async function handleSubCommands(
   completion: Completion,
   subCommands: PluginContext['subCommands'],
-  configs: CompletionConfig['subCommands'] = {}
+  configs: Record<string, CompletionConfig> = {}
 ) {
   for (const [name, cmd] of subCommands) {
     if (cmd.internal || cmd.entry || name === 'complete') {
@@ -195,12 +193,11 @@ async function handleSubCommands(
     }
     const isPositional = hasPositional(resolvedCmd)
     // TODO(kazupon): more tweaking for subcommand completion
-    const handler = configs[name] || NOOP_HANDLER
     const commandName = completion.addCommand(
       name,
-      resolvedCmd.description,
+      resolvedCmd.description ?? '',
       isPositional ? [false] : [],
-      handler
+      configs?.[name]?.handler ?? NOOP_HANDLER
     )
 
     const args = cmd.args || (Object.create(null) as Args)
@@ -212,8 +209,8 @@ async function handleSubCommands(
       completion.addOption(
         commandName,
         `--${name}`,
-        schema.description || '',
-        NOOP_HANDLER,
+        schema.description ?? '',
+        configs[commandName]?.args?.[name]?.handler ?? NOOP_HANDLER,
         schema.short
       )
     }

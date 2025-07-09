@@ -26,17 +26,25 @@ export type PluginId = typeof pluginId
 export interface CompletionCommandContext {}
 
 /**
+ * Completion configuration, which structure is similar `bombsh/tab`'s `CompletionConfig`.
+ */
+export interface CompletionConfig {
+  handler?: Handler
+  args?: Record<string, { handler: Handler }>
+}
+
+/**
  * Completion plugin options.
  */
 export interface CompletionOptions {
   config?: {
     /**
-     * The entry point handler.
+     * The entry point completion configuration.
      */
-    entry?: Handler
+    entry?: CompletionConfig
     /**
      * The handlers for subcommands.
      */
-    subCommands?: Record<string, Handler>
+    subCommands?: Record<string, CompletionConfig>
   }
 }
