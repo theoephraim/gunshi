@@ -136,17 +136,12 @@ function createInitialSubCommands<G extends GunshiParamsConstraint>(
   const subCommands = new Map(options.subCommands)
 
   // add entry command to sub commands if there are sub commands
-  if (options.subCommands || subCommands.size > 0) {
-    if (isLazyCommand(entryCmd)) {
-      if (entryCmd.commandName) {
-        entryCmd.entry = true
-        subCommands.set(entryCmd.commandName, entryCmd as LazyCommand<G>)
-      }
-      // } else if (typeof entryCmd === 'object' && entryCmd.name) {
-    } else if (typeof entryCmd === 'object') {
-      entryCmd.entry = true
-      subCommands.set(entryCmd.name || '', entryCmd as Command<G>)
-    }
+  if (
+    (options.subCommands || subCommands.size > 0) &&
+    (isLazyCommand(entryCmd) || typeof entryCmd === 'object')
+  ) {
+    entryCmd.entry = true
+    subCommands.set(resolveEntryName(entryCmd as LazyCommand<G> | Command<G>), entryCmd)
   }
 
   return subCommands
@@ -256,8 +251,12 @@ async function resolveCommand<G extends GunshiParamsConstraint>(
   }
 }
 
-function resolveEntryName<G extends GunshiParamsConstraint>(entry: Command<G>): string {
-  return entry.name || ANONYMOUS_COMMAND_NAME
+function resolveEntryName<G extends GunshiParamsConstraint>(
+  entry: Command<G> | LazyCommand<G>
+): string {
+  return isLazyCommand<G>(entry)
+    ? entry.commandName || ANONYMOUS_COMMAND_NAME
+    : entry.name || ANONYMOUS_COMMAND_NAME
 }
 
 function getPluginExtensions(plugins: Plugin[]): Record<string, CommandContextExtension> {
