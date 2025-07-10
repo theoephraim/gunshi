@@ -71,7 +71,7 @@ export type CommandArgKeys<A extends Args> = GenerateNamespacedKey<
 >
 
 /**
- * Translation fucntion interface
+ * Translation function interface
  */
 export interface Translation<
   T extends string = CommandBuiltinKeys,

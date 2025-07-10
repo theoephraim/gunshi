@@ -16,7 +16,7 @@ exports[`default command > suggest duplicate options for short option 1`] = `
 "
 `;
 
-exports[`default command > suggest for inputing 1`] = `
+exports[`default command > suggest for inputting 1`] = `
 "--config	Use specified config file
 --mode	Set env mode
 --logLevel	info | warn | error | silent
@@ -100,7 +100,7 @@ exports[`subcommand > suggest for long option 1`] = `
 "
 `;
 
-exports[`subcommand > suggest for option inputing 1`] = `
+exports[`subcommand > suggest for option inputting 1`] = `
 "--host	Specify hostname
 --port	Specify port
 :4

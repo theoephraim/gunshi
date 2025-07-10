@@ -21,7 +21,7 @@ test('no input', async () => {
 })
 
 describe('default command', () => {
-  test('suggest for inputing', async () => {
+  test('suggest for inputting', async () => {
     const output = await runCommand(`${SCRIPT} --`)
     expect(output).toMatchSnapshot()
   })
@@ -58,7 +58,7 @@ describe('subcommand', () => {
     expect(output).toMatchSnapshot()
   })
 
-  test('suggest for option inputing', async () => {
+  test('suggest for option inputting', async () => {
     const output = await runCommand(`${SCRIPT} dev --`)
     expect(output).toMatchSnapshot()
   })
