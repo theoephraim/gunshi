@@ -26,26 +26,11 @@ export type PluginId = typeof pluginId
 export interface CompletionCommandContext {}
 
 /**
- * Parameters for {@link CompletionHandler | the completion handler}.
- */
-export interface CompletionParams {
-  previousArgs: Parameters<Handler>[0]
-  toComplete: Parameters<Handler>[1]
-  endWithSpace: Parameters<Handler>[2]
-  locale?: Intl.Locale
-}
-
-/**
- * The handler for completion.
- */
-export type CompletionHandler = (params: CompletionParams) => ReturnType<Handler>
-
-/**
  * Completion configuration, which structure is similar `bombsh/tab`'s `CompletionConfig`.
  */
 export interface CompletionConfig {
-  handler?: CompletionHandler
-  args?: Record<string, { handler: CompletionHandler }>
+  handler?: Handler
+  args?: Record<string, { handler: Handler }>
 }
 
 /**
