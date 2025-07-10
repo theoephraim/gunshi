@@ -61,6 +61,9 @@
     "@bombsh/tab": "git+ssh://git@github.com:bombshell-dev/tab.git",
     "@gunshi/plugin": "workspace:*"
   },
+  "peerDependencies": {
+    "@gunshi/plugin-i18n": "workspace:*"
+  },
   "devDependencies": {
     "@gunshi/shared": "workspace:*",
     "deno": "catalog:",

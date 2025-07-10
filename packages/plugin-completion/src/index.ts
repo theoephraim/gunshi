@@ -4,18 +4,24 @@
  */
 
 import { Completion, script } from '@bombsh/tab'
-import { plugin } from '@gunshi/plugin'
-import { resolveLazyCommand } from '@gunshi/shared'
+import {
+  COMMAND_OPTIONS_DEFAULT,
+  createCommandContext as _createCommandContext,
+  plugin
+} from '@gunshi/plugin'
+import { localizable, namespacedId, resolveArgKey, resolveLazyCommand } from '@gunshi/shared'
 import { pluginId } from './types.ts'
 
 import type { Handler } from '@bombsh/tab'
 import type {
   Args,
   Command,
+  CommandContext,
   LazyCommand,
   PluginContext,
-  PluginWithoutExtension
+  PluginWithExtension
 } from '@gunshi/plugin'
+import type { I18nCommandContext } from '@gunshi/plugin-i18n'
 import type { CompletionCommandContext, CompletionConfig, CompletionOptions } from './types.ts'
 
 export * from './types.ts'
@@ -26,18 +32,22 @@ const NOOP_HANDLER: Handler = () => {
   return []
 }
 
+const i18nPluginId = namespacedId('i18n')
+
 /**
  * completion plugin for gunshi
  */
 export default function completion(
   options: CompletionOptions = {}
-): PluginWithoutExtension<CompletionCommandContext> {
+): PluginWithExtension<CompletionCommandContext> {
   const config = options.config || {}
   const completion = new Completion()
 
   return plugin({
     id: pluginId,
     name: 'completion',
+
+    dependencies: [{ id: i18nPluginId, optional: true }],
 
     async setup(ctx) {
       /**
@@ -49,19 +59,9 @@ export default function completion(
         name: completeName,
         // TODO(kazupon): support description localization
         description: 'Generate shell completion script',
-        // args: {
-        //   shell: {
-        //     type: 'string',
-        //     // @ts-ignore -- TOOD: `args-tokens` will be updated to support `shell` type
-        //     required: false,
-        //     // TODO(kazupon): support description localization
-        //     description:
-        //       'shell type to generate completion script (zsh, bash, fish, fig, powershell)',
-        //   }
-        // },
         run: async cmdCtx => {
           if (!cmdCtx.env.name) {
-            throw new Error('cli name is not defined.')
+            throw new Error('your cli name is not defined.')
           }
 
           let shell: string | undefined = cmdCtx._[1]
@@ -71,7 +71,7 @@ export default function completion(
 
           if (shell === undefined) {
             const extra = cmdCtx._.slice(cmdCtx._.indexOf(TERMINATOR) + 1)
-            completion.parse(extra)
+            await completion.parse(extra)
           } else {
             script(shell as Parameters<typeof script>[0], cmdCtx.env.name, quoteExec())
           }
@@ -83,48 +83,78 @@ export default function completion(
        */
       // TODO(kazupon): we might be change this to a more flexible way
       ctx.decorateHeaderRenderer(async (_baseRenderer, _cmdCtx) => '')
+    },
 
-      /**
-       * setup bombshell completion
-       */
+    // TODO(kazupon): type inference with plugin function type parameter
+    extension: (_ctx, _cmd): CompletionCommandContext => {
+      return {} as CompletionCommandContext
+    },
 
-      const entry = [...ctx.subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry)
+    /**
+     * setup bombshell completion with `onExtension` hook
+     */
+
+    onExtension: async (ctx, cmd) => {
+      // TODO(kazupon): type inference with plugin function type parameter, more improvements!
+      const extensions = ctx.extensions as unknown as { [i18nPluginId]: I18nCommandContext }
+      const i18n = extensions[i18nPluginId]
+      const subCommands = ctx.env.subCommands as ReadonlyMap<string, Command | LazyCommand>
+
+      const entry = [...subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry)
       if (!entry) {
-        throw new Error(
-          'No entry command found. Please ensure that an entry command is defined in the plugin context.'
-        )
+        throw new Error('entry command not found.')
       }
+
+      const entryCtx = await createCommandContext(entry)
+      const localizeDescription = localizable(
+        entryCtx as unknown as CommandContext,
+        cmd,
+        i18n ? i18n.translate : undefined
+      )
 
       // setup root level completion
       const isPositional = hasPositional(await resolveLazyCommand(entry as Command))
       const root = ''
-      // TODO(kazupon): more tweaking for root completion
       completion.addCommand(
         root,
-        entry.description ?? '',
+        (await localizeDescription('description')) || entry.description || '',
         isPositional ? [false] : [],
         NOOP_HANDLER
       )
 
       const args = entry.args || (Object.create(null) as Args)
-      for (const [name, schema] of Object.entries(args)) {
+      for (const [key, schema] of Object.entries(args)) {
         if (schema.type === 'positional') {
           continue // skip positional arguments on subcommands
         }
         // TODO(kazupon): more tweaking for root option completion
         completion.addOption(
           root,
-          `--${name}`,
-          schema.description ?? '',
-          config.entry?.args?.[name]?.handler ?? NOOP_HANDLER,
+          `--${key}`,
+          (await localizeDescription(resolveArgKey(key))) || schema.description || '',
+          config.entry?.args?.[key]?.handler || NOOP_HANDLER,
           schema.short
         )
       }
 
-      handleSubCommands(completion, ctx.subCommands, config.subCommands)
-    },
+      await handleSubCommands(completion, subCommands, config.subCommands, i18n)
+    }
+  })
+}
 
-    extension: async (_ctx, _cmd) => {}
+async function createCommandContext(cmd: Command | LazyCommand): Promise<CommandContext> {
+  return await _createCommandContext({
+    args: cmd.args || (Object.create(null) as Args),
+    values: Object.create(null),
+    positionals: [],
+    rest: [],
+    argv: [],
+    tokens: [],
+    omitted: false,
+    callMode: cmd.entry ? 'entry' : 'subCommand',
+    command: cmd,
+    extensions: Object.create(null),
+    cliOptions: COMMAND_OPTIONS_DEFAULT
   })
 }
 
@@ -171,7 +201,7 @@ function quoteExec(): string {
       throw new Error('deno not implemented yet, welcome contributions :)')
     }
     default: {
-      throw new Error('Unsupported runtime for completion script generation.')
+      throw new Error('Unsupported your javascript runtime for completion script generation.')
     }
   }
 }
@@ -179,38 +209,38 @@ function quoteExec(): string {
 async function handleSubCommands(
   completion: Completion,
   subCommands: PluginContext['subCommands'],
-  configs: Record<string, CompletionConfig> = {}
+  configs: Record<string, CompletionConfig> = {},
+  i18n?: I18nCommandContext | undefined
 ) {
   for (const [name, cmd] of subCommands) {
     if (cmd.internal || cmd.entry || name === 'complete') {
       continue // skip entry / internal command / completion command itself
     }
+
     const resolvedCmd = await resolveLazyCommand(cmd)
-    if (!resolvedCmd.description) {
-      throw new Error(
-        `Command "${name}" does not have a description. Please ensure that all commands have a description defined.`
-      )
-    }
+    const ctx = await createCommandContext(resolvedCmd)
+    const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
+
     const isPositional = hasPositional(resolvedCmd)
     // TODO(kazupon): more tweaking for subcommand completion
     const commandName = completion.addCommand(
       name,
-      resolvedCmd.description ?? '',
+      (await localizeDescription('description')) || resolvedCmd.description || '',
       isPositional ? [false] : [],
-      configs?.[name]?.handler ?? NOOP_HANDLER
+      configs?.[name]?.handler || NOOP_HANDLER
     )
 
-    const args = cmd.args || (Object.create(null) as Args)
-    for (const [name, schema] of Object.entries(args)) {
+    const args = resolvedCmd.args || (Object.create(null) as Args)
+    for (const [key, schema] of Object.entries(args)) {
       if (schema.type === 'positional') {
         continue // skip positional arguments on subcommands
       }
       // TODO(kazupon): more tweaking for subcommand option completion
       completion.addOption(
         commandName,
-        `--${name}`,
-        schema.description ?? '',
-        configs[commandName]?.args?.[name]?.handler ?? NOOP_HANDLER,
+        `--${key}`,
+        (await localizeDescription(resolveArgKey(key))) || schema.description || '',
+        configs[commandName]?.args?.[key]?.handler || NOOP_HANDLER,
         schema.short
       )
     }

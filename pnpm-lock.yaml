@@ -282,6 +282,9 @@ importers:
       '@gunshi/plugin':
         specifier: workspace:*
         version: link:../plugin
+      '@gunshi/plugin-i18n':
+        specifier: workspace:*
+        version: link:../plugin-i18n
     devDependencies:
       '@gunshi/shared':
         specifier: workspace:*
@@ -289,9 +292,6 @@ importers:
       deno:
         specifier: 'catalog:'
         version: 2.4.0
-      gunshi:
-        specifier: workspace:*
-        version: link:../gunshi
       jsr:
         specifier: 'catalog:'
         version: 0.13.5
