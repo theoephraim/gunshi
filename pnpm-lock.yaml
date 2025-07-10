@@ -286,6 +286,9 @@ importers:
       '@gunshi/shared':
         specifier: workspace:*
         version: link:../shared
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.16.0
       deno:
         specifier: 'catalog:'
         version: 2.4.0
@@ -1918,9 +1921,6 @@ packages:
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
-
-  '@types/node@22.15.29':
-    resolution: {integrity: sha512-LNdjOkUDlU1RZb8e1kOIUpN1qQUlzGkEtbVNo53vbrwDg5om6oduhm4SiUaPW5ASTXhAiP0jInWG8Qx9fVlOeQ==}
 
   '@types/node@22.16.0':
     resolution: {integrity: sha512-B2egV9wALML1JCpv3VQoQ+yesQKAmNMBIAY7OteVrikcOcAkWm+dGL6qpeCktPjAv6N1JLnhbNiqS35UpFyBsQ==}
@@ -6138,10 +6138,6 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node@22.15.29':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@22.16.0':
     dependencies:
       undici-types: 6.21.0
@@ -6753,7 +6749,7 @@ snapshots:
 
   bun-types@1.2.18(@types/react@19.1.8):
     dependencies:
-      '@types/node': 22.15.29
+      '@types/node': 22.16.0
       '@types/react': 19.1.8
 
   byte-size@9.0.1: {}
