@@ -19,13 +19,18 @@ import type {
   PluginWithExtension
 } from '@gunshi/plugin'
 import type { I18nCommandContext } from '@gunshi/plugin-i18n'
-import type { CompletionCommandContext, CompletionConfig, CompletionOptions } from './types.ts'
+import type {
+  CompletionCommandContext,
+  CompletionConfig,
+  CompletionHandler,
+  CompletionOptions
+} from './types.ts'
 
 export * from './types.ts'
 
 const TERMINATOR = '--'
 
-const NOOP_HANDLER: Handler = () => {
+const NOOP_HANDLER = () => {
   return []
 }
 
@@ -124,12 +129,14 @@ export default function completion(
         if (schema.type === 'positional') {
           continue // skip positional arguments on subcommands
         }
-        // TODO(kazupon): more tweaking for root option completion
         completion.addOption(
           root,
           `--${key}`,
           (await localizeDescription(resolveArgKey(key))) || schema.description || '',
-          config.entry?.args?.[key]?.handler || NOOP_HANDLER,
+          toBombshellCompletionHandler(
+            config.entry?.args?.[key]?.handler || NOOP_HANDLER,
+            i18n ? toLocale(i18n.locale) : undefined
+          ),
           schema.short
         )
       }
@@ -155,12 +162,14 @@ async function handleSubCommands(
     const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
 
     const isPositional = hasPositional(resolvedCmd)
-    // TODO(kazupon): more tweaking for subcommand completion
     const commandName = completion.addCommand(
       name,
       (await localizeDescription('description')) || resolvedCmd.description || '',
       isPositional ? [false] : [],
-      configs?.[name]?.handler || NOOP_HANDLER
+      toBombshellCompletionHandler(
+        configs?.[name]?.handler || NOOP_HANDLER,
+        i18n ? toLocale(i18n.locale) : undefined
+      )
     )
 
     const args = resolvedCmd.args || (Object.create(null) as Args)
@@ -168,12 +177,14 @@ async function handleSubCommands(
       if (schema.type === 'positional') {
         continue // skip positional arguments on subcommands
       }
-      // TODO(kazupon): more tweaking for subcommand option completion
       completion.addOption(
         commandName,
         `--${key}`,
         (await localizeDescription(resolveArgKey(key))) || schema.description || '',
-        configs[commandName]?.args?.[key]?.handler || NOOP_HANDLER,
+        toBombshellCompletionHandler(
+          configs[commandName]?.args?.[key]?.handler || NOOP_HANDLER,
+          i18n ? toLocale(i18n.locale) : undefined
+        ),
         schema.short
       )
     }
@@ -182,4 +193,13 @@ async function handleSubCommands(
 
 function hasPositional(cmd: Command | LazyCommand) {
   return cmd.args && Object.values(cmd.args).some(arg => arg.type === 'positional')
+}
+
+function toLocale(locale: string | Intl.Locale): Intl.Locale {
+  return locale instanceof Intl.Locale ? locale : new Intl.Locale(locale)
+}
+
+function toBombshellCompletionHandler(handler: CompletionHandler, locale?: Intl.Locale): Handler {
+  return (previousArgs, toComplete, endWithSpace) =>
+    handler({ previousArgs, toComplete, endWithSpace, locale })
 }
