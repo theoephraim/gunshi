@@ -5,20 +5,12 @@
 
 import { Completion, script } from '@bombsh/tab'
 import { plugin } from '@gunshi/plugin'
-import { localizable, namespacedId, resolveArgKey, resolveLazyCommand } from '@gunshi/shared'
+import { resolveLazyCommand } from '@gunshi/shared'
 import { pluginId } from './types.ts'
-import { createCommandContext, quoteExec } from './utils.ts'
+import { quoteExec } from './utils.ts'
 
 import type { Handler } from '@bombsh/tab'
-import type {
-  Args,
-  Command,
-  CommandContext,
-  LazyCommand,
-  PluginContext,
-  PluginWithExtension
-} from '@gunshi/plugin'
-import type { I18nCommandContext } from '@gunshi/plugin-i18n'
+import type { Args, Command, LazyCommand, PluginContext, PluginWithExtension } from '@gunshi/plugin'
 import type { CompletionCommandContext, CompletionConfig, CompletionOptions } from './types.ts'
 
 export * from './types.ts'
@@ -29,7 +21,8 @@ const NOOP_HANDLER: Handler = () => {
   return []
 }
 
-const i18nPluginId = namespacedId('i18n')
+// NOTE(kazupon): we should use plugin-i18n for completion localization, but it is not ready yet.
+// const i18nPluginId = namespacedId('i18n')
 
 /**
  * completion plugin for gunshi
@@ -44,7 +37,8 @@ export default function completion(
     id: pluginId,
     name: 'completion',
 
-    dependencies: [{ id: i18nPluginId, optional: true }],
+    // NOTE(kazupon): disable dependencies for now, because plugin-i18n is not still ready yet for completion
+    // dependencies: [{ id: i18nPluginId, optional: true }],
 
     async setup(ctx) {
       /**
@@ -91,10 +85,12 @@ export default function completion(
      * setup bombshell completion with `onExtension` hook
      */
 
-    onExtension: async (ctx, cmd) => {
+    onExtension: async (ctx, _cmd) => {
       // TODO(kazupon): type inference with plugin function type parameter, more improvements!
-      const extensions = ctx.extensions as unknown as { [i18nPluginId]: I18nCommandContext }
-      const i18n = extensions[i18nPluginId]
+
+      // NOTE(kazupon): we should use plugin-i18n for completion localization, but it is not ready yet.
+      // const extensions = ctx.extensions as unknown as { [i18nPluginId]: I18nCommandContext }
+      // const i18n = extensions[i18nPluginId]
       const subCommands = ctx.env.subCommands as ReadonlyMap<string, Command | LazyCommand>
 
       const entry = [...subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry)
@@ -102,19 +98,22 @@ export default function completion(
         throw new Error('entry command not found.')
       }
 
-      const entryCtx = await createCommandContext(entry)
-      const localizeDescription = localizable(
-        entryCtx as unknown as CommandContext,
-        cmd,
-        i18n ? i18n.translate : undefined
-      )
+      // NOTE(kazupon): we should use localizeDescription here, but it is not ready yet.
+      // const entryCtx = await createCommandContext(entry)
+      // const localizeDescription = localizable(
+      //   entryCtx as unknown as CommandContext,
+      //   cmd,
+      //   i18n ? i18n.translate : undefined
+      // )
 
       // setup root level completion
       const isPositional = hasPositional(await resolveLazyCommand(entry as Command))
       const root = ''
       completion.addCommand(
         root,
-        (await localizeDescription('description')) || entry.description || '',
+        entry.description || '',
+        // NOTE(kazupon): we should use localizeDescription here, but it is not ready yet.
+        // (await localizeDescription('description')) || entry.description || '',
         isPositional ? [false] : [],
         NOOP_HANDLER
       )
@@ -128,13 +127,15 @@ export default function completion(
         completion.addOption(
           root,
           `--${key}`,
-          (await localizeDescription(resolveArgKey(key))) || schema.description || '',
+          schema.description || '',
+          // NOTE(kazupon): we should use localizeDescription here, but it is not ready yet.
+          // (await localizeDescription(resolveArgKey(key))) || schema.description || '',
           config.entry?.args?.[key]?.handler || NOOP_HANDLER,
           schema.short
         )
       }
 
-      await handleSubCommands(completion, subCommands, config.subCommands, i18n)
+      await handleSubCommands(completion, subCommands, config.subCommands /* , i18n*/)
     }
   })
 }
@@ -142,8 +143,9 @@ export default function completion(
 async function handleSubCommands(
   completion: Completion,
   subCommands: PluginContext['subCommands'],
-  configs: Record<string, CompletionConfig> = {},
-  i18n?: I18nCommandContext | undefined
+  configs: Record<string, CompletionConfig> = {}
+  // NOTE(kazupon): we should use i18n for subcommand localization, but it is not ready yet.
+  // i18n?: I18nCommandContext | undefined
 ) {
   for (const [name, cmd] of subCommands) {
     if (cmd.internal || cmd.entry || name === 'complete') {
@@ -151,14 +153,17 @@ async function handleSubCommands(
     }
 
     const resolvedCmd = await resolveLazyCommand(cmd)
-    const ctx = await createCommandContext(resolvedCmd)
-    const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
+    // NOTE(kazupon): we should use localizeDescription here, but it is not ready yet.
+    // const ctx = await createCommandContext(resolvedCmd)
+    // const localizeDescription = localizable(ctx, resolvedCmd, i18n ? i18n.translate : undefined)
 
     const isPositional = hasPositional(resolvedCmd)
     // TODO(kazupon): more tweaking for subcommand completion
     const commandName = completion.addCommand(
       name,
-      (await localizeDescription('description')) || resolvedCmd.description || '',
+      resolvedCmd.description || '',
+      // NOTE(kazupon): we should use localizeDescription here, but it is not ready yet.
+      // (await localizeDescription('description')) || resolvedCmd.description || '',
       isPositional ? [false] : [],
       configs?.[name]?.handler || NOOP_HANDLER
     )
@@ -172,7 +177,9 @@ async function handleSubCommands(
       completion.addOption(
         commandName,
         `--${key}`,
-        (await localizeDescription(resolveArgKey(key))) || schema.description || '',
+        schema.description || '',
+        // NOTE(kazupon): we should use localizeDescription here, but it is not ready yet.
+        // (await localizeDescription(resolveArgKey(key))) || schema.description || '',
         configs[commandName]?.args?.[key]?.handler || NOOP_HANDLER,
         schema.short
       )

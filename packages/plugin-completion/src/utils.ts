@@ -3,25 +3,26 @@
  * @license MIT
  */
 
-import { CLI_OPTIONS_DEFAULT, createCommandContext as _createCommandContext } from '@gunshi/plugin'
-
-import type { Args, Command, CommandContext, LazyCommand } from '@gunshi/plugin'
-
-export async function createCommandContext(cmd: Command | LazyCommand): Promise<CommandContext> {
-  return await _createCommandContext({
-    args: cmd.args || (Object.create(null) as Args),
-    values: Object.create(null),
-    positionals: [],
-    rest: [],
-    argv: [],
-    tokens: [],
-    omitted: false,
-    callMode: cmd.entry ? 'entry' : 'subCommand',
-    command: cmd,
-    extensions: Object.create(null),
-    cliOptions: CLI_OPTIONS_DEFAULT
-  })
-}
+// NOTE(kazupon): comment out, because it is not used yet.
+// import { CLI_OPTIONS_DEFAULT, createCommandContext as _createCommandContext } from '@gunshi/plugin'
+//
+// import type { Args, Command, CommandContext, LazyCommand } from '@gunshi/plugin'
+//
+// async function createCommandContext(cmd: Command | LazyCommand): Promise<CommandContext> {
+//   return await _createCommandContext({
+//     args: cmd.args || (Object.create(null) as Args),
+//     values: Object.create(null),
+//     positionals: [],
+//     rest: [],
+//     argv: [],
+//     tokens: [],
+//     omitted: false,
+//     callMode: cmd.entry ? 'entry' : 'subCommand',
+//     command: cmd,
+//     extensions: Object.create(null),
+//     cliOptions: CLI_OPTIONS_DEFAULT
+//   })
+// }
 
 function detectRuntime(): 'bun' | 'deno' | 'node' | 'unknown' {
   // @ts-ignore -- NOTE: ignore, because `process` will detect ts compile error on `deno check`
