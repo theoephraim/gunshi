@@ -5,7 +5,7 @@
 
 import { Completion, script } from '@bombsh/tab'
 import {
-  COMMAND_OPTIONS_DEFAULT,
+  CLI_OPTIONS_DEFAULT,
   createCommandContext as _createCommandContext,
   plugin
 } from '@gunshi/plugin'
@@ -154,7 +154,7 @@ async function createCommandContext(cmd: Command | LazyCommand): Promise<Command
     callMode: cmd.entry ? 'entry' : 'subCommand',
     command: cmd,
     extensions: Object.create(null),
-    cliOptions: COMMAND_OPTIONS_DEFAULT
+    cliOptions: CLI_OPTIONS_DEFAULT
   })
 }
 

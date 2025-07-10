@@ -4,7 +4,7 @@
  */
 
 import { parseArgs, resolveArgs } from 'args-tokens'
-import { ANONYMOUS_COMMAND_NAME, COMMAND_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
+import { ANONYMOUS_COMMAND_NAME, CLI_OPTIONS_DEFAULT, NOOP } from '../constants.ts'
 import { createCommandContext } from '../context.ts'
 import { createDecorators } from '../decorators.ts'
 import { createPluginContext } from '../plugin/context.ts'
@@ -155,7 +155,7 @@ function normalizeCliOptions<G extends GunshiParamsConstraint>(
   // get the latest sub commands from plugin context (already includes entry command)
   const subCommands = new Map(pluginContext.subCommands)
 
-  const resolvedOptions = Object.assign(create<CliOptions<G>>(), COMMAND_OPTIONS_DEFAULT, options, {
+  const resolvedOptions = Object.assign(create<CliOptions<G>>(), CLI_OPTIONS_DEFAULT, options, {
     subCommands
   }) as CliOptions<G>
 
