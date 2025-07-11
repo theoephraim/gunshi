@@ -64,7 +64,7 @@ export function quoteExec(): string {
       throw new Error('deno not implemented yet, welcome contributions :)')
     }
     case 'bun': {
-      throw new Error('deno not implemented yet, welcome contributions :)')
+      throw new Error('bun not implemented yet, welcome contributions :)')
     }
     default: {
       throw new Error('Unsupported your javascript runtime for completion script generation.')
