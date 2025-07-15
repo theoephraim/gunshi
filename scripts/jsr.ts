@@ -47,10 +47,15 @@ function updatePkgJson(pkg: string, json: Record<string, any>): Record<string, a
       break
     }
     case 'packages/plugin-i18n':
-    case 'packages/plugin-completion':
     case 'packages/plugin-global': {
       json.dependencies['@gunshi/plugin'] = version
       json.dependencies['@gunshi/shared'] = version
+      break
+    }
+    case 'packages/plugin-completion': {
+      json.dependencies['@gunshi/plugin'] = version
+      json.dependencies['@gunshi/shared'] = version
+      json.dependencies['@bombsh/tab'] = 'https://pkg.pr.new/bombshell-dev/tab@main'
       break
     }
     case 'packages/plugin-renderer': {
