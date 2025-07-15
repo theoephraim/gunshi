@@ -277,8 +277,8 @@ importers:
   packages/plugin-completion:
     dependencies:
       '@bombsh/tab':
-        specifier: git+ssh://git@github.com:bombshell-dev/tab.git
-        version: tab@https://codeload.github.com/bombshell-dev/tab/tar.gz/6c42c55f46157ae97e2c059039e21ee412b48138
+        specifier: https://pkg.pr.new/bombshell-dev/tab@main
+        version: tab@https://pkg.pr.new/bombshell-dev/tab@main
       '@gunshi/plugin':
         specifier: workspace:*
         version: link:../plugin
@@ -4503,8 +4503,8 @@ packages:
     resolution: {integrity: sha512-2pR2ubZSV64f/vqm9eLPz/KOvR9Dm+Co/5ChLgeHl0yEDRc6h5hXHoxEQH8Y5Ljycozd3p1k5TTSVdzYGkPvLw==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  tab@https://codeload.github.com/bombshell-dev/tab/tar.gz/6c42c55f46157ae97e2c059039e21ee412b48138:
-    resolution: {tarball: https://codeload.github.com/bombshell-dev/tab/tar.gz/6c42c55f46157ae97e2c059039e21ee412b48138}
+  tab@https://pkg.pr.new/bombshell-dev/tab@main:
+    resolution: {tarball: https://pkg.pr.new/bombshell-dev/tab@main}
     version: 0.0.0
 
   tabbable@6.2.0:
@@ -9265,7 +9265,7 @@ snapshots:
     dependencies:
       '@pkgr/core': 0.2.4
 
-  tab@https://codeload.github.com/bombshell-dev/tab/tar.gz/6c42c55f46157ae97e2c059039e21ee412b48138:
+  tab@https://pkg.pr.new/bombshell-dev/tab@main:
     dependencies:
       mri: 1.2.0
 

@@ -58,7 +58,7 @@
     "typecheck:deno": "deno check --import-map=../../importmap.json ./src"
   },
   "dependencies": {
-    "@bombsh/tab": "git+ssh://git@github.com:bombshell-dev/tab.git",
+    "@bombsh/tab": "https://pkg.pr.new/bombshell-dev/tab@main",
     "@gunshi/plugin": "workspace:*"
   },
   "devDependencies": {
