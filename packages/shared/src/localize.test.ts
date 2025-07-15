@@ -34,6 +34,7 @@ async function setup() {
     args: command1.args!,
     values: {},
     positionals: [],
+    explicit: {},
     rest: [],
     argv: [],
     tokens: [],
