@@ -139,6 +139,5 @@ The development of Gunshi is supported by my OSS sponsors!
 [jsr-src]: https://jsr.io/badges/@gunshi/gunshi
 [jsr-href]: https://jsr.io/@gunshi/gunshi
 [install-size-src]: https://pkg-size.dev/badge/install/72346
-[install-size-href]: https://pkg-size.dev/gunshi
 [ci-src]: https://github.com/kazupon/gunshi/actions/workflows/ci.yml/badge.svg
 [ci-href]: https://github.com/kazupon/gunshi/actions/workflows/ci.yml
