@@ -465,10 +465,10 @@ const resource = {
 }
 // In your command
 const { translate } = ctx.extensions['g:i18n']
-translate('welcome', { name: 'John' }) // "Welcome, John!"
-translate('items.count', { count: 5 }) // "You have 5 items"
-translate('file_deleted', { path: '/tmp/file.txt' }) // "Deleted /tmp/file.txt"
-translate('error_message', { error: 'File not found' }) // "Error: File not found"
+translate(resolveKey('welcome'), { name: 'John' }) // "Welcome, John!"
+translate(resolveKey('items.count'), { count: 5 }) // "You have 5 items"
+translate(resolveKey('file_deleted'), { path: '/tmp/file.txt' }) // "Deleted /tmp/file.txt"
+translate(resolveKey('error_message'), { error: 'File not found' }) // "Error: File not found"
 ```
 
 <!-- eslint-disable markdown/no-missing-label-refs -->
