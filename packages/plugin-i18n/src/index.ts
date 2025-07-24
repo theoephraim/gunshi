@@ -79,7 +79,7 @@ const BUILT_IN_PREFIX_CODE = BUILT_IN_PREFIX.codePointAt(0)
  */
 export default function i18n(
   options: I18nPluginOptions = {}
-): PluginWithExtension<Promise<I18nCommandContext<DefaultGunshiParams>>> {
+): PluginWithExtension<I18nCommandContext<DefaultGunshiParams>> {
   // extract locale configuration from options
   const locale = toLocale(options.locale)
   const localeStr = toLocaleString(locale)
@@ -188,8 +188,7 @@ export default function i18n(
     },
 
     onExtension: async (ctx, cmd) => {
-      // TODO(kazupon): should fix the type of ctx.extensions, should be inferred extended context, exclude Promise type...
-      const i18n = ctx.extensions[id] as unknown as I18nCommandContext
+      const i18n = ctx.extensions[id]
 
       /**
        * load command resources, after the command context is extended

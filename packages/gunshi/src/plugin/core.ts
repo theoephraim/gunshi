@@ -50,7 +50,7 @@ export type PluginFunction<G extends GunshiParams = DefaultGunshiParams> = (
 export type PluginExtension<
   T = Record<string, unknown>,
   G extends GunshiParams = DefaultGunshiParams
-> = (ctx: CommandContextCore<G>, cmd: Command<G>) => T
+> = (ctx: CommandContextCore<G>, cmd: Command<G>) => Awaitable<T>
 
 /**
  * Plugin extension callback type
@@ -59,7 +59,7 @@ export type PluginExtension<
 export type OnPluginExtension<G extends GunshiParams = DefaultGunshiParams> = (
   ctx: Readonly<CommandContext<G>>,
   cmd: Readonly<Command<G>>
-) => void
+) => Awaitable<void>
 
 /**
  * Plugin definition options
@@ -149,12 +149,12 @@ export function plugin<
   dependencies?: (PluginDependency | string)[]
   setup?: (
     ctx: Readonly<
-      PluginContext<GunshiParams<{ args: Args; extensions: { [K in I]: ReturnType<P> } }>>
+      PluginContext<GunshiParams<{ args: Args; extensions: { [K in I]: Awaited<ReturnType<P>> } }>>
     >
   ) => Awaitable<void>
   extension: P
-  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]: ReturnType<P> } }>
-}): PluginWithExtension<ReturnType<P>>
+  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]: Awaited<ReturnType<P>> } }>
+}): PluginWithExtension<Awaited<ReturnType<P>>>
 
 /**
  * Define a plugin without extension capabilities
@@ -184,11 +184,13 @@ export function plugin<
   name?: string
   dependencies?: (PluginDependency | string)[]
   setup?: (
-    ctx: Readonly<PluginContext<GunshiParams<{ args: Args; extensions: { [K in I]?: E } }>>>
+    ctx: Readonly<
+      PluginContext<GunshiParams<{ args: Args; extensions: { [K in I]?: Awaited<E> } }>>
+    >
   ) => Awaitable<void>
   extension?: PluginExtension<E, DefaultGunshiParams>
-  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]?: E } }>
-}): PluginWithExtension<E> | PluginWithoutExtension<DefaultGunshiParams['extensions']> {
+  onExtension?: OnPluginExtension<{ args: Args; extensions: { [K in I]?: Awaited<E> } }>
+}): PluginWithExtension<Awaited<E>> | PluginWithoutExtension<DefaultGunshiParams['extensions']> {
   const { id, name, setup, onExtension, dependencies } = options
   const extension = options.extension || (NOOP_EXTENSION as PluginExtension<E, DefaultGunshiParams>)
 
@@ -236,5 +238,5 @@ export function plugin<
         configurable: true
       }
     })
-  }) as PluginWithExtension<E> | PluginWithoutExtension<DefaultGunshiParams['extensions']>
+  }) as PluginWithExtension<Awaited<E>> | PluginWithoutExtension<DefaultGunshiParams['extensions']>
 }
