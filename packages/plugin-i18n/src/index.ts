@@ -82,7 +82,7 @@ export default function i18n(
 ): PluginWithExtension<Promise<I18nCommandContext<DefaultGunshiParams>>> {
   // extract locale configuration from options
   const locale = toLocale(options.locale)
-  const localeStr = locale.toString()
+  const localeStr = toLocaleString(locale)
 
   const resources =
     options.resources ||
@@ -131,7 +131,7 @@ export default function i18n(
         locale: string | Intl.Locale
       ): Record<BuiltinResourceKeys, string> | undefined {
         const targetLocale = toLocale(locale)
-        const targetLocaleStr = targetLocale.toString()
+        const targetLocaleStr = toLocaleString(targetLocale)
         return localeBuiltinResources.get(targetLocaleStr)
       }
 
@@ -141,11 +141,11 @@ export default function i18n(
         resource: Record<BuiltinResourceKeys, string>
       ): void {
         const targetLocale = toLocale(locale)
-        const targetLocaleStr = targetLocale.toString()
+        const targetLocaleStr = toLocaleString(targetLocale)
         if (localeBuiltinResources.has(targetLocaleStr)) {
           return
         }
-        localeBuiltinResources.set(targetLocale.toString(), mapResourceWithBuiltinKey(resource))
+        localeBuiltinResources.set(targetLocaleStr, mapResourceWithBuiltinKey(resource))
       }
 
       // set default locale resources
