@@ -63,6 +63,7 @@ import type {
   I18nPluginOptions
 } from './types.ts'
 
+export { resolveArgKey, resolveBuiltInKey, resolveKey } from '@gunshi/shared'
 export * from './helpers.ts'
 export * from './translation.ts'
 export * from './types.ts'
