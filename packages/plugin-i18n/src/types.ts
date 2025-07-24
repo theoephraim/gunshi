@@ -42,7 +42,7 @@ export interface I18nCommandContext<G extends GunshiParams<any> = DefaultGunshiP
   /**
    * Command locale
    */
-  locale: string | Intl.Locale
+  locale: Intl.Locale
   /**
    * Translate a message.
    * @param key Translation key

@@ -199,6 +199,7 @@ Available extensions:
 
 - `locale: Intl.Locale`: The current locale
 - `translate<T>(key: T, values?: Record<string, unknown>): string`: Translation function
+- `loadResource(locale: string | Intl.Locale, ctx: CommandContext, command: Command): Promise<boolean>`: Manually load resources for a specific locale and command
 
 ## 📝 Resource Key Naming Conventions
 
@@ -281,6 +282,86 @@ Bad Nested structure (won't work with `ctx.extensions['g:i18n'].translate('messa
   }
 }
 ```
+
+## 🔧 Implementation Details
+
+This section covers important implementation details that can help you better understand and use the i18n plugin.
+
+### Translation Return Values
+
+The `translate` function has different behaviors depending on the key type:
+
+- **Custom keys**: Returns an empty string (`''`) if the key is not found
+- **Built-in keys** (internally prefixed with `_:`): Returns the key itself if not found
+
+This difference is important for error handling and fallback displays:
+
+```ts
+const { translate } = ctx.extensions['g:i18n']
+
+// Custom key not found
+translate('nonexistent_key') // Returns: ''
+
+// Built-in key not found (if not overridden)
+translate('USAGE') // Returns: 'USAGE'
+```
+
+### Exported Constants
+
+The plugin exports several useful constants:
+
+```ts
+import { DEFAULT_LOCALE, pluginId } from '@gunshi/plugin-i18n'
+
+console.log(DEFAULT_LOCALE) // 'en-US'
+console.log(pluginId) // 'g:i18n'
+```
+
+### Resource Loading Behavior
+
+When loading command resources, the plugin automatically:
+
+1. Extracts option descriptions from command args definitions
+2. Creates default resources in English
+3. Merges built-in resources with command-specific resources
+4. Handles errors gracefully (logs to console.error but continues execution)
+
+### Error Handling
+
+- If a resource function throws an error, it's caught and logged to `console.error`, but execution continues
+- The `loadResource` method returns `false` if loading fails
+- Null or undefined values in interpolation are replaced with empty strings
+
+### Extending DefaultTranslation
+
+The default translation adapter is exported and can be extended:
+
+```ts
+import { DefaultTranslation } from '@gunshi/plugin-i18n'
+
+class MyCustomTranslation extends DefaultTranslation {
+  translate(locale: string, key: string, values?: Record<string, unknown>): string | undefined {
+    const result = super.translate(locale, key, values)
+    // Add custom post-processing
+    return result?.toUpperCase()
+  }
+}
+
+// Use in plugin options
+await cli(args, command, {
+  plugins: [
+    i18n({
+      translationAdapterFactory: options => new MyCustomTranslation(options)
+    })
+  ]
+})
+```
+
+### Internal Key Prefixing
+
+- Built-in resource keys are internally prefixed with `_:` (e.g., `_:USAGE`, `_:OPTIONS`)
+- This prefix is handled automatically - you don't need to use it when overriding built-in translations
+- Argument keys use the `arg:` prefix as documented
 
 ## 🔤 Translation Interpolation
 
@@ -515,6 +596,43 @@ With Intlify, you get advanced features like:
 > Intlify uses `{name}` syntax for interpolation (without the `$` prefix), which is different from Gunshi's default adapter that uses `{$name}`.
 
 <!-- eslint-enable markdown/no-missing-label-refs -->
+
+## 🎯 Type-Safe Translation Keys
+
+The i18n plugin provides sophisticated TypeScript type support for translation keys. When using TypeScript, the `translate` function will provide auto-completion and type checking for:
+
+- Built-in keys (`USAGE`, `OPTIONS`, `COMMANDS`, etc.)
+- Argument keys based on your command's args definition (`arg:name`, `arg:verbose`, etc.)
+- Custom keys defined in your resource
+
+```ts
+import { defineI18n } from '@gunshi/plugin-i18n'
+
+const command = defineI18n({
+  name: 'example',
+  args: {
+    file: { type: 'string' },
+    verbose: { type: 'boolean' }
+  },
+  resource: async () => ({
+    description: 'Example command',
+    'arg:file': 'File to process',
+    'arg:verbose': 'Enable verbose output',
+    custom_message: 'This is a custom message'
+  }),
+  run: ctx => {
+    const { translate } = ctx.extensions['g:i18n']
+
+    // TypeScript knows these are valid keys
+    translate('USAGE') // Built-in key
+    translate('arg:file') // Arg key from command definition
+    translate('custom_message') // Custom key from resource
+
+    // TypeScript will error on invalid keys
+    // translate('invalid_key')  // Type error!
+  }
+})
+```
 
 ## 📚 API References
 
