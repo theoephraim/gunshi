@@ -184,6 +184,88 @@ const i18nCommand = withI18nResource(basicCommand, async ctx => {
 })
 ```
 
+### Key Resolution Helpers
+
+The i18n plugin exports key resolution helper functions that handle the internal key structure, so you don't need to manually prefix your keys:
+
+- `resolveKey(key: string, ctx: CommandContext): string` - Resolves a custom key with command namespace if applicable
+- `resolveArgKey(key: string, ctx: CommandContext): string` - Resolves an argument key with `arg:` prefix and namespace
+- `resolveBuiltInKey(key: string): string` - Resolves a built-in key with `_:` prefix
+
+```ts
+import { resolveKey, resolveArgKey, resolveBuiltInKey } from '@gunshi/plugin-i18n'
+
+// These helpers automatically add the correct prefixes
+resolveKey('description', ctx) // Returns namespaced key for description
+resolveArgKey('verbose', ctx) // Returns 'arg:verbose' or 'command:arg:verbose' based on context
+resolveBuiltInKey('USAGE') // Returns '_:USAGE'
+```
+
+#### Why Use Key Resolution Helpers?
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!NOTE]
+> See also the [Resource Key Naming Conventions](#-resource-key-naming-conventions) section for details on how keys should be structured in your resource definitions.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
+The i18n plugin internally uses different key prefixes to organize translations:
+
+- Built-in keys use `_:` prefix (e.g., `_:USAGE`, `_:OPTIONS`)
+- Argument keys use `arg:` prefix (e.g., `arg:file`, `arg:verbose`)
+- Command-specific keys can be namespaced with command name
+
+While the `translate` function accepts keys without prefixes in most cases, using these helpers ensures:
+
+- Consistent key resolution across your application
+- Proper namespacing when using sub-commands
+- Compatibility with future plugin updates
+- Type-safe key generation
+
+#### Example Usage
+
+```ts
+import { defineI18n, resolveKey, resolveArgKey, resolveBuiltInKey } from '@gunshi/plugin-i18n'
+
+const command = defineI18n({
+  name: 'deploy',
+  args: {
+    environment: { type: 'string', short: 'e' },
+    force: { type: 'boolean', short: 'f' }
+  },
+  resource: async ctx => ({
+    description: 'Deploy application',
+    'arg:environment': 'Target environment',
+    'arg:force': 'Force deployment',
+    deploy_start: 'Starting deployment...',
+    deploy_success: 'Deployment completed successfully!'
+  }),
+  run: async ctx => {
+    const { translate } = ctx.extensions['g:i18n']
+
+    // Direct usage (need to prefix with command name)
+    console.log(translate('deploy:deploy_start'))
+
+    // Using helpers for explicit control
+    const envKey = resolveArgKey('environment', ctx)
+    console.log(translate(envKey)) // Same as translate('arg:environment')
+
+    // Useful when building dynamic keys
+    const args = ['environment', 'force']
+    for (const arg of args) {
+      const key = resolveArgKey(arg, ctx)
+      const description = translate(key)
+      console.log(`${arg}: ${description}`)
+    }
+
+    // For built-in messages
+    const usageKey = resolveBuiltInKey('USAGE')
+    console.log(translate(usageKey)) // Translates the "USAGE" header
+  }
+})
+```
+
 ## 🧩 Context Extensions
 
 When using the i18n plugin, your command context is extended via `ctx.extensions['g:i18n']`.
@@ -202,6 +284,13 @@ Available extensions:
 - `loadResource(locale: string | Intl.Locale, ctx: CommandContext, command: Command): Promise<boolean>`: Manually load resources for a specific locale and command
 
 ## 📝 Resource Key Naming Conventions
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!TIP]
+> The plugin provides [Key Resolution Helpers](#key-resolution-helpers) (`resolveKey`, `resolveArgKey`, `resolveBuiltInKey`) to automatically handle these naming conventions programmatically.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 When defining your localization resources (either directly in the `resource` function or in separate files), there are specific naming conventions to follow for the keys:
 
@@ -225,7 +314,7 @@ When defining your localization resources (either directly in the `resource` fun
   - `help` - Description for the help option ("Display this help message")
   - `version` - Description for the version option ("Display this version")
 
-  Internally, these keys are prefixed with `_:` (e.g., `_:USAGE`, `_:OPTIONS`), but you don't need to use this prefix directly. When overriding built-in translations in your resources, use the key names without the prefix (e.g., providing your own translation for `NEGATABLE`, not `_:NEGATABLE`).
+  Internally, these keys are prefixed with `_:` (e.g., `_:USAGE`, `_:OPTIONS`), but you don't need to use this prefix directly. When overriding built-in translations in your resources, use the key names without the prefix (e.g., providing your own translation for `NEGATABLE`, not `_:NEGATABLE`). Additionally, custom keys are automatically namespaced with the command name in sub-command contexts (e.g., `deploy:informal_greeting` for a 'deploy' command).
 
 Here's an example illustrating the convention:
 
@@ -253,6 +342,13 @@ const command = defineI18n({
   }
 })
 ```
+
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!IMPORTANT]
+> When defining resources, argument and option descriptions **must** be prefixed with `arg:` (e.g., `arg:target`, `arg:verbose`). All other keys like `description`, `examples`, and custom keys do not require prefixes.
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
 
 Adhering to these conventions ensures that Gunshi correctly identifies and uses your translations for descriptions, help messages, and within your command's logic via `ctx.extensions['g:i18n'].translate()`.
 
@@ -306,17 +402,6 @@ translate('nonexistent_key') // Returns: ''
 translate('USAGE') // Returns: 'USAGE'
 ```
 
-### Exported Constants
-
-The plugin exports several useful constants:
-
-```ts
-import { DEFAULT_LOCALE, pluginId } from '@gunshi/plugin-i18n'
-
-console.log(DEFAULT_LOCALE) // 'en-US'
-console.log(pluginId) // 'g:i18n'
-```
-
 ### Resource Loading Behavior
 
 When loading command resources, the plugin automatically:
@@ -325,12 +410,6 @@ When loading command resources, the plugin automatically:
 2. Creates default resources in English
 3. Merges built-in resources with command-specific resources
 4. Handles errors gracefully (logs to console.error but continues execution)
-
-### Error Handling
-
-- If a resource function throws an error, it's caught and logged to `console.error`, but execution continues
-- The `loadResource` method returns `false` if loading fails
-- Null or undefined values in interpolation are replaced with empty strings
 
 ### Extending DefaultTranslation
 
@@ -359,9 +438,18 @@ await cli(args, command, {
 
 ### Internal Key Prefixing
 
+<!-- eslint-disable markdown/no-missing-label-refs -->
+
+> [!IMPORTANT]
+> Understanding these prefixes is essential for using the [Key Resolution Helpers](#key-resolution-helpers) effectively and following the [Resource Key Naming Conventions](#-resource-key-naming-conventions).
+
+<!-- eslint-enable markdown/no-missing-label-refs -->
+
 - Built-in resource keys are internally prefixed with `_:` (e.g., `_:USAGE`, `_:OPTIONS`)
 - This prefix is handled automatically - you don't need to use it when overriding built-in translations
 - Argument keys use the `arg:` prefix as documented
+- Custom keys can be namespaced with the command name when in sub-command context (e.g., `deploy:custom_message` for a 'deploy' command)
+- Use the exported helper functions (`resolveKey`, `resolveArgKey`, `resolveBuiltInKey`) to generate properly prefixed keys programmatically
 
 ## 🔤 Translation Interpolation
 
