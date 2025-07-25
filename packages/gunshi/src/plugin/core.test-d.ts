@@ -4,5 +4,5 @@ import { PluginExtension } from './core.ts'
 
 test('PluginExtension', () => {
   type T1 = PluginExtension<{ foo: number }>
-  expectTypeOf<ReturnType<T1>>().toEqualTypeOf<{ foo: number }>()
+  expectTypeOf<Awaited<ReturnType<T1>>>().toEqualTypeOf<{ foo: number }>()
 })

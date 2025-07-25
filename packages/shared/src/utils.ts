@@ -22,12 +22,26 @@ import type {
   RemovedIndex
 } from './types.ts'
 
+/**
+ * Resolve a namespaced key for built-in resources.
+ * Built-in keys are prefixed with "_:".
+ * @param key The built-in key to resolve.
+ * @returns Prefixed built-in key.
+ */
 export function resolveBuiltInKey<
   K extends string = CommandBuiltinArgsKeys | CommandBuiltinResourceKeys
 >(key: K): GenerateNamespacedKey<K> {
   return `${BUILT_IN_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
+/**
+ * Resolve a namespaced key for argument resources.
+ * Argument keys are prefixed with "arg:".
+ * If the command name is provided, it will be prefixed with the command name (e.g. "cmd1:arg:foo").
+ * @param key The argument key to resolve.
+ * @param ctx The command context.
+ * @returns Prefixed argument key.
+ */
 export function resolveArgKey<
   A extends Args = DefaultGunshiParams['args'],
   K extends string = KeyOfArgs<RemovedIndex<A>>
@@ -35,6 +49,13 @@ export function resolveArgKey<
   return `${ctx?.name ? `${ctx.name}${BUILT_IN_KEY_SEPARATOR}` : ''}${ARG_PREFIX}${BUILT_IN_KEY_SEPARATOR}${key}`
 }
 
+/**
+ * Resolve a namespaced key for non-built-in resources.
+ * Non-built-in keys are not prefixed with any special characters. If the command name is provided, it will be prefixed with the command name (e.g. "cmd1:foo").
+ * @param key The non-built-in key to resolve.
+ * @param ctx The command context.
+ * @returns Prefixed non-built-in key.
+ */
 export function resolveKey<
   T extends Record<string, string> = {},
   K = keyof T extends string ? keyof T : string

@@ -87,8 +87,7 @@ export default function completion(options: CompletionOptions = {}): PluginWitho
      */
 
     onExtension: async (ctx, cmd) => {
-      const extensions = ctx.extensions as unknown as { [i18nPluginId]: I18nCommandContext }
-      const i18n = extensions[i18nPluginId]
+      const i18n = ctx.extensions?.[i18nPluginId] as I18nCommandContext | undefined
       const subCommands = ctx.env.subCommands as ReadonlyMap<string, Command | LazyCommand>
 
       const entry = [...subCommands].map(([_, cmd]) => cmd).find(cmd => cmd.entry)
