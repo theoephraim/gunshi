@@ -96,7 +96,9 @@ export function isCommandNotFoundError(error: unknown): error is CommandNotFound
     (error instanceof Error &&
       error.name === 'CommandNotFoundError' &&
       'commandName' in error &&
-      'candidates' in error)
+      typeof error.commandName === 'string' &&
+      'candidates' in error &&
+      Array.isArray(error.candidates))
   )
 }
 
@@ -116,7 +118,11 @@ export function isArgsValidationError(error: unknown): error is ArgsValidationEr
     (error instanceof Error &&
       error.name === 'ArgsValidationError' &&
       'code' in error &&
-      'values' in error)
+      // `code` is optional on the class, so the constructor may leave it `undefined`
+      (typeof error.code === 'string' || error.code === undefined) &&
+      'values' in error &&
+      typeof error.values === 'object' &&
+      error.values !== null)
   )
 }
 

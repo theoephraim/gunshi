@@ -51,6 +51,28 @@ describe('isCommandNotFoundError', () => {
     expect(isCommandNotFoundError({ name: 'CommandNotFoundError' })).toBe(false)
     expect(isCommandNotFoundError(undefined)).toBe(false)
   })
+
+  test('does not match an error whose properties have the wrong shape', () => {
+    // keys exist, but the values would not satisfy the `CommandNotFoundError` type
+    expect(
+      isCommandNotFoundError(
+        Object.assign(new Error('bad'), {
+          name: 'CommandNotFoundError',
+          commandName: 'x',
+          candidates: undefined
+        })
+      )
+    ).toBe(false)
+    expect(
+      isCommandNotFoundError(
+        Object.assign(new Error('bad'), {
+          name: 'CommandNotFoundError',
+          commandName: 1,
+          candidates: []
+        })
+      )
+    ).toBe(false)
+  })
 })
 
 describe('isArgsValidationError', () => {
@@ -76,6 +98,37 @@ describe('isArgsValidationError', () => {
     expect(isArgsValidationError(new Error('boom'))).toBe(false)
     expect(isArgsValidationError({ name: 'ArgsValidationError' })).toBe(false)
     expect(isArgsValidationError(undefined)).toBe(false)
+  })
+
+  test('matches a duplicated-copy error without a `code`', () => {
+    // `code` is optional on `ArgsValidationError`, so `undefined` is a valid shape
+    const error = Object.assign(new Error('bad'), {
+      name: 'ArgsValidationError',
+      code: undefined,
+      values: {}
+    })
+    expect(isArgsValidationError(error)).toBe(true)
+  })
+
+  test('does not match an error whose properties have the wrong shape', () => {
+    expect(
+      isArgsValidationError(
+        Object.assign(new Error('bad'), {
+          name: 'ArgsValidationError',
+          code: 1,
+          values: {}
+        })
+      )
+    ).toBe(false)
+    expect(
+      isArgsValidationError(
+        Object.assign(new Error('bad'), {
+          name: 'ArgsValidationError',
+          code: ArgsValidationErrorKeys.unknownOption,
+          values: undefined
+        })
+      )
+    ).toBe(false)
   })
 })
 
